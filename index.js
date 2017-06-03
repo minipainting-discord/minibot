@@ -4,7 +4,7 @@ const settings = require('./settings.json');
 const sql = require('sqlite');
 
 var scoredb = 0;
-var accountsdb = 1;
+var accountsdb = 0;
 
 Promise
   .all([
