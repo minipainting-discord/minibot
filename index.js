@@ -543,13 +543,13 @@ client.on('message', message => {
       message.reply('Invalid user');
     }
   } else if (message.content.startsWith(prefix + "reset")) {
-    //    let myRole1 = message.guild.roles.find("name", "Admin");
+    let myRole1 = message.guild.roles.find("name", "Admin");
 
-    // if (!message.member.roles.has(myRole1.id)) {
-    //   message.reply(
-    //       `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `);
-    //   return;
-    // }
+    if (!message.member.roles.has(myRole1.id)) {
+      message.reply(
+          `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `);
+      return;
+    }
     message.reply(`Coming back!`);
 
     setTimeout(() => {
