@@ -552,7 +552,7 @@ client.on('message', message => {
 
     setTimeout(() => {
       process.exit();
-    }, 500);
+    }, 1000);
   }
 });
 
