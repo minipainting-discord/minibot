@@ -546,8 +546,6 @@ client.on('message', message => {
     let myRole1 = message.guild.roles.find("name", "Admin");
 
     if (!message.member.roles.has(myRole1.id)) {
-      message.reply(
-          `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `);
       return;
     }
     message.reply(`Coming back!`);
