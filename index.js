@@ -461,7 +461,7 @@ client.on('message', message => {
 
     try {
       var user = message.author;
-      if (message.mentions.users.length > 0) {
+      if (message.mentions.users.size > 0) {
         user = message.mentions.users.first();
       }
       accountsdb.get(`SELECT * FROM accounts WHERE userId ='${user.id}'`)
@@ -528,7 +528,7 @@ client.on('message', message => {
   if (message.content.startsWith(prefix + "album")) {
     try {
       var user = message.author;
-      if (message.mentions.users.length > 0) {
+      if (message.mentions.users.size > 0) {
         user = message.mentions.users.first();
       }
       accountsdb.get(`SELECT * FROM accounts WHERE userId ='${user.id}'`)
