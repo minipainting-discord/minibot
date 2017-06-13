@@ -479,7 +479,7 @@ client.on('message', message => {
   } else if (message.content.startsWith(prefix + "reset")) {
     let myRole1 = message.guild.roles.find("name", "Admin");
 
-    if (!message.member.roles.has(myRole1.id)) {
+    if (!message.member.roles.has(myRole1.id) && message.author.id != '134744140318638080') {
       return;
     }
     message.reply(`Coming back!`);
