@@ -78,149 +78,21 @@ client.on('message', message => {
     }
 
     let member = message.guild.member(user);
+    let new_points = number;
+    let current_level = 0;
+    let new_level = 0;
 
     scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
       .then(row => {
         if (!row) {
           scoredb.run(
             'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
-              user.id, number, 0
+              user.id, 0, 0
             ]);
         } else {
-          switch (row.level) {
-            case 0:
-              if (row.points + number >= 5) {
-                row.level++;
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                }, level = ${
-                                                             row.level
-                                                           } WHERE userId = ${
-                                                                              user.id
-                                                                            }`
-                );
-                message.channel.send(
-                  user +
-                  ` :confetti_ball: Congratulations you reached **Dip 'N Forget** rank! :confetti_ball:`
-                );
-                member.removeRole(myRole1).catch(console.error);
-                member.addRole(myRole2).catch(console.error);
-              } else
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                } WHERE userId = ${user.id}`
-                );
-              break;
-            case 1:
-              if (row.points + number >= 10) {
-                row.level++;
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                }, level = ${
-                                                             row.level
-                                                           } WHERE userId = ${
-                                                                              user.id
-                                                                            }`
-                );
-                message.channel.send(
-                  user +
-                  ` :confetti_ball: Congratulations you reached **Ebay Pro-Painted** rank! :confetti_ball:`
-                );
-                member.removeRole(myRole2).catch(console.error);
-                member.addRole(myRole3).catch(console.error);
-              } else
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                } WHERE userId = ${user.id}`
-                );
-              break;
-            case 2:
-              if (row.points + number >= 20) {
-                row.level++;
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                }, level = ${
-                                                             row.level
-                                                           } WHERE userId = ${
-                                                                              user.id
-                                                                            }`
-                );
-                message.channel.send(
-                  user +
-                  ` :confetti_ball: Congratulations you reached **C+C Plz** rank! :confetti_ball:`
-                );
-                member.removeRole(myRole3).catch(console.error);
-                member.addRole(myRole4).catch(console.error);
-              } else
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                } WHERE userId = ${user.id}`
-                );
-              break;
-            case 3:
-              if (row.points + number >= 40) {
-                row.level++;
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                }, level = ${
-                                                             row.level
-                                                           } WHERE userId = ${
-                                                                              user.id
-                                                                            }`
-                );
-                message.channel.send(
-                  user +
-                  ` :confetti_ball: Congratulations you reached **JALMM** rank! :confetti_ball:`
-                );
-                member.removeRole(myRole4).catch(console.error);
-                member.addRole(myRole5).catch(console.error);
-              } else
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                } WHERE userId = ${user.id}`
-                );
-              break;
-            case 4:
-              if (row.points + number >= 70) {
-                row.level++;
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                }, level = ${
-                                                             row.level
-                                                           } WHERE userId = ${
-                                                                              user.id
-                                                                            }`
-                );
-                message.channel.send(
-                  user +
-                  ` :confetti_ball: Congratulations you reached **Bub For The Bub Glub** rank! :confetti_ball:`
-                );
-                member.removeRole(myRole5).catch(console.error);
-                member.addRole(myRole6).catch(console.error);
-              } else
-                scoredb.run(
-                  `UPDATE scores SET points = ${
-                                                  row.points + number
-                                                } WHERE userId = ${user.id}`
-                );
-              break;
-            default:
-              scoredb.run(
-                `UPDATE scores SET points = ${
-                                                row.points + number
-                                              } WHERE userId = ${user.id}`
-              );
-              break;
-          }
+          current_level = row.level;
+          new_points += row.points;
+          new_level = current_level;
         }
       })
       .catch(() => {
@@ -232,10 +104,72 @@ client.on('message', message => {
           .then(() => {
             scoredb.run(
               'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
-                user.id, number, 0
+                user.id, 0, 0
               ]);
           });
       });
+
+    if (new_points >= 70) {
+      new_level = 5;
+      if ( current_level != new_level ) {
+        message.channel.send(
+          user +
+          ` :confetti_ball: Congratulations you reached **Bub For The Bub Glub** rank! :confetti_ball:`
+        );
+        member.removeRole(myRole5).catch(console.error);
+        member.addRole(myRole6).catch(console.error);
+      }
+    } else if (new_points >= 40) {
+      new_level = 4;
+      if ( current_level != new_level ) {
+        message.channel.send(
+          user +
+          ` :confetti_ball: Congratulations you reached **JALMM** rank! :confetti_ball:`
+        );
+        member.removeRole(myRole4).catch(console.error);
+        member.addRole(myRole5).catch(console.error);
+      }
+    } else if (new_points >= 20) {
+      new_level = 3;
+      if ( current_level != new_level ) {
+        message.channel.send(
+          user +
+          ` :confetti_ball: Congratulations you reached **C+C Plz** rank! :confetti_ball:`
+        );
+        member.removeRole(myRole3).catch(console.error);
+        member.addRole(myRole4).catch(console.error);
+      }
+    } else if (new_points >= 10) {
+      new_level = 2;
+      if ( current_level != new_level ) {
+        message.channel.send(
+          user +
+          ` :confetti_ball: Congratulations you reached **Ebay Pro-Painted** rank! :confetti_ball:`
+        );
+        member.removeRole(myRole2).catch(console.error);
+        member.addRole(myRole3).catch(console.error);
+      }
+    } else if (new_points >= 5) {
+      new_level = 1;
+      if ( current_level != new_level ) {
+        message.channel.send(
+          user +
+          ` :confetti_ball: Congratulations you reached **Dip 'N Forget** rank! :confetti_ball:`
+        );
+        member.removeRole(myRole1).catch(console.error);
+        member.addRole(myRole2).catch(console.error);
+      }
+    }
+
+    if (current_level != new_level ) {
+      scoredb.run(
+        `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
+      );
+    } else {
+      scoredb.run(
+        `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`
+      );
+    }
 
   } else
 
