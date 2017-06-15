@@ -134,9 +134,10 @@ client.on('message', message => {
     if (index !== -1) {
       number = Number(message.content.substring(index + 1));
     }
-    let myRole1 = message.guild.roles.find("name", "Admin");
+    let adminRole = message.guild.roles.find("name", "Admin");
+    let modRole = message.guild.roles.find("name", "Moderators");
 
-    if (!message.member.roles.has(myRole1.id)) {
+    if (!message.member.roles.has(adminRole.id) && !message.member.roles.has(modRole.id)) {
       message.reply(
         `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
       );
