@@ -6,6 +6,77 @@ const sql = require('sqlite');
 var scoredb = 0;
 var accountsdb = 0;
 
+function set_points(message, user, new_points, current_level) {
+  let new_level = 0;
+  let member = message.guild.member(user);
+  let myRole2 = message.guild.roles.find("name", "Dip 'N Forget");
+  let myRole3 = message.guild.roles.find("name", "Ebay Propainted");
+  let myRole4 = message.guild.roles.find("name", "C+C Plz");
+  let myRole5 = message.guild.roles.find("name", "JALMM");
+  let myRole6 = message.guild.roles.find("name", "Bub For The Bub Glub");
+
+  if (new_points >= 70) {
+    new_level = 5;
+    if (current_level != new_level) {
+      message.channel.send(
+        user +
+        ` :confetti_ball: Congratulations you reached **Bub For The Bub Glub** rank! :confetti_ball:`
+      );
+      member.removeRole(myRole5).catch(console.error);
+      member.addRole(myRole6).catch(console.error);
+    }
+  } else if (new_points >= 40) {
+    new_level = 4;
+    if (current_level != new_level) {
+      message.channel.send(
+        user +
+        ` :confetti_ball: Congratulations you reached **JALMM** rank! :confetti_ball:`
+      );
+      member.removeRole(myRole4).catch(console.error);
+      member.addRole(myRole5).catch(console.error);
+    }
+  } else if (new_points >= 20) {
+    new_level = 3;
+    if (current_level != new_level) {
+      message.channel.send(
+        user +
+        ` :confetti_ball: Congratulations you reached **C+C Plz** rank! :confetti_ball:`
+      );
+      member.removeRole(myRole3).catch(console.error);
+      member.addRole(myRole4).catch(console.error);
+    }
+  } else if (new_points >= 10) {
+    new_level = 2;
+    if (current_level != new_level) {
+      message.channel.send(
+        user +
+        ` :confetti_ball: Congratulations you reached **Ebay Pro-Painted** rank! :confetti_ball:`
+      );
+      member.removeRole(myRole2).catch(console.error);
+      member.addRole(myRole3).catch(console.error);
+    }
+  } else if (new_points >= 5) {
+    new_level = 1;
+    if (current_level != new_level) {
+      message.channel.send(
+        user +
+        ` :confetti_ball: Congratulations you reached **Dip 'N Forget** rank! :confetti_ball:`
+      );
+      member.addRole(myRole2).catch(console.error);
+    }
+  }
+
+  if (current_level != new_level) {
+    scoredb.run(
+      `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
+    );
+  } else {
+    scoredb.run(
+      `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`
+    );
+  }
+}
+
 Promise
   .all([
     sql.open('./score.sqlite', {
@@ -64,11 +135,6 @@ client.on('message', message => {
       number = Number(message.content.substring(index + 1));
     }
     let myRole1 = message.guild.roles.find("name", "Admin");
-    let myRole2 = message.guild.roles.find("name", "Dip 'N Forget");
-    let myRole3 = message.guild.roles.find("name", "Ebay Propainted");
-    let myRole4 = message.guild.roles.find("name", "C+C Plz");
-    let myRole5 = message.guild.roles.find("name", "JALMM");
-    let myRole6 = message.guild.roles.find("name", "Bub For The Bub Glub");
 
     if (!message.member.roles.has(myRole1.id)) {
       message.reply(
@@ -77,7 +143,6 @@ client.on('message', message => {
       return;
     }
 
-    let member = message.guild.member(user);
     let new_points = number;
     let current_level = 0;
     let new_level = 0;
@@ -94,6 +159,8 @@ client.on('message', message => {
           new_points += row.points;
           new_level = current_level;
         }
+
+        set_points(message, user, new_points, current_level);
       })
       .catch(() => {
         console.error;
@@ -106,70 +173,10 @@ client.on('message', message => {
               'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
                 user.id, 0, 0
               ]);
+            
+            set_points(message, user, new_points, current_level);
           });
       });
-
-    if (new_points >= 70) {
-      new_level = 5;
-      if ( current_level != new_level ) {
-        message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **Bub For The Bub Glub** rank! :confetti_ball:`
-        );
-        member.removeRole(myRole5).catch(console.error);
-        member.addRole(myRole6).catch(console.error);
-      }
-    } else if (new_points >= 40) {
-      new_level = 4;
-      if ( current_level != new_level ) {
-        message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **JALMM** rank! :confetti_ball:`
-        );
-        member.removeRole(myRole4).catch(console.error);
-        member.addRole(myRole5).catch(console.error);
-      }
-    } else if (new_points >= 20) {
-      new_level = 3;
-      if ( current_level != new_level ) {
-        message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **C+C Plz** rank! :confetti_ball:`
-        );
-        member.removeRole(myRole3).catch(console.error);
-        member.addRole(myRole4).catch(console.error);
-      }
-    } else if (new_points >= 10) {
-      new_level = 2;
-      if ( current_level != new_level ) {
-        message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **Ebay Pro-Painted** rank! :confetti_ball:`
-        );
-        member.removeRole(myRole2).catch(console.error);
-        member.addRole(myRole3).catch(console.error);
-      }
-    } else if (new_points >= 5) {
-      new_level = 1;
-      if ( current_level != new_level ) {
-        message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **Dip 'N Forget** rank! :confetti_ball:`
-        );
-        member.removeRole(myRole1).catch(console.error);
-        member.addRole(myRole2).catch(console.error);
-      }
-    }
-
-    if (current_level != new_level ) {
-      scoredb.run(
-        `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
-      );
-    } else {
-      scoredb.run(
-        `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`
-      );
-    }
 
   } else
 
@@ -479,7 +486,8 @@ client.on('message', message => {
   } else if (message.content.startsWith(prefix + "reset")) {
     let myRole1 = message.guild.roles.find("name", "Admin");
 
-    if (!message.member.roles.has(myRole1.id) && message.author.id != '134744140318638080') {
+    if (!message.member.roles.has(myRole1.id) && message.author.id !=
+      '134744140318638080') {
       return;
     }
     message.reply(`Coming back!`);
