@@ -313,7 +313,9 @@ client.on('message', message => {
 		"!reddit [user]": Get a user's linked reddit account!
 		"!setalbum [link]": You can link an album of your paintings!
 		"!album [user]": Get a user's linked album!`
-    );
+    ).then(msg => {
+	    msg.delete(5000);
+    });
 
   } else
 
