@@ -109,14 +109,18 @@ client.on('message', message => {
     let can_upload = false;
 
     if (message.author.id in last_user_upload) {
-      let last_upload = last_user_upload[message.author.id];
-      if ((Date.now().getTime() - last_upload.getTime()) > 10000) {
+      message.reply('you were found: ' + last_user_upload[message.author.id];
+        let last_upload = last_user_upload[message.author.id];
+        if ((Date.now().getTime() - last_upload.getTime()) > 10000) {
+          last_user_upload[message.author.id] = Date.now();
+          can_upload = true;
+        }
+      } else {
         last_user_upload[message.author.id] = Date.now();
+        message.reply('you were not found: ' + last_user_upload[message.author
+          .id]);
         can_upload = true;
       }
-    } else {
-      last_user_upload[message.author.id] = Date.now();
-      can_upload = true;
     }
 
     if (!can_upload)
@@ -167,7 +171,8 @@ client.on('message', message => {
     let adminRole = message.guild.roles.find("name", "Admin");
     let modRole = message.guild.roles.find("name", "Moderators");
 
-    if (!message.member.roles.has(adminRole.id) && !message.member.roles.has(
+    if (!message.member.roles.has(adminRole.id) && !message.member.roles
+      .has(
         modRole.id)) {
       message.reply(
         `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
@@ -235,7 +240,8 @@ client.on('message', message => {
     let myRole3 = message.guild.roles.find("name", "Ebay Propainted");
     let myRole4 = message.guild.roles.find("name", "C+C Plz");
     let myRole5 = message.guild.roles.find("name", "JALMM");
-    let myRole6 = message.guild.roles.find("name", "Bub For The Bub Glub");
+    let myRole6 = message.guild.roles.find("name",
+      "Bub For The Bub Glub");
 
     if (member.roles.has(myRole2.id)) {
       member.removeRole(myRole2).catch(console.error);
@@ -257,25 +263,26 @@ client.on('message', message => {
       member.removeRole(myRole6).catch(console.error);
     }
 
-    scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
-      if (!row) {
-        scoredb.run(
-          'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
-            user.id, number, 0
-          ]);
-      } else {
-        scoredb.run(
-          `UPDATE scores SET points = ${
+    scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(
+      row => {
+        if (!row) {
+          scoredb.run(
+            'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
+              user.id, number, 0
+            ]);
+        } else {
+          scoredb.run(
+            `UPDATE scores SET points = ${
                                           number
                                         }, level = ${
                                                      number
                                                    } WHERE userId = ${
                                                                       user.id
                                                                     }`
-        );
-        console.log("points-reset!");
-      }
-    });
+          );
+          console.log("points-reset!");
+        }
+      });
 
   } else
 
