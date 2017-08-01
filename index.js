@@ -113,7 +113,7 @@ client.on('message', message => {
         return;
       }
       client.channels.get("236042005929656320").sendMessage(message.author +
-        ":" + message_text);
+        " : " + message_text);
       return;
     }
 
