@@ -104,6 +104,7 @@ client.on('message', message => {
     return;
 
   if (message.channel.id === "236049686820159488") {
+	  message.reply('your type is:' + message.type);
     for (let attachment of message.attachments.values()) {
       if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
         client.channels.get("236042005929656320")
