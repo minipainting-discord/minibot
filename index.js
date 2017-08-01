@@ -96,6 +96,7 @@ client.on('ready', () => {
 });
 
 var prefix = "!"
+var last_user_upload = {};
 
 client.on('message', message => {
   if (message.author.bot)
@@ -105,6 +106,23 @@ client.on('message', message => {
 
   if (message.channel.id === "236049686820159488") {
 
+    let can_upload = false;
+
+    if (message.author.id in last_user_upload) {
+      let last_upload = last_user_upload[message.author.id];
+      if ((Date.now().getTime() - last_upload.getTime()) > 10000) {
+        last_user_upload[message.author.id] = Date.now();
+        can_upload = true;
+      }
+    } else {
+      last_user_upload[message.author.id] = Date.now();
+      can_upload = true;
+    }
+
+    if (!can_upload)
+      return;
+
+
     if (message.attachments.array().length == 0) {
       let message_text = message.content;
       if (!(message_text.startsWith('https://') || message_text.startsWith(
@@ -113,14 +131,25 @@ client.on('message', message => {
         return;
       }
       client.channels.get("236042005929656320").sendMessage(message.author +
-        " : " + message_text);
+        ":" + message_text);
       return;
     }
 
-    let attachment = message.attachments.array()[0];
-    if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
+    for (let attachment of message.attachments.values()) {
+      if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
         client.channels.get("236042005929656320")
           .sendFile(attachment.url, attachment.url, message.author);
+      }
+    }
+
+    var match = message.content.match(
+      /(?:[^:/?#\s]+:\/\/)?[^/?#\s]+\/(?:[^?#\s]*\.(?:jpe?g|gif|png))(?:\?[^#\s]*)?(?:#.*)?/ig
+    );
+    if (!match)
+      return;
+    for (let url of match) {
+      client.channels.get("236042005929656320")
+        .sendFile(url, url, message.author);
     }
   }
 
