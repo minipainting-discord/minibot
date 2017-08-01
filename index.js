@@ -107,6 +107,17 @@ client.on('message', message => {
   if (message.channel.id === "236049686820159488") {
 
     let can_upload = false;
+    let is_link = false;
+
+    if (message.attachments.array().length == 0) {
+      let message_text = message.content;
+      if (!(message_text.startsWith('https://') || message_text.startsWith(
+          'http://') || message_text.startsWith('www'))) {
+        message.delete();
+        return;
+      }
+      is_link = true;
+    }
 
     if (message.author.id in last_user_upload) {
       message.reply('you were found: ' + last_user_upload[message.author.id];
@@ -126,18 +137,12 @@ client.on('message', message => {
     if (!can_upload)
       return;
 
-
-    if (message.attachments.array().length == 0) {
-      let message_text = message.content;
-      if (!(message_text.startsWith('https://') || message_text.startsWith(
-          'http://') || message_text.startsWith('www'))) {
-        message.delete();
-        return;
-      }
+    if (is_link) {
       client.channels.get("236042005929656320").sendMessage(message.author +
         ":" + message_text);
       return;
     }
+
 
     for (let attachment of message.attachments.values()) {
       if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
