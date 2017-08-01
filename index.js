@@ -140,7 +140,7 @@ client.on('message', message => {
     if (!message.member.roles.has(adminRole.id) && !message.member.roles.has(modRole.id)) {
       message.reply(
         `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
-      ).then(msg.delete(1000));
+      ).then(message.delete(10000));
       return;
     }
 
