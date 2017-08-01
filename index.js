@@ -117,21 +117,10 @@ client.on('message', message => {
       return;
     }
 
-    for (let attachment of message.attachments.values()) {
-      if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
+    let attachment = message.attachments.array()[0];
+    if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
         client.channels.get("236042005929656320")
           .sendFile(attachment.url, attachment.url, message.author);
-      }
-    }
-
-    var match = message.content.match(
-      /(?:[^:/?#\s]+:\/\/)?[^/?#\s]+\/(?:[^?#\s]*\.(?:jpe?g|gif|png))(?:\?[^#\s]*)?(?:#.*)?/ig
-    );
-    if (!match)
-      return;
-    for (let url of match) {
-      client.channels.get("236042005929656320")
-        .sendFile(url, url, message.author);
     }
   }
 
