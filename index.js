@@ -104,7 +104,19 @@ client.on('message', message => {
     return;
 
   if (message.channel.id === "236049686820159488") {
-	  message.reply('your type is:' + message.type);
+
+    if (message.attachments.array().length == 0) {
+      let message_text = message.content;
+      if (!(message_text.startsWith('https://') || message_text.startsWith(
+          'http://') || message_text.startsWith('www'))) {
+        message.delete();
+        return;
+      }
+      client.channels.get("236042005929656320").sendMessage(message.author +
+        ":" + message_text);
+      return;
+    }
+
     for (let attachment of message.attachments.values()) {
       if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
         client.channels.get("236042005929656320")
