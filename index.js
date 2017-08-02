@@ -121,7 +121,7 @@ client.on('message', message => {
 
     if (message.author.id in last_user_upload) {
       let last_upload = last_user_upload[message.author.id];
-      if ((Date.getTime() - last_upload.getTime()) > 10000) {
+      if ((Date().getTime() - last_upload.getTime()) > 10000) {
         last_user_upload[message.author.id] = Date.now();
         can_upload = true;
       }
