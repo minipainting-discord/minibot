@@ -120,16 +120,13 @@ client.on('message', message => {
     }
 
     if (message.author.id in last_user_upload) {
-      message.reply('you were found: ' + last_user_upload[message.author.id]);
       let last_upload = last_user_upload[message.author.id];
-      if ((Date.now().getTime() - last_upload.getTime()) > 10000) {
+      if ((Date.getTime() - last_upload.getTime()) > 10000) {
         last_user_upload[message.author.id] = Date.now();
         can_upload = true;
       }
     } else {
       last_user_upload[message.author.id] = Date.now();
-      message.reply('you were not found: ' + last_user_upload[message.author
-        .id]);
       can_upload = true;
     }
 
