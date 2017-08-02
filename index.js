@@ -4,6 +4,8 @@ const settings = require('./settings.json');
 const sql = require('sqlite');
 const createCollage = require("photo-collage");
 const sizeOf = require('image-size');
+var url = require('url');
+var http = require('http');
 
 var scoredb = 0;
 var accountsdb = 0;
@@ -157,23 +159,32 @@ client.on('message', message => {
           w = 3;
         }
         let h = images.length / w;
-        var dimensions = sizeOf(images[0]);
-        const options = {
-          sources: images,
-          width: w, // number of images per row
-          height: h, // number of images per column
-          imageWidth: dimensions.width / w,
-          imageHeight: dimensions.height / h,
-          backgroundColor: "#cccccc", // optional, defaults to black.
-          spacing: 2, // optional: pixels between each image
-        };
-        createCollage(options)
-          .then((canvas) => {
-            let buf = canvas.toBuffer();
-            client.channels.get("236042005929656320")
-              .sendFile(buf, 'minigalleryimage.png', message.author);
-          });
 
+        var options = url.parse(images[0]);
+        http.get(options, function(response) {
+          var chunks = [];
+          response.on('data', function(chunk) {
+            chunks.push(chunk);
+          }).on('end', function() {
+            var buffer = Buffer.concat(chunks);
+            const options = {
+              sources: images,
+              width: w, // number of images per row
+              height: h, // number of images per column
+              imageWidth: sizeOf(buffer).width / w,
+              imageHeight: sizeOf(buffer).height / h;
+              backgroundColor: "#cccccc", // optional, defaults to black.
+              spacing: 2, // optional: pixels between each image
+            };
+            createCollage(options)
+              .then((canvas) => {
+                let buf = canvas.toBuffer();
+                client.channels.get("236042005929656320")
+                  .sendFile(buf, 'minigalleryimage.png',
+                    message.author);
+              });
+          });
+        });
       });
 
     return;
