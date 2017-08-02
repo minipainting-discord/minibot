@@ -151,6 +151,8 @@ client.on('message', message => {
       .then(collected => message.reply('got' + collected.size))
       .catch(collected => message.reply('error'));
 
+    message.reply('www.awaiting.');
+
     /*
         for (let attachment of message.attachments.values()) {
           if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
