@@ -140,7 +140,7 @@ client.on('message', message => {
         for (let attachment of message.attachments.values()) {
           images.push(attachment.url);
         }
-        for (let msg of collected) {
+        for (let msg of collected.values()) {
           for (let attachment of msg.attachments.values()) {
             images.push(attachment.url);
           }
