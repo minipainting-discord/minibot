@@ -146,11 +146,17 @@ client.on('message', message => {
         let images = [];
         for (let attachment of message.attachments.values()) {
           images.push(attachment.url);
+          if (images.length >= 3)
+            break;
         }
         for (let msg of collected.values()) {
           for (let attachment of msg.attachments.values()) {
             images.push(attachment.url);
+            if (images.length >= 3)
+              break;
           }
+          if (images.length >= 3)
+            break;
         }
 
         //message.reply('www.collected' + images);
@@ -170,7 +176,7 @@ client.on('message', message => {
             const options = {
               sources: images,
               width: w, // number of images per row
-              height: h, // number of images per column
+              height: 1, // number of images per column
               imageWidth: sizeOf(buffer).width / w,
               imageHeight: sizeOf(buffer).height / w,
               backgroundColor: "#cccccc", // optional, defaults to black.
