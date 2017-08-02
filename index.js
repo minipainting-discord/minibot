@@ -152,12 +152,18 @@ client.on('message', message => {
         }
 
         message.reply('www.collected' + images);
+        let w = images.length;
+        if (width > 3) {
+          width = 3;
+        }
+        let h = images.length / w;
+        if (images.length % w != 0) {
+          h += 1;
+        }
         const options = {
           sources: images,
-          width: 3, // number of images per row
-          height: 2, // number of images per column
-          imageWidth: 350, // width of each image
-          imageHeight: 250, // height of each image
+          width: w, // number of images per row
+          height: h, // number of images per column
           backgroundColor: "#cccccc", // optional, defaults to black.
           spacing: 2, // optional: pixels between each image
         };
