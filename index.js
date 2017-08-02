@@ -137,9 +137,13 @@ client.on('message', message => {
         })
       .then(collected => {
         let images = [];
-        images.push(message.attachments[0].url);
+        for (let attachment of message.attachments.values()) {
+          images.push(attachment.url);
+        }
         for (let msg of collected) {
-          images.push(msg.attachments[0].url);
+          for (let attachment of msg.attachments.values()) {
+            images.push(attachment.url);
+          }
         }
         message.reply('www.collected' + images);
 
