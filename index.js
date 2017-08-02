@@ -151,7 +151,7 @@ client.on('message', message => {
           }
         }
 
-        message.reply('www.collected' + images);
+        //message.reply('www.collected' + images);
         let w = images.length;
         if (width > 3) {
           width = 3;
