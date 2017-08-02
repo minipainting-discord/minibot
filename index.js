@@ -2,6 +2,8 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const settings = require('./settings.json');
 const sql = require('sqlite');
+const createCollage = require("photo-collage");
+
 
 var scoredb = 0;
 var accountsdb = 0;
@@ -108,16 +110,13 @@ client.on('message', message => {
   if (message.channel.id === "236049686820159488") {
     let is_link = false;
 
-    if (waiting_users.includes(message.author.id))
-      return;
-
     if (message.attachments.size == 0) {
       let message_text = message.content;
       if (message_text.startsWith('https://') || message_text.startsWith(
           'http://') || message_text.startsWith('www')) {
         is_link = true;
       } else {
-        //message.delete();
+        message.delete();
         return;
       }
     }
@@ -130,12 +129,18 @@ client.on('message', message => {
       return;
     }
 
+    if (waiting_users.includes(message.author.id))
+      return;
+
     waiting_users.push(message.author.id);
     message.channel.awaitMessages(m => m.attachments.size > 0 && m.author.id ==
         message.author.id, {
           time: 5e3
         })
       .then(collected => {
+        let idx = waiting_users.indexOf(message.author.id);
+        waiting_users.splice(idx, 1);
+
         let images = [];
         for (let attachment of message.attachments.values()) {
           images.push(attachment.url);
@@ -145,13 +150,26 @@ client.on('message', message => {
             images.push(attachment.url);
           }
         }
-        message.reply('www.collected' + images);
 
-        let idx = waiting_users.indexOf(message.author.id);
-        waiting_users.splice(idx, 1);
+        message.reply('www.collected' + images);
+        const options = {
+          sources: images,
+          width: 3, // number of images per row
+          height: 2, // number of images per column
+          imageWidth: 350, // width of each image
+          imageHeight: 250, // height of each image
+          backgroundColor: "#cccccc", // optional, defaults to black.
+          spacing: 2, // optional: pixels between each image
+        };
+        createCollage(options)
+          .then((canvas) => {
+            let buf = canvas.toBuffer();
+            client.channels.get("236042005929656320")
+              .sendFile(buf, 'minigalleryimage.png', message.author);
+          });
+
       });
 
-    message.reply('www.awaiting.');
     return;
 
     /*
