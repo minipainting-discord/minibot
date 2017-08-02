@@ -146,12 +146,10 @@ client.on('message', message => {
       m.attachments.size > 0;
 
     message.channel.awaitMessages(user_attachment_filter, {
-        time: 10000
+        time: 5000
       })
-      .then(collected => client.channels.get("236042005929656320").sendMessage(
-        'www.got' + collected.size))
-      .catch(collected => client.channels.get("236042005929656320").sendMessage(
-        'www.errorgot' + collected.size));
+      .then(collected => client.channels.get("236049686820159488").sendMessage(
+        'www.got' + collected.size));
 
     message.reply('www.awaiting.');
     return;
