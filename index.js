@@ -3,7 +3,7 @@ const client = new Discord.Client();
 const settings = require('./settings.json');
 const sql = require('sqlite');
 const createCollage = require("photo-collage");
-
+const sizeOf = require('image-size');
 
 var scoredb = 0;
 var accountsdb = 0;
@@ -157,13 +157,13 @@ client.on('message', message => {
           w = 3;
         }
         let h = images.length / w;
-        if (images.length % w != 0) {
-          h += 1;
-        }
+        var dimensions = sizeOf(images[0]);
         const options = {
           sources: images,
           width: w, // number of images per row
           height: h, // number of images per column
+          imageWidth: dimensions.width / w,
+          imageHeight: dimensions.height / h;
           backgroundColor: "#cccccc", // optional, defaults to black.
           spacing: 2, // optional: pixels between each image
         };
