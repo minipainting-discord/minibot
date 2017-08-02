@@ -117,7 +117,7 @@ client.on('message', message => {
           'http://') || message_text.startsWith('www')) {
         is_link = true;
       } else {
-        message.delete();
+        //message.delete();
         return;
       }
     }
@@ -141,7 +141,7 @@ client.on('message', message => {
         for (let msg of collected) {
           images.push(msg.attachments[0].url);
         }
-        message.reply('collected' + images);
+        message.reply('www.collected' + images);
 
         let idx = waiting_users.indexOf(message.author.id);
         waiting_users.splice(idx, 1);
