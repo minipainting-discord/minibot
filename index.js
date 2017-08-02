@@ -148,8 +148,8 @@ client.on('message', message => {
         time: 5000,
         errors: ['time']
       })
-      .then(collected => message.reply('got' + collected.size))
-      .catch(collected => message.reply('error'));
+      .then(collected => message.reply('www.got' + collected.size))
+      .catch(collected => message.reply('www.error'));
 
     message.reply('www.awaiting.');
 
