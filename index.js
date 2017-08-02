@@ -132,7 +132,7 @@ client.on('message', message => {
     }
 
     if (!can_upload) {
-      message.reply('timeout');
+      message.reply('www.timeout');
       return;
     }
 
