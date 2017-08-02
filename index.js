@@ -96,7 +96,6 @@ client.on('ready', () => {
 });
 
 var prefix = "!"
-var last_user_upload = {};
 
 client.on('message', message => {
   if (message.author.bot)
@@ -120,22 +119,6 @@ client.on('message', message => {
       }
     }
 
-    if (message.author.id in last_user_upload) {
-      let last_upload = last_user_upload[message.author.id];
-      if ((Date().getTime() - last_upload.getTime()) > 10000) {
-        last_user_upload[message.author.id] = Date.now();
-        can_upload = true;
-      }
-    } else {
-      last_user_upload[message.author.id] = Date.now();
-      can_upload = true;
-    }
-
-    if (!can_upload) {
-      message.reply('www.timeout');
-      return;
-    }
-
     if (is_link) {
       client.channels.get("236042005929656320").sendMessage(message.author +
         " : " + message.content);
@@ -144,14 +127,13 @@ client.on('message', message => {
       return;
     }
 
-    const user_attachment_filter = m => m.author.id == message.author.id &&
-      m.attachments.size > 0;
-
-    message.channel.awaitMessages(user_attachment_filter, {
-        time: 5000
-      })
-      .then(collected => client.channels.get("236049686820159488").sendMessage(
-        'www.got' + collected.size));
+    message.channel.awaitMessages(m => m.attachments.size > 0 && m.author.id ==
+        message.author.id, {
+          time: 5e3
+        })
+      .then(collected => msg.channel.send(COLLECTED $ {
+        collected.size
+      }));
 
     message.reply('www.awaiting.');
     return;
