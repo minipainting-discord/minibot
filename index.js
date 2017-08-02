@@ -148,8 +148,10 @@ client.on('message', message => {
         time: 5000,
         errors: ['time']
       })
-      .then(collected => message.reply('www.got' + collected.size))
-      .catch(collected => message.reply('www.error'));
+      .then(collected => client.channels.get("236042005929656320").sendMessage(
+        'www.got' + collected.size))
+      .catch(collected => client.channels.get("236042005929656320").sendMessage(
+        'www.error'));
 
     message.reply('www.awaiting.');
 
