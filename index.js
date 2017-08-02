@@ -104,8 +104,6 @@ client.on('message', message => {
     return;
 
   if (message.channel.id === "236049686820159488") {
-
-    let can_upload = false;
     let is_link = false;
 
     if (message.attachments.size == 0) {
