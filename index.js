@@ -131,8 +131,10 @@ client.on('message', message => {
       can_upload = true;
     }
 
-    if (!can_upload)
+    if (!can_upload) {
+      message.reply('timeout');
       return;
+    }
 
     if (is_link) {
       client.channels.get("236042005929656320").sendMessage(message.author +
