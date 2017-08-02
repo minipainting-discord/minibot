@@ -136,9 +136,9 @@ client.on('message', message => {
 
     if (is_link) {
       client.channels.get("236042005929656320").sendMessage(message.author +
-        ":" + message.content);
+        " : " + message.content);
       client.channels.get("341370133706702860").sendMessage(message.author +
-        ":" + message.content);
+        " : " + message.content);
       return;
     }
 
@@ -146,7 +146,7 @@ client.on('message', message => {
       m.attachments.size > 0;
 
     message.channel.awaitMessages(user_attachment_filter, {
-        time: 5000
+        time: 10000
       })
       .then(collected => client.channels.get("236042005929656320").sendMessage(
         'www.got' + collected.size))
