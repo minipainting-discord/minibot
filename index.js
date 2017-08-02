@@ -219,8 +219,9 @@ client.on('message', message => {
       message.reply(
         `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
       ).then(msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      message.delete();
       return;
     }
 
@@ -258,7 +259,7 @@ client.on('message', message => {
             set_points(message, user, new_points, current_level);
           });
       });
-
+message.delete(7e3);
   } else
 
   if (message.content.startsWith(prefix + 'resetpoints')) {
@@ -271,8 +272,9 @@ client.on('message', message => {
       message.reply(
         `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
       ).then(msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      message.delete();
       return;
     }
 
@@ -325,6 +327,7 @@ client.on('message', message => {
           console.log("points-reset!");
         }
       });
+message.delete(7e3);
 
   } else
 
@@ -336,15 +339,19 @@ client.on('message', message => {
     scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
       .then(row => {
         if (!row) {
-          return message.reply('Your current points are 0').then(msg => {
-            msg.delete(10000);
+          return message.reply(user + ` has 0 points`).then(msg => {
+            msg.delete(7000);
           });
+          message.delete();
+          return
         }
 
-        return message.reply(
-          `Your current points are ${row.points}`).then(msg => {
-          msg.delete(10000);
+
+ message.reply(user +`has ${row.points} points`).then(msg => {
+          msg.delete(7000);
         });
+        message.delete();
+        return
       });
   } else
 
@@ -353,8 +360,9 @@ client.on('message', message => {
     message.reply(
       `here's a list of all manufacturers: https://www.reddit.com/r/minipainting/wiki/manufacturers`
     ).then(msg => {
-      msg.delete(10000);
+      msg.delete(7000);
     });
+    message.delete();
   } else
 
   if (message.content.startsWith(prefix + "tutorials")) {
@@ -362,8 +370,9 @@ client.on('message', message => {
     message.reply(
       `here's a compilation of useful guides: https://www.reddit.com/r/minipainting/wiki/tutorials`
     ).then(msg => {
-      msg.delete(10000);
+      msg.delete(7000);
     });
+    message.delete();
   } else
 
   if (message.content.startsWith(prefix + "leaderboard")) {
@@ -372,14 +381,16 @@ client.on('message', message => {
       scoredb.get(`SELECT TOP 5 * FROM scores order by points desc`)
         .then(table => {
           message.reply(table).then(msg => {
-            msg.delete(10000);
+            msg.delete(7000);
           });
+          message.delete();
 
         });
     } catch (e) {
       message.reply("Chron broked it.").then(msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      messsge.delete(7000);
     }
 
   } else
@@ -397,8 +408,9 @@ client.on('message', message => {
 		"!setalbum [link]": You can link an album of your paintings!
 		"!album [user]": Get a user's linked album!`
     ).then(msg => {
-      msg.delete(10000);
+      msg.delete(7000);
     });
+    message.delete(7000);
 
   } else
 
@@ -415,22 +427,25 @@ client.on('message', message => {
 			S
 			T`).then(
       msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      message.delete(7000);
   } else
 
   if (message.content.startsWith(prefix + "redpiano")) {
 
     message.reply(`O I L`).then(msg => {
-      msg.delete(10000);
+      msg.delete(7000);
     });
+    message.delete();
   } else
 
   if (message.content.startsWith(prefix + "sdub")) {
 
     message.reply(`https://www.youtube.com/user/SDubist`).then(msg => {
-      msg.delete(10000);
+      msg.delete(7000);
     });
+    message.delete();
   } else
 
   if (message.content.startsWith(prefix + "setredditaccount")) {
@@ -439,8 +454,9 @@ client.on('message', message => {
     let redditAccount = "";
     if (index == -1) {
       message.reply('Usage: !setredditaccount [username]').then(msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      message.delete();
       return;
     }
     redditAccount = message.content.substring(index + 1);
@@ -493,8 +509,9 @@ client.on('message', message => {
     message.reply(
       `Successfully linked to https://www.reddit.com/u/` +
       redditAccount).then(msg => {
-      msg.delete(10000);
+      msg.delete(7000);
     });
+    message.delete();
 
   } else
 
@@ -512,20 +529,23 @@ client.on('message', message => {
             message.reply(user +
               ` does not have a linked Reddit account.`).then(
               msg => {
-                msg.delete(10000);
+                msg.delete(7000);
               });
+              message.delete();
           } else {
             message.reply(`Reddit Account for ` + user +
               `: https://www.reddit.com/user/` + row.account).then(
               msg => {
-                msg.delete(10000);
+                msg.delete(7000);
               });
+              messsage.delete();
           }
         });
     } catch (e) {
       message.reply('Invalid user').then(msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      message.delete();
     }
   } else
 
@@ -535,8 +555,9 @@ client.on('message', message => {
     let album = "";
     if (index == -1) {
       message.reply('Usage: !setalbum [link]').then(msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      message.delete();
       return;
     }
     album = message.content.substring(index + 1);
@@ -577,8 +598,9 @@ client.on('message', message => {
       });
 
     message.reply(`Successfully set album to ` + album).then(msg => {
-      msg.delete(10000);
+      msg.delete(7000);
     });
+    message.delete();
   } else
 
   if (message.content.startsWith(prefix + "album")) {
@@ -594,20 +616,23 @@ client.on('message', message => {
             message.reply(user + ` does not have a linked album.`)
               .then(
                 msg => {
-                  msg.delete(10000);
+                  msg.delete(7000);
                 });
+                message.delete();
           } else {
             message.reply(`Album for ` + user + `: ` + row.album)
               .then(
                 msg => {
-                  msg.delete(10000);
+                  msg.delete(7000);
                 });
+                message.delete();
           }
         });
     } catch (e) {
       message.reply('Invalid user').then(msg => {
-        msg.delete(10000);
+        msg.delete(7000);
       });
+      message.delete();
     }
   } else if (message.content.startsWith(prefix + "reset")) {
     let myRole1 = message.guild.roles.find("name", "Admin");
