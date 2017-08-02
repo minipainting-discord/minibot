@@ -109,7 +109,7 @@ client.on('message', message => {
     let can_upload = false;
     let is_link = false;
 
-    if (message.attachments.array().length == 0) {
+    if (message.attachments.size == 0) {
       let message_text = message.content;
       if (!(message_text.startsWith('https://') || message_text.startsWith(
           'http://') || message_text.startsWith('www'))) {
@@ -142,16 +142,15 @@ client.on('message', message => {
     }
 
     const user_attachment_filter = m => m.author.id == message.author.id &&
-      m.attachments.array().length > 0;
+      m.attachments.size > 0;
 
     message.channel.awaitMessages(user_attachment_filter, {
-        time: 5000,
-        errors: ['time']
+        time: 5000
       })
       .then(collected => client.channels.get("236042005929656320").sendMessage(
         'www.got' + collected.size))
       .catch(collected => client.channels.get("236042005929656320").sendMessage(
-        'www.error'));
+        'www.errorgot' + collected.size));
 
     message.reply('www.awaiting.');
 
