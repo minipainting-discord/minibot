@@ -5,7 +5,7 @@ const sql = require('sqlite');
 const createCollage = require("photo-collage");
 const sizeOf = require('image-size');
 var url = require('url');
-var http = require('http');
+var http = require('https');
 
 var scoredb = 0;
 var accountsdb = 0;
@@ -172,7 +172,7 @@ client.on('message', message => {
               width: w, // number of images per row
               height: h, // number of images per column
               imageWidth: sizeOf(buffer).width / w,
-              imageHeight: sizeOf(buffer).height / h,
+              imageHeight: sizeOf(buffer).height / w,
               backgroundColor: "#cccccc", // optional, defaults to black.
               spacing: 2, // optional: pixels between each image
             };
@@ -182,31 +182,15 @@ client.on('message', message => {
                 client.channels.get("236042005929656320")
                   .sendFile(buf, 'minigalleryimage.png',
                     message.author);
+                client.channels.get("341370133706702860")
+                  .sendFile(buf, 'minigalleryimage.png',
+                    message.author);
               });
           });
         });
       });
 
     return;
-
-    /*
-        for (let attachment of message.attachments.values()) {
-          if ((/\.(gif|jpe?g|tiff|png)$/i).test(attachment.url)) {
-            client.channels.get("236042005929656320")
-              .sendFile(attachment.url, attachment.url, message.author);
-          }
-        }
-
-        var match = message.content.match(
-          /(?:[^:/?#\s]+:\/\/)?[^/?#\s]+\/(?:[^?#\s]*\.(?:jpe?g|gif|png))(?:\?[^#\s]*)?(?:#.*)?/ig
-        );
-        if (!match)
-          return;
-        for (let url of match) {
-          client.channels.get("236042005929656320")
-            .sendFile(url, url, message.author);
-        }
-        */
   }
 
   if (!message.content.startsWith(prefix))
