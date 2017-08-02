@@ -96,15 +96,20 @@ client.on('ready', () => {
 });
 
 var prefix = "!"
+var waiting_users = [];
 
 client.on('message', message => {
   if (message.author.bot)
     return;
+
   if (message.channel.type !== 'text')
     return;
 
   if (message.channel.id === "236049686820159488") {
     let is_link = false;
+
+    if (waiting_users.includes(message.author.id))
+      return;
 
     if (message.attachments.size == 0) {
       let message_text = message.content;
@@ -125,13 +130,22 @@ client.on('message', message => {
       return;
     }
 
+    waiting_users.push(message.author.id);
     message.channel.awaitMessages(m => m.attachments.size > 0 && m.author.id ==
         message.author.id, {
           time: 5e3
         })
-      .then(collected => message.channel.send('collected ' +
-        collected.size
-      ));
+      .then(collected => {
+        let images = [];
+        images.push(message.attachments[0].url);
+        for (let msg of collected) {
+          images.push(msg.attachments[0].url);
+        }
+        message.reply('collected' + images);
+
+        let idx = waiting_users.indexOf(message.author.id);
+        waiting_users.splice(idx, 1);
+      });
 
     message.reply('www.awaiting.');
     return;
