@@ -111,12 +111,13 @@ client.on('message', message => {
 
     if (message.attachments.size == 0) {
       let message_text = message.content;
-      if (!(message_text.startsWith('https://') || message_text.startsWith(
-          'http://') || message_text.startsWith('www'))) {
+      if (message_text.startsWith('https://') || message_text.startsWith(
+          'http://') || message_text.startsWith('www')) {
+        is_link = true;
+      } else {
         message.delete();
         return;
       }
-      is_link = true;
     }
 
     if (message.author.id in last_user_upload) {
@@ -135,9 +136,9 @@ client.on('message', message => {
 
     if (is_link) {
       client.channels.get("236042005929656320").sendMessage(message.author +
-        ":" + message_text);
+        ":" + message.content);
       client.channels.get("341370133706702860").sendMessage(message.author +
-        ":" + message_text);
+        ":" + message.content);
       return;
     }
 
