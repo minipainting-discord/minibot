@@ -129,7 +129,7 @@ client.on('message', message => {
         message.author.id, {
           time: 5e3
         })
-      .then(collected => msg.channel.send('collected ' +
+      .then(collected => message.channel.send('collected ' +
         collected.size
       ));
 
