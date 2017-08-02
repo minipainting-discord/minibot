@@ -145,7 +145,7 @@ client.on('message', message => {
       .attachments.array().length > 0;
 
     message.channel.awaitMessages(user_attachment_filter, {
-        time: 5000,
+        time: 5,
         errors: ['time']
       })
       .then(collected => client.channels.get("236042005929656320").sendMessage(
