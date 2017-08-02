@@ -172,7 +172,7 @@ client.on('message', message => {
               width: w, // number of images per row
               height: h, // number of images per column
               imageWidth: sizeOf(buffer).width / w,
-              imageHeight: sizeOf(buffer).height / h;
+              imageHeight: sizeOf(buffer).height / h,
               backgroundColor: "#cccccc", // optional, defaults to black.
               spacing: 2, // optional: pixels between each image
             };
