@@ -153,6 +153,7 @@ client.on('message', message => {
         'www.errorgot' + collected.size));
 
     message.reply('www.awaiting.');
+    return;
 
     /*
         for (let attachment of message.attachments.values()) {
