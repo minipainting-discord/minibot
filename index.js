@@ -129,9 +129,9 @@ client.on('message', message => {
         message.author.id, {
           time: 5e3
         })
-      .then(collected => msg.channel.send(COLLECTED $ {
+      .then(collected => msg.channel.send('collected ' +
         collected.size
-      }));
+      ));
 
     message.reply('www.awaiting.');
     return;
