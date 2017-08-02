@@ -132,7 +132,6 @@ client.on('message', message => {
         .id]);
       can_upload = true;
     }
-  }
 
   if (!can_upload)
     return;
