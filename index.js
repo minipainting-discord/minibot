@@ -141,11 +141,11 @@ client.on('message', message => {
       return;
     }
 
-    let user_attachment_filter = m => m.author.id == message.author.id && m
-      .attachments.array().length > 0;
+    const user_attachment_filter = m => m.author.id == message.author.id &&
+      m.attachments.array().length > 0;
 
     message.channel.awaitMessages(user_attachment_filter, {
-        time: 5,
+        time: 5000,
         errors: ['time']
       })
       .then(collected => client.channels.get("236042005929656320").sendMessage(
