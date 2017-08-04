@@ -399,14 +399,13 @@ message.delete(7e3);
 
     message.reply(
       `**COMMAND LIST**\n
-		"!points":	You can see you're current experience points!
-		"!checkponts [name]":	You can check someones points!
-		"!makers":	You can find all mini related manufactores!
-		"!tutorials":	You can find useful guide lists!
-		"!setredditaccount [username]": You can link your reddit account!
-		"!reddit [user]": Get a user's linked reddit account!
-		"!setalbum [link]": You can link an album of your paintings!
-		"!album [user]": Get a user's linked album!`
+        "!points [user]":   Check a user's points!
+        "!makers":    You can find all mini related manufactores!
+        "!tutorials":    You can find useful guide lists!
+        "!setredditaccount [username]": You can link your reddit account!
+        "!reddit [user]": Get a user's linked reddit account!
+        "!setalbum [link]": You can link an album of your paintings!
+        "!album [user]": Get a user's linked album!`
     ).then(msg => {
       msg.delete(7000);
     });
@@ -418,14 +417,14 @@ message.delete(7e3);
 
     message.reply(
       `
-			C O N T R A S T
-			O
-			N
-			T
-			R
-			A
-			S
-			T`).then(
+            C O N T R A S T
+            O
+            N
+            T
+            R
+            A
+            S
+            T`).then(
       msg => {
         msg.delete(7000);
       });
