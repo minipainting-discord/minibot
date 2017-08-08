@@ -408,7 +408,7 @@ client.on('message', message => {
         message.reply(user + ` has 0 points`);
         return;
       }
-      message.reply(user + `has ${row.points} points`);
+      message.reply(user + ` has ${row.points} points`);
       return;
     });
     return;
