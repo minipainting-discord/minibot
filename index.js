@@ -13,85 +13,96 @@ var accountsdb = 0;
 function set_points(message, user, new_points, current_level) {
   let new_level = 0;
   let member = message.guild.member(user);
-  let myRole2 = message.guild.roles.find("name", "Dip 'N Forget");
-  let myRole3 = message.guild.roles.find("name", "Ebay Propainted");
-  let myRole4 = message.guild.roles.find("name", "C+C Plz");
-  let myRole5 = message.guild.roles.find("name", "JALMM");
-  let myRole6 = message.guild.roles.find("name", "Bub For The Bub Glub");
+  let role2 = message.guild.roles.find("name", "Dip 'N Forget");
+  let role3 = message.guild.roles.find("name", "Ebay Propainted");
+  let role4 = message.guild.roles.find("name", "C+C Plz");
+  let role5 = message.guild.roles.find("name", "JALMM");
+  let role6 = message.guild.roles.find("name", "Bub For The Bub Glub");
 
   if (new_points >= 70) {
     new_level = 5;
     if (current_level != new_level) {
-      message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **Bub For The Bub Glub** rank! :confetti_ball:`);
-      member.removeRole(myRole5).catch(console.error);
-      member.addRole(myRole6).catch(console.error);
+      client.channels.get("236042005929656320")
+        .sendMessage(user +
+          ` :confetti_ball: Congratulations you reached **Bub For The Bub Glub** rank! :confetti_ball:`
+        );
+      member.removeRole(role5).catch(console.error);
+      member.addRole(role6).catch(console.error);
     }
   } else if (new_points >= 40) {
     new_level = 4;
     if (current_level != new_level) {
-      message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **JALMM** rank! :confetti_ball:`);
-      member.removeRole(myRole4).catch(console.error);
-      member.addRole(myRole5).catch(console.error);
+      client.channels.get("236042005929656320")
+        .sendMessage(user +
+          ` :confetti_ball: Congratulations you reached **JALMM** rank! :confetti_ball:`
+        );
+      member.removeRole(role4).catch(console.error);
+      member.addRole(role5).catch(console.error);
     }
   } else if (new_points >= 20) {
     new_level = 3;
     if (current_level != new_level) {
-      message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **C+C Plz** rank! :confetti_ball:`);
-      member.removeRole(myRole3).catch(console.error);
-      member.addRole(myRole4).catch(console.error);
+      client.channels.get("236042005929656320")
+        .sendMessage(user +
+          ` :confetti_ball: Congratulations you reached **C+C Plz** rank! :confetti_ball:`
+        );
+      member.removeRole(role3).catch(console.error);
+      member.addRole(role4).catch(console.error);
     }
   } else if (new_points >= 10) {
     new_level = 2;
     if (current_level != new_level) {
-      message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **Ebay Pro-Painted** rank! :confetti_ball:`);
-      member.removeRole(myRole2).catch(console.error);
-      member.addRole(myRole3).catch(console.error);
+      client.channels.get("236042005929656320")
+        .sendMessage(user +
+          ` :confetti_ball: Congratulations you reached **Ebay Propainted** rank! :confetti_ball:`
+        );
+      member.removeRole(role2).catch(console.error);
+      member.addRole(role3).catch(console.error);
     }
   } else if (new_points >= 5) {
     new_level = 1;
     if (current_level != new_level) {
-      message.channel.send(
-          user +
-          ` :confetti_ball: Congratulations you reached **Dip 'N Forget** rank! :confetti_ball:`);
-      member.addRole(myRole2).catch(console.error);
+      client.channels.get("236042005929656320")
+        .sendMessage(user +
+          ` :confetti_ball: Congratulations you reached **Dip 'N Forget** rank! :confetti_ball:`
+        );
+      member.addRole(role2).catch(console.error);
     }
   }
 
   if (current_level != new_level) {
     scoredb.run(
-        `UPDATE scores SET points = ${
-                                      new_points
-                                    }, level = ${
-                                                 new_level
-                                               } WHERE userId = ${user.id}`);
+      `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
+    );
   } else {
     scoredb.run(
-        `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`);
+      `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`);
   }
 }
 
-Promise
-    .all([
-      sql.open('./score.sqlite', {Promise}),
-      sql.open('./accounts.sqlite', {Promise})
-    ])
-    .then(function([ scoreDB, accountsDB ]) {
-      scoredb = scoreDB;
-      accountsdb = accountsDB;
-    });
+Promise.all([
+  sql.open('./score.sqlite', {
+    Promise
+  }),
+  sql.open('./accounts.sqlite', {
+    Promise
+  })
+]).then(function([scoreDB, accountsDB]) {
+  scoredb = scoreDB;
+  accountsdb = accountsDB;
+});
 
-client.on('ready', () => { console.log('I\'m Online\nl\'m Online'); });
+client.on('ready', () => {
+  console.log('I\'m Online\nl\'m Online');
+});
 
 var prefix = "!"
 var waiting_users = [];
+
+//mini-gallery:   236049686820159488
+//general:        236042005929656320
+//botchannel:     344320952991219712
+//pointsrequest:  341370133706702860
 
 client.on('message', message => {
   if (message.author.bot)
@@ -106,8 +117,8 @@ client.on('message', message => {
     if (message.attachments.size == 0) {
       let message_text = message.content;
       if (message_text.startsWith('https://') ||
-          message_text.startsWith('http://') ||
-          message_text.startsWith('www')) {
+        message_text.startsWith('http://') ||
+        message_text.startsWith('www')) {
         is_link = true;
       } else {
         message.delete();
@@ -116,10 +127,10 @@ client.on('message', message => {
     }
 
     if (is_link) {
-      client.channels.get("236042005929656320")
-          .sendMessage(message.author + " : " + message.content);
-      client.channels.get("341370133706702860")
-          .sendMessage(message.author + " : " + message.content);
+      client.channels.get("236042005929656320").sendMessage(message.author +
+        " : " + message.content);
+      client.channels.get("341370133706702860").sendMessage(message.author +
+        " : " + message.content);
       return;
     }
 
@@ -128,62 +139,65 @@ client.on('message', message => {
 
     waiting_users.push(message.author.id);
     message.channel
-        .awaitMessages(m => m.attachments.size > 0 &&
-                            m.author.id == message.author.id,
-                       {time : 5e3})
-        .then(collected => {
-          let idx = waiting_users.indexOf(message.author.id);
-          waiting_users.splice(idx, 1);
+      .awaitMessages(m => m.attachments.size > 0 &&
+        m.author.id == message.author.id, {
+          time: 10e3
+        })
+      .then(collected => {
+        let idx = waiting_users.indexOf(message.author.id);
+        waiting_users.splice(idx, 1);
 
-          let images = [];
-          for (let attachment of message.attachments.values()) {
+        let images = [];
+        for (let attachment of message.attachments.values()) {
+          images.push(attachment.url);
+          if (images.length >= 3)
+            break;
+        }
+        for (let msg of collected.values()) {
+          for (let attachment of msg.attachments.values()) {
             images.push(attachment.url);
             if (images.length >= 3)
               break;
           }
-          for (let msg of collected.values()) {
-            for (let attachment of msg.attachments.values()) {
-              images.push(attachment.url);
-              if (images.length >= 3)
-                break;
-            }
-            if (images.length >= 3)
-              break;
-          }
+          if (images.length >= 3)
+            break;
+        }
 
-          // message.reply('www.collected' + images);
-          let w = images.length;
-          if (w > 3) {
-            w = 3;
-          }
-          let h = images.length / w;
+        // message.reply('www.collected' + images);
+        let w = images.length;
+        if (w > 3) {
+          w = 3;
+        }
+        let h = images.length / w;
 
-          var options = url.parse(images[0]);
-          http.get(options, function(response) {
-            var chunks = [];
-            response.on('data', function(chunk) {
-                      chunks.push(chunk);
-                    }).on('end', function() {
-              var buffer = Buffer.concat(chunks);
-              const options = {
-                sources : images,
-                width : w,  // number of images per row
-                height : 1, // number of images per column
-                imageWidth : sizeOf(buffer).width / w,
-                imageHeight : sizeOf(buffer).height / w,
-                backgroundColor : "#cccccc", // optional, defaults to black.
-                spacing : 2, // optional: pixels between each image
-              };
-              createCollage(options).then((canvas) => {
-                let buf = canvas.toBuffer();
-                client.channels.get("236042005929656320")
-                    .sendFile(buf, 'minigalleryimage.png', message.author);
-                client.channels.get("341370133706702860")
-                    .sendFile(buf, 'minigalleryimage.png', message.author);
-              });
+        var options = url.parse(images[0]);
+        http.get(options, function(response) {
+          var chunks = [];
+          response.on('data', function(chunk) {
+            chunks.push(chunk);
+          }).on('end', function() {
+            var buffer = Buffer.concat(chunks);
+            const options = {
+              sources: images,
+              width: w, // number of images per row
+              height: 1, // number of images per column
+              imageWidth: sizeOf(buffer).width / w,
+              imageHeight: sizeOf(buffer).height / w,
+              backgroundColor: "#cccccc", // optional, defaults to black.
+              spacing: 2, // optional: pixels between each image
+            };
+            createCollage(options).then((canvas) => {
+              let buf = canvas.toBuffer();
+              client.channels.get("236042005929656320")
+                .sendFile(buf, 'minigalleryimage.png',
+                  message.author);
+              client.channels.get("341370133706702860")
+                .sendFile(buf, 'minigalleryimage.png',
+                  message.author);
             });
           });
         });
+      });
 
     return;
   }
@@ -191,8 +205,81 @@ client.on('message', message => {
   if (!message.content.startsWith(prefix))
     return;
 
+  const addPointsCmd = 1;
+  const resetPointsCmd = 2;
+  const pointsCmd = 3;
+  const makersCmd = 4;
+  const tutorialsCmd = 5;
+  const leaderboardCmd = 6;
+  const helpCmd = 7;
+  const bioEndioCmd = 8;
+  const redpianoCmd = 9;
+  const sdubCmd = 10;
+  const setRAccountCmd = 11;
+  const redditCmd = 12;
+  const setAlbumCmd = 13;
+  const albumCmd = 14;
+  const resetCmd = 15;
+
+  let bot_command = 0;
   if (message.content.startsWith(prefix + 'addpoints')) {
-    console.log(message.mentions.users);
+    bot_command = addPointsCmd;
+  } else if (message.content.startsWith(prefix + 'resetpoints')) {
+    bot_command = resetPointsCmd;
+  } else if (message.content.startsWith(prefix + 'points')) {
+    bot_command = pointsCmd;
+  } else if (message.content.startsWith(prefix + 'makers')) {
+    bot_command = makersCmd;
+  } else if (message.content.startsWith(prefix + 'tutorials')) {
+    bot_command = tutorialsCmd;
+  } else if (message.content.startsWith(prefix + 'leaderboard')) {
+    bot_command = leaderboardCmd;
+  } else if (message.content.startsWith(prefix + 'help')) {
+    bot_command = helpCmd;
+  } else if (message.content.startsWith(prefix + 'bio_endio')) {
+    bot_command = bioEndioCmd;
+  } else if (message.content.startsWith(prefix + 'redpiano')) {
+    bot_command = redpianoCmd;
+  } else if (message.content.startsWith(prefix + 'sdub')) {
+    bot_command = sdubCmd;
+  } else if (message.content.startsWith(prefix + 'setredditaccount')) {
+    bot_command = setRAccountCmd;
+  } else if (message.content.startsWith(prefix + 'reddit')) {
+    bot_command = redditCmd;
+  } else if (message.content.startsWith(prefix + 'setalbum')) {
+    bot_command = setAlbumCmd;
+  } else if (message.content.startsWith(prefix + 'album')) {
+    bot_command = albumCmd;
+  } else if (message.content.startsWith(prefix + 'reset')) {
+    bot_command = resetCmd;
+  }
+
+  let pointschannel = (message.channel.id === "341370133706702860");
+  let botchannel = (message.channel.id === "344320952991219712");
+  let generalchannel = (message.channel.id === "236042005929656320");
+
+  let ignoreMessage = true;
+
+  if (generalchannel && (bot_command == bioEndioCmd || bot_command ==
+      redpianoCmd)) {
+    ignoreMessage = false;
+  }
+
+  if (botchannel) {
+    ignoreMessage = false;
+  }
+
+  if (pointschannel && (bot_command == addPointsCmd || bot_command ==
+      resetPointsCmd || bot_command == pointsCmd)) {
+    ignoreMessage = false;
+  }
+
+  if (ignoreMessage)
+    return;
+
+
+  if (bot_command == addPointsCmd) {
+    console.log('addPoints:' + message.mentions.users);
     var user = message.mentions.users.first();
     var number = 0;
     var index = message.content.lastIndexOf(" ");
@@ -203,12 +290,10 @@ client.on('message', message => {
     let modRole = message.guild.roles.find("name", "Moderators");
 
     if (!message.member.roles.has(adminRole.id) &&
-        !message.member.roles.has(modRole.id)) {
-      message
-          .reply(
-              `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `)
-          .then(msg => {       msg.delete(7000); });
-          message.delete();
+      !message.member.roles.has(modRole.id)) {
+      message.reply(
+        `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
+      );
       return;
     }
 
@@ -217,61 +302,55 @@ client.on('message', message => {
     let new_level = 0;
 
     scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
-        .then(row => {
-          if (!row) {
+      .then(row => {
+        if (!row) {
+          scoredb.run(
+            'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
+              user.id, 0, 0
+            ]);
+        } else {
+          current_level = row.level;
+          new_points += row.points;
+          new_level = current_level;
+        }
+
+        set_points(message, user, new_points, current_level);
+        scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(
+          row => {
+            message.reply(user + ` has ${row.points} points`);
+          });
+      })
+      .catch(() => {
+        console.error;
+        scoredb
+          .run(
+            'CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)'
+          )
+          .then(() => {
             scoredb.run(
-                'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)',
-                [ user.id, 0, 0 ]);
-          } else {
-            current_level = row.level;
-            new_points += row.points;
-            new_level = current_level;
-          }
+              'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
+                user.id, 0, 0
+              ]);
 
-          set_points(message, user, new_points, current_level);
-        })
-        .catch(() => {
-          console.error;
-          scoredb
-              .run(
-                  'CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)')
-              .then(() => {
-                scoredb.run(
-                    'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)',
-                    [ user.id, 0, 0 ]);
-
-                set_points(message, user, new_points, current_level);
+            set_points(message, user, new_points, current_level);
+            scoredb.get(
+              `SELECT * FROM scores WHERE userId ='${user.id}'`).then(
+              row => {
+                message.reply(user + ` has ${row.points} points`);
               });
-        });
-    scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
-      if (!row) {
-               return message.reply(user + ` has 0 points`).then(msg => {
-                    msg.delete(7000);
-        });
-                message.delete();
-        return;
-      }
-
-      message.reply(user + `has ${row.points} points`).then(msg => {
-                msg.delete(7000);
+          });
       });
-            message.delete();
-      return;
-    });
-  } else
-
-      if (message.content.startsWith(prefix + 'resetpoints')) {
+    return;
+  } else if (bot_command == resetPointsCmd) {
     var user = message.mentions.users.first();
     var number = 0;
 
     let myRole1 = message.guild.roles.find("name", "Admin");
 
     if (!message.member.roles.has(myRole1.id)) {
-      message
-          .reply(
-              `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `)
-          .then(msg => {       msg.delete(7000); });
-          message.delete();
+      message.reply(
+        `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
+      );
       return;
     }
 
@@ -306,102 +385,69 @@ client.on('message', message => {
     scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
       if (!row) {
         scoredb.run(
-            'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)',
-            [ user.id, number, 0 ]);
+          'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
+            user.id, number, 0
+          ]);
       } else {
         scoredb.run(
-            `UPDATE scores SET points = ${
-                                          number
-                                        }, level = ${
-                                                     number
-                                                   } WHERE userId = ${
-                                                                      user.id
-                                                                    }`);
-        console.log("points-reset!");
+          `UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${user.id}`
+        );
       }
+      console.log("points-reset!");
+      message.reply(user + ` reset to 0 points`);
+      return;
     });
-    message.delete(7e3);
-
-  } else
-
-      if (message.content.startsWith(prefix + 'points')) {
+    return;
+  } else if (bot_command == pointsCmd) {
     var user = message.author;
     if (message.mentions.users.size > 0) {
       user = message.mentions.users.first();
     }
     scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
-      if (!row) {
-                return message.reply(user + ` has 0 points`).then(msg => {
-                    msg.delete(7000);
-        });
-                message.delete();
+      if (!row) {    
+        message.reply(user + ` has 0 points`);
         return;
       }
-
-      message.reply(user + `has ${row.points} points`).then(msg => {
-                msg.delete(7000);
-      });
-            message.delete();
+      message.reply(user + `has ${row.points} points`);
       return;
     });
-  } else
-
-      if (message.content.startsWith(prefix + "makers")) {
-
-    message
-        .reply(
-            `here's a list of all manufacturers: https://www.reddit.com/r/minipainting/wiki/manufacturers`)
-        .then(msg => {     msg.delete(7000); });
-      message.delete();
-  } else
-
-      if (message.content.startsWith(prefix + "tutorials")) {
-
-    message
-        .reply(
-            `here's a compilation of useful guides: https://www.reddit.com/r/minipainting/wiki/tutorials`)
-        .then(msg => {     msg.delete(7000); });
-      message.delete();
-  } else
-
-      if (message.content.startsWith(prefix + "leaderboard")) {
+    return;
+  } else if (bot_command == makersCmd) {
+    message.reply(
+      `Here's a list of all manufacturers: https://www.reddit.com/r/minipainting/wiki/manufacturers`
+    );
+    return;
+  } else if (bot_command == tutorialsCmd) {
+    message.reply(
+      `Here's a compilation of useful guides: https://www.reddit.com/r/minipainting/wiki/tutorials`
+    );
+    return;
+  } else if (bot_command == leaderboardCmd) {
     try {
-
       scoredb.get(`SELECT TOP 5 * FROM scores order by points desc`)
-          .then(table => {
-            message.reply(table).then(msg => {           msg.delete(7000); });
-                    message.delete();
-
-          });
+        .then(table => {
+          message.reply(table);
+          return;
+        });
     } catch (e) {
-      message.reply("Chron broked it.").then(msg => {
-              msg.delete(7000);
-      });
-          messsge.delete(7000);
+      message.reply("Chron broked it.");
     }
-
-  } else
-
-      if (message.content.startsWith(prefix + "help")) {
-
-    message
-        .reply(`**COMMAND LIST**\n
+    return;
+  } else if (bot_command == helpCmd) {
+    message.reply(
+      `**COMMAND LIST**\n
         "!points [user]":   Check a user's points!
         "!makers":    You can find all mini related manufactores!
         "!tutorials":    You can find useful guide lists!
         "!setredditaccount [username]": You can link your reddit account!
         "!reddit [user]": Get a user's linked reddit account!
         "!setalbum [link]": You can link an album of your paintings!
-        "!album [user]": Get a user's linked album!`)
-        .then(msg => {     msg.delete(7000); });
-      message.delete(7000);
-
-  } else
-
-      if (message.content.startsWith(prefix + "bio_endio")) {
-
-    message
-        .reply(`
+        "!album [user]": Get a user's linked album!`
+    );
+    return;
+  } else if (bot_command == bioEndioCmd) {
+    message.reply(
+      `
             C O N T R A S T
             O
             N
@@ -409,34 +455,24 @@ client.on('message', message => {
             R
             A
             S
-            T`)
-        .then(msg => {       msg.delete(7000); });
-        message.delete(7000);
-  } else
-
-      if (message.content.startsWith(prefix + "redpiano")) {
-
-    message.reply(`O I L`).then(msg => {     msg.delete(7000); });
-      message.delete();
-  } else
-
-      if (message.content.startsWith(prefix + "sdub")) {
-
-    message.reply(`https://www.youtube.com/user/SDubist`).then(msg => {
-          msg.delete(7000);
-    });
-      message.delete();
-  } else
-
-      if (message.content.startsWith(prefix + "setredditaccount")) {
+            T`
+    );
+    return;
+  } else if (bot_command == redpianoCmd) {
+    message.reply(`O I L`);
+    return;
+  } else if (bot_command == sdubCmd) {
+    message.reply(`https://www.youtube.com/user/SDubist`);
+    return;
+  } else if (bot_command == setRAccountCmd) {
     let author = message.author;
     let index = message.content.lastIndexOf(" ");
     let redditAccount = "";
     if (index == -1) {
-      message.reply('Usage: !setredditaccount [username]').then(msg => {
-              msg.delete(7000);
-      });
-          message.delete();
+      message.reply('Usage: !setredditaccount [username]').then(msg => {   
+        msg.delete(7000);
+      });  
+      message.delete();
       return;
     }
     redditAccount = message.content.substring(index + 1);
@@ -454,77 +490,68 @@ client.on('message', message => {
     }
 
     accountsdb.get(`SELECT * FROM accounts WHERE userId ='${author.id}'`)
-        .then(row => {
-          if (!row) {
-            accountsdb.run(
-                'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)',
-                [ author.id, redditAccount, "" ]);
-          } else {
-            accountsdb.run(
-                `UPDATE accounts SET account = "${
+      .then(row => {
+        if (!row) {
+          accountsdb.run(
+            'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)', [
+              author.id, redditAccount, ""
+            ]);
+        } else {
+          accountsdb.run(
+            `UPDATE accounts SET account = "${
                                                   redditAccount
                                                 }" WHERE userId = ${
                                                                     author.id
-                                                                  }`);
-          }
-          console.log("set reddit account!");
-        })
-        .catch(() => {
-          console.error;
-          accountsdb
-              .run(
-                  'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)')
-              .then(() => {
-                accountsdb.run(
-                    'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)',
-                    [ author.id, redditAccount, "" ]);
-              });
-        });
+                                                                  }`
+          );
+        }
+        console.log("set reddit account!");
+      })
+      .catch(() => {
+        console.error;
+        accountsdb
+          .run(
+            'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)'
+          )
+          .then(() => {
+            accountsdb.run(
+              'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)', [
+                author.id, redditAccount, ""
+              ]);
+          });
+      });
 
-    message
-        .reply(`Successfully linked to https://www.reddit.com/u/` +
-               redditAccount)
-        .then(msg => {     msg.delete(7000); });
-      message.delete();
-
-  } else
-
-      if (message.content.startsWith(prefix + "reddit")) {
-
+    message.reply(`Successfully linked to https://www.reddit.com/u/` +
+      redditAccount);
+    return;
+  } else if (bot_command == redditCmd) {
     try {
       var user = message.author;
       if (message.mentions.users.size > 0) {
         user = message.mentions.users.first();
       }
       accountsdb.get(`SELECT * FROM accounts WHERE userId ='${user.id}'`)
-          .then(row => {
-            if (!row || row.account == "") {
-              message.reply(user + ` does not have a linked Reddit account.`)
-                  .then(msg => {               msg.delete(7000); });
-                          message.delete();
-            } else {
-              message
-                  .reply(`Reddit Account for ` + user +
-                         `: https://www.reddit.com/user/` + row.account)
-                  .then(msg => {               msg.delete(7000); });
-                          messsage.delete();
-            }
-          });
+        .then(row => {
+          if (!row || row.account == "") {
+            message.reply(user +
+              ` does not have a linked Reddit account.`);
+            return;
+          } else {
+            message.reply(`Reddit Account for ` + user +
+              `: https://www.reddit.com/user/` + row.account);
+            return;
+          }
+        });
     } catch (e) {
-      message.reply('Invalid user').then(msg => {       msg.delete(7000); });
-          message.delete();
+      message.reply('Invalid user');
+      return;
     }
-  } else
-
-      if (message.content.startsWith(prefix + "setalbum")) {
+  } else if (bot_command == setAlbumCmd) {
     let author = message.author;
     let index = message.content.lastIndexOf(" ");
     let album = "";
     if (index == -1) {
-      message.reply('Usage: !setalbum [link]').then(msg => {
-              msg.delete(7000);
-      });
-          message.delete();
+      message.reply('Usage: !setalbum [link]');
       return;
     }
     album = message.content.substring(index + 1);
@@ -533,69 +560,68 @@ client.on('message', message => {
     }
 
     accountsdb.get(`SELECT * FROM accounts WHERE userId ='${author.id}'`)
-        .then(row => {
-          if (!row) {
-            accountsdb.run(
-                'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)',
-                [ author.id, "", album ]);
-          } else {
-            accountsdb.run(
-                `UPDATE accounts SET album = "${
+      .then(row => {
+        if (!row) {
+          accountsdb.run(
+            'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)', [
+              author.id, "", album
+            ]);
+        } else {
+          accountsdb.run(
+            `UPDATE accounts SET album = "${
                                                 album
-                                              }" WHERE userId = ${author.id}`);
-          }
-          console.log("set album!");
-        })
-        .catch(() => {
-          console.error;
-          accountsdb
-              .run(
-                  'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)')
-              .then(() => {
-                accountsdb.run(
-                    'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)',
-                    [ author.id, "", album ]);
-              });
-        });
+                                              }" WHERE userId = ${author.id}`
+          );
+        }
+        console.log("set album!");
+      })
+      .catch(() => {
+        console.error;
+        accountsdb
+          .run(
+            'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)'
+          )
+          .then(() => {
+            accountsdb.run(
+              'INSERT INTO accounts (userId, account, album) VALUES (?, ?, ?)', [
+                author.id, "", album
+              ]);
+          });
+      });
 
-    message.reply(`Successfully set album to ` + album).then(msg => {
-          msg.delete(7000);
-    });
-      message.delete();
-  } else
-
-      if (message.content.startsWith(prefix + "album")) {
+    message.reply(`Successfully set album to ` + album);
+  } else if (bot_command == albumCmd) {
     try {
       var user = message.author;
       if (message.mentions.users.size > 0) {
         user = message.mentions.users.first();
       }
       accountsdb.get(`SELECT * FROM accounts WHERE userId ='${user.id}'`)
-          .then(row => {
-            if (!row || row.album == "") {
-              message.reply(user + ` does not have a linked album.`)
-                  .then(msg => {                 msg.delete(7000); });
-                            message.delete();
-            } else {
-              message.reply(`Album for ` + user + `: ` + row.album)
-                  .then(msg => {                 msg.delete(7000); });
-                            message.delete();
-            }
-          });
+        .then(row => {
+          if (!row || row.album == "") {
+            message.reply(user + ` does not have a linked album.`);
+            return;
+          } else {
+            message.reply(`Album for ` + user + `: ` + row.album);
+            return;
+          }
+        });
     } catch (e) {
-      message.reply('Invalid user').then(msg => {       msg.delete(7000); });
-          message.delete();
+      message.reply('Invalid user');
+      return;
     }
   } else if (message.content.startsWith(prefix + "reset")) {
     let myRole1 = message.guild.roles.find("name", "Admin");
 
     if (!message.member.roles.has(myRole1.id) &&
-        message.author.id != '134744140318638080') {
+      message.author.id != '134744140318638080') {
       return;
     }
     message.reply(`Coming back!`);
 
-    setTimeout(() => { process.exit(); }, 1000);
+    setTimeout(() => {
+      process.exit();
+    }, 1000);
   }
 });
 
