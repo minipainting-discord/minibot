@@ -102,7 +102,7 @@ var waiting_users = [];
 //mini-gallery:   236049686820159488
 //general:        236042005929656320
 //botchannel:     344320952991219712
-//pointsrequest:  341370133706702860
+//pointsrequest:  344320952991219712
 
 client.on('message', message => {
   if (message.author.bot)
@@ -129,7 +129,7 @@ client.on('message', message => {
     if (is_link) {
       client.channels.get("236042005929656320").sendMessage(message.author +
         " : " + message.content);
-      client.channels.get("341370133706702860").sendMessage(message.author +
+      client.channels.get("344320952991219712").sendMessage(message.author +
         " : " + message.content);
       return;
     }
@@ -191,7 +191,7 @@ client.on('message', message => {
               client.channels.get("236042005929656320")
                 .sendFile(buf, 'minigalleryimage.png',
                   message.author);
-              client.channels.get("341370133706702860")
+              client.channels.get("344320952991219712")
                 .sendFile(buf, 'minigalleryimage.png',
                   message.author);
             });
