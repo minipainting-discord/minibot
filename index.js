@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const Discord = require('discord.js'); // https://discord.js.org/#/ 
 const client = new Discord.Client();
 const settings = require('./settings.json');
 const sql = require('sqlite');
@@ -7,79 +7,55 @@ const sizeOf = require('image-size');
 var url = require('url');
 var http = require('https');
 
+const miniGalleryChannelId = "236049686820159488";
+const generalChannelId = "236042005929656320";
+const botChannelId = "344320952991219712";
+const pointsRequestChannelId = "341370133706702860";
+
 var scoredb = 0;
 var accountsdb = 0;
 
 function set_points(message, user, new_points, current_level) {
-  let new_level = 0;
   let member = message.guild.member(user);
-  let role2 = message.guild.roles.find("name", "Dip 'N Forget");
-  let role3 = message.guild.roles.find("name", "Ebay Propainted");
-  let role4 = message.guild.roles.find("name", "C+C Plz");
-  let role5 = message.guild.roles.find("name", "JALMM");
-  let role6 = message.guild.roles.find("name", "Bub For The Bub Glub");
+  let role1 = message.guild.roles.find("name", "Dip 'N Forget");
+  let role2 = message.guild.roles.find("name", "Ebay Propainted");
+  let role3 = message.guild.roles.find("name", "C+C Plz");
+  let role4 = message.guild.roles.find("name", "JALMM");
+  let role5 = message.guild.roles.find("name", "Bub For The Bub Glub");
 
-  if (new_points >= 70) {
-    new_level = 5;
+  function update_role(new_level, old_role, new_role) {
     if (current_level != new_level) {
-      client.channels.get("236042005929656320")
+      client.channels.get(generalChannelId)
         .sendMessage(user +
-          ` :confetti_ball: Congratulations you reached **Bub For The Bub Glub** rank! :confetti_ball:`
+        ` :confetti_ball: Congratulations you reached **${new_role.name}** rank! :confetti_ball:`
         );
-      member.removeRole(role5).catch(console.error);
-      member.addRole(role6).catch(console.error);
-    }
-  } else if (new_points >= 40) {
-    new_level = 4;
-    if (current_level != new_level) {
-      client.channels.get("236042005929656320")
-        .sendMessage(user +
-          ` :confetti_ball: Congratulations you reached **JALMM** rank! :confetti_ball:`
-        );
-      member.removeRole(role4).catch(console.error);
-      member.addRole(role5).catch(console.error);
-    }
-  } else if (new_points >= 20) {
-    new_level = 3;
-    if (current_level != new_level) {
-      client.channels.get("236042005929656320")
-        .sendMessage(user +
-          ` :confetti_ball: Congratulations you reached **C+C Plz** rank! :confetti_ball:`
-        );
-      member.removeRole(role3).catch(console.error);
-      member.addRole(role4).catch(console.error);
-    }
-  } else if (new_points >= 10) {
-    new_level = 2;
-    if (current_level != new_level) {
-      client.channels.get("236042005929656320")
-        .sendMessage(user +
-          ` :confetti_ball: Congratulations you reached **Ebay Propainted** rank! :confetti_ball:`
-        );
-      member.removeRole(role2).catch(console.error);
-      member.addRole(role3).catch(console.error);
-    }
-  } else if (new_points >= 5) {
-    new_level = 1;
-    if (current_level != new_level) {
-      client.channels.get("236042005929656320")
-        .sendMessage(user +
-          ` :confetti_ball: Congratulations you reached **Dip 'N Forget** rank! :confetti_ball:`
-        );
-      member.addRole(role2).catch(console.error);
+
+      if (old_role !== null) member.removeRole(old_role).catch(console.error);
+      member.addRole(new_role).catch(console.error);
+
+      scoredb.run(
+        `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
+      );
+    } else {
+      scoredb.run(
+        `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`);
     }
   }
 
-  if (current_level != new_level) {
-    scoredb.run(
-      `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
-    );
-  } else {
-    scoredb.run(
-      `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`);
+  if (new_points >= 70) {
+    update_role(5, role4, role5);
+  } else if (new_points >= 40) {
+    update_role(4, role3, role4);
+  } else if (new_points >= 20) {
+    update_role(3, role2, role3);
+  } else if (new_points >= 10) {
+    update_role(2, role1, role2);
+  } else if (new_points >= 5) {
+    update_role(1, null, role1);
   }
 }
 
+// Open the local SQLite database to store account and score information.
 Promise.all([
   sql.open('./score.sqlite', {
     Promise
@@ -87,7 +63,7 @@ Promise.all([
   sql.open('./accounts.sqlite', {
     Promise
   })
-]).then(function([scoreDB, accountsDB]) {
+]).then(function ([scoreDB, accountsDB]) {
   scoredb = scoreDB;
   accountsdb = accountsDB;
 });
@@ -96,13 +72,8 @@ client.on('ready', () => {
   console.log('I\'m Online\nl\'m Online');
 });
 
-var prefix = "!"
+var commandPrefix = "!"
 var waiting_users = [];
-
-//mini-gallery:   236049686820159488
-//general:        236042005929656320
-//botchannel:     344320952991219712
-//pointsrequest:  341370133706702860
 
 client.on('message', message => {
   if (message.author.bot)
@@ -111,7 +82,7 @@ client.on('message', message => {
   if (message.channel.type !== 'text')
     return;
 
-  if (message.channel.id === "236049686820159488") {
+  if (message.channel.id === miniGalleryChannelId) {
     let is_link = false;
 
     if (message.attachments.size == 0) {
@@ -127,10 +98,10 @@ client.on('message', message => {
     }
 
     if (is_link) {
-      client.channels.get("236042005929656320").sendMessage(message.author +
-        " : " + message.content);
-      client.channels.get("341370133706702860").sendMessage(message.author +
-        " : " + message.content);
+      client.channels.get(generalChannelId)
+        .sendMessage(message.author + " : " + message.content);
+      client.channels.get(pointsRequestChannelId)
+        .sendMessage(message.author + " : " + message.content);
       return;
     }
 
@@ -141,8 +112,8 @@ client.on('message', message => {
     message.channel
       .awaitMessages(m => m.attachments.size > 0 &&
         m.author.id == message.author.id, {
-          time: 10e3
-        })
+        time: 10e3
+      })
       .then(collected => {
         let idx = waiting_users.indexOf(message.author.id);
         waiting_users.splice(idx, 1);
@@ -171,11 +142,11 @@ client.on('message', message => {
         let h = images.length / w;
 
         var options = url.parse(images[0]);
-        http.get(options, function(response) {
+        http.get(options, function (response) {
           var chunks = [];
-          response.on('data', function(chunk) {
+          response.on('data', function (chunk) {
             chunks.push(chunk);
-          }).on('end', function() {
+          }).on('end', function () {
             var buffer = Buffer.concat(chunks);
             const options = {
               sources: images,
@@ -188,12 +159,12 @@ client.on('message', message => {
             };
             createCollage(options).then((canvas) => {
               let buf = canvas.toBuffer();
-              client.channels.get("236042005929656320")
+              client.channels.get(generalChannelId)
                 .sendFile(buf, 'minigalleryimage.png',
-                  message.author);
-              client.channels.get("341370133706702860")
+                message.author);
+              client.channels.get(pointsRequestChannelId)
                 .sendFile(buf, 'minigalleryimage.png',
-                  message.author);
+                message.author);
             });
           });
         });
@@ -202,7 +173,7 @@ client.on('message', message => {
     return;
   }
 
-  if (!message.content.startsWith(prefix))
+  if (!message.content.startsWith(commandPrefix))
     return;
 
   const addPointsCmd = 1;
@@ -222,46 +193,45 @@ client.on('message', message => {
   const resetCmd = 15;
 
   let bot_command = 0;
-  if (message.content.startsWith(prefix + 'addpoints')) {
+  if (message.content.startsWith(commandPrefix + 'addpoints')) {
     bot_command = addPointsCmd;
-  } else if (message.content.startsWith(prefix + 'resetpoints')) {
+  } else if (message.content.startsWith(commandPrefix + 'resetpoints')) {
     bot_command = resetPointsCmd;
-  } else if (message.content.startsWith(prefix + 'points')) {
+  } else if (message.content.startsWith(commandPrefix + 'points')) {
     bot_command = pointsCmd;
-  } else if (message.content.startsWith(prefix + 'makers')) {
+  } else if (message.content.startsWith(commandPrefix + 'makers')) {
     bot_command = makersCmd;
-  } else if (message.content.startsWith(prefix + 'tutorials')) {
+  } else if (message.content.startsWith(commandPrefix + 'tutorials')) {
     bot_command = tutorialsCmd;
-  } else if (message.content.startsWith(prefix + 'leaderboard')) {
+  } else if (message.content.startsWith(commandPrefix + 'leaderboard')) {
     bot_command = leaderboardCmd;
-  } else if (message.content.startsWith(prefix + 'help')) {
+  } else if (message.content.startsWith(commandPrefix + 'help')) {
     bot_command = helpCmd;
-  } else if (message.content.startsWith(prefix + 'bio_endio')) {
+  } else if (message.content.startsWith(commandPrefix + 'bio_endio')) {
     bot_command = bioEndioCmd;
-  } else if (message.content.startsWith(prefix + 'redpiano')) {
+  } else if (message.content.startsWith(commandPrefix + 'redpiano')) {
     bot_command = redpianoCmd;
-  } else if (message.content.startsWith(prefix + 'sdub')) {
+  } else if (message.content.startsWith(commandPrefix + 'sdub')) {
     bot_command = sdubCmd;
-  } else if (message.content.startsWith(prefix + 'setredditaccount')) {
+  } else if (message.content.startsWith(commandPrefix + 'setredditaccount')) {
     bot_command = setRAccountCmd;
-  } else if (message.content.startsWith(prefix + 'reddit')) {
+  } else if (message.content.startsWith(commandPrefix + 'reddit')) {
     bot_command = redditCmd;
-  } else if (message.content.startsWith(prefix + 'setalbum')) {
+  } else if (message.content.startsWith(commandPrefix + 'setalbum')) {
     bot_command = setAlbumCmd;
-  } else if (message.content.startsWith(prefix + 'album')) {
+  } else if (message.content.startsWith(commandPrefix + 'album')) {
     bot_command = albumCmd;
-  } else if (message.content.startsWith(prefix + 'reset')) {
+  } else if (message.content.startsWith(commandPrefix + 'reset')) {
     bot_command = resetCmd;
   }
 
-  let pointschannel = (message.channel.id === "341370133706702860");
-  let botchannel = (message.channel.id === "344320952991219712");
-  let generalchannel = (message.channel.id === "236042005929656320");
+  let pointschannel = (message.channel.id === pointsRequestChannelId);
+  let botchannel = (message.channel.id === botChannelId);
+  let generalchannel = (message.channel.id === generalChannelId);
 
   let ignoreMessage = true;
 
-  if (generalchannel && (bot_command == bioEndioCmd || bot_command ==
-      redpianoCmd)) {
+  if (generalchannel && (bot_command == bioEndioCmd || bot_command == redpianoCmd)) {
     ignoreMessage = false;
   }
 
@@ -269,14 +239,13 @@ client.on('message', message => {
     ignoreMessage = false;
   }
 
-  if (pointschannel && (bot_command == addPointsCmd || bot_command ==
-      resetPointsCmd || bot_command == pointsCmd)) {
+  if (pointschannel
+    && (bot_command == addPointsCmd || bot_command == resetPointsCmd || bot_command == pointsCmd)) {
     ignoreMessage = false;
   }
 
   if (ignoreMessage)
     return;
-
 
   if (bot_command == addPointsCmd) {
     console.log('addPoints:' + message.mentions.users);
@@ -289,6 +258,7 @@ client.on('message', message => {
     let adminRole = message.guild.roles.find("name", "Admin");
     let modRole = message.guild.roles.find("name", "Moderators");
 
+    // Only allow Admin and Moderators to add points.
     if (!message.member.roles.has(adminRole.id) &&
       !message.member.roles.has(modRole.id)) {
       message.reply(
@@ -324,7 +294,7 @@ client.on('message', message => {
         console.error;
         scoredb
           .run(
-            'CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)'
+          'CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)'
           )
           .then(() => {
             scoredb.run(
@@ -404,7 +374,7 @@ client.on('message', message => {
       user = message.mentions.users.first();
     }
     scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
-      if (!row) {    
+      if (!row) {
         message.reply(user + ` has 0 points`);
         return;
       }
@@ -469,9 +439,9 @@ client.on('message', message => {
     let index = message.content.lastIndexOf(" ");
     let redditAccount = "";
     if (index == -1) {
-      message.reply('Usage: !setredditaccount [username]').then(msg => {   
+      message.reply('Usage: !setredditaccount [username]').then(msg => {
         msg.delete(7000);
-      });  
+      });
       message.delete();
       return;
     }
@@ -499,10 +469,10 @@ client.on('message', message => {
         } else {
           accountsdb.run(
             `UPDATE accounts SET account = "${
-                                                  redditAccount
-                                                }" WHERE userId = ${
-                                                                    author.id
-                                                                  }`
+            redditAccount
+            }" WHERE userId = ${
+            author.id
+            }`
           );
         }
         console.log("set reddit account!");
@@ -511,7 +481,7 @@ client.on('message', message => {
         console.error;
         accountsdb
           .run(
-            'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)'
+          'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)'
           )
           .then(() => {
             accountsdb.run(
@@ -569,8 +539,8 @@ client.on('message', message => {
         } else {
           accountsdb.run(
             `UPDATE accounts SET album = "${
-                                                album
-                                              }" WHERE userId = ${author.id}`
+            album
+            }" WHERE userId = ${author.id}`
           );
         }
         console.log("set album!");
@@ -579,7 +549,7 @@ client.on('message', message => {
         console.error;
         accountsdb
           .run(
-            'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)'
+          'CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)'
           )
           .then(() => {
             accountsdb.run(
@@ -610,7 +580,7 @@ client.on('message', message => {
       message.reply('Invalid user');
       return;
     }
-  } else if (message.content.startsWith(prefix + "reset")) {
+  } else if (message.content.startsWith(commandPrefix + "reset")) {
     let myRole1 = message.guild.roles.find("name", "Admin");
 
     if (!message.member.roles.has(myRole1.id) &&
