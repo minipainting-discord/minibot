@@ -397,7 +397,7 @@ client.on('message', message => {
       scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`).then(results => {
         if (results) {
           for (row of results) {
-            var rowUser = client.fetchUser(row.userId).then(rUser => {
+            let rowUser = client.fetchUser(row.userId).then(rUser => {
               message.reply(`${row.points} - ${rUser.username}`);
             });
           }
