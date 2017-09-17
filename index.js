@@ -394,11 +394,16 @@ client.on('message', message => {
     return;
   } else if (bot_command == leaderboardCmd) {
     try {
-      scoredb.get(`SELECT TOP 5 * FROM scores order by points desc`)
-        .then(table => {
-          message.reply(table);
-          return;
-        });
+      scoredb.all(`SELECT TOP 5 * FROM scores order by points desc`, [], function (err, rows) {
+        if (rows !== null) {
+          for (row of rows) {
+            message.reply(`${row.points} - ${row.userId}`);
+          }
+        } else {
+          message.reply("Oops, something went wrong!");
+        }
+        return;
+      });
     } catch (e) {
       message.reply("Chron broked it.");
     }
@@ -407,6 +412,7 @@ client.on('message', message => {
     message.reply(
       `**COMMAND LIST**\n
         "!points [user]":   Check a user's points!
+        "!leaderboard":   Check the points leaderboard!
         "!makers":    You can find all mini related manufactores!
         "!tutorials":    You can find useful guide lists!
         "!setredditaccount [username]": You can link your reddit account!
