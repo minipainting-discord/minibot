@@ -394,7 +394,7 @@ client.on('message', message => {
     return;
   } else if (bot_command == leaderboardCmd) {
     try {
-      scoredb.all(`SELECT TOP 5 * FROM scores order by points desc`, [], function (err, rows) {
+      scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`, [], function (err, rows) {
         if (rows !== null) {
           for (row of rows) {
             message.reply(`${row.points} - ${row.userId}`);
