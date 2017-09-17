@@ -394,15 +394,16 @@ client.on('message', message => {
     return;
   } else if (bot_command == leaderboardCmd) {
     try {
-      scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`, [], function (err, rows) {
-        if (rows !== null) {
-          for (row of rows) {
-            message.reply(`${row.points} - ${row.userId}`);
+      scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`).then(results => {
+        if (results) {
+          for (row of results) {
+            var rowUser = client.fetchUser(row.userId).then(rUser => {
+              message.reply(`${row.points} - ${rUser.username}`);
+            });
           }
         } else {
           message.reply("Oops, something went wrong!");
         }
-        return;
       });
     } catch (e) {
       message.reply("Chron broked it.");
