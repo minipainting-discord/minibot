@@ -395,20 +395,21 @@ client.on('message', message => {
   } else if (bot_command == leaderboardCmd) {
     scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`).then(results => {
       if (results) {
-        let resultPromises = [];
+        let userPromises = [];
         for (let i = 0; i < results.length; i++) {
-          client.fetchUser(results[i].userId).then(rUser => {
-            resultPromises.push({ points: results[i].points, name: rUser.username });
-          });
+          userPromises.push(client.fetchUser(results[i].userId));
         }
-        Promise.all(resultPromises).then(values => {
-          values.sort(function (a, b) { return b.points - a.points });
+        Promise.all(userPromises).then(users => {
           let msg = [];
-          for (let i = 0; i < values.length; i++) {
-            msg.push(`${values[i].points} - ${values[i].name}`);
+          for (let j = 0; j < results.length; j++) {
+            for (let i = 0; i < users.length; i++) {
+              if (results[j].userId == users[i].id) {
+                msg.push(`${results[i].points} - ${users[i].username}`);
+              }
+            }
           }
           message.reply(msg);
-        })
+        });
       } else {
         message.reply("Oops, something went wrong!");
       }
