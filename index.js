@@ -403,13 +403,12 @@ client.on('message', message => {
         }
         Promise.all(resultPromises).then(values => {
           values.sort(function (a, b) { return b.points - a.points });
-          let msg = ``;
+          let msg = [];
           for (let i = 0; i < values.length; i++) {
-            msg += `${values[i].points} - ${values[i].name} \n`;
+            msg.push(`${values[i].points} - ${values[i].name}`);
           }
           message.reply(msg);
         })
-
       } else {
         message.reply("Oops, something went wrong!");
       }
