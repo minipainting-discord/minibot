@@ -393,21 +393,27 @@ client.on('message', message => {
     );
     return;
   } else if (bot_command == leaderboardCmd) {
-    try {
-      scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`).then(results => {
-        if (results) {
-          for (let i = 0; i < results.length; i++) {
-            let rowUser = client.fetchUser(results[i].userId).then(rUser => {
-              message.reply(`${results[i].points} - ${rUser.username}`);
-            });
-          }
-        } else {
-          message.reply("Oops, something went wrong!");
+    scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`).then(results => {
+      if (results) {
+        let userPromises = [];
+        for (let i = 0; i < results.length; i++) {
+          userPromises.push(client.fetchUser(results[i].userId));
         }
-      });
-    } catch (e) {
-      message.reply("Chron broked it.");
-    }
+        Promise.all(userPromises).then(users => {
+          let msg = [];
+          for (let j = 0; j < results.length; j++) {
+            for (let i = 0; i < users.length; i++) {
+              if (results[j].userId == users[i].id) {
+                msg.push(`${results[i].points} - ${users[i].username}`);
+              }
+            }
+          }
+          message.reply(msg);
+        });
+      } else {
+        message.reply("Oops, something went wrong!");
+      }
+    });
     return;
   } else if (bot_command == helpCmd) {
     message.reply(
