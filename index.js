@@ -10,7 +10,7 @@ var http = require('https');
 const miniGalleryChannelId = "236049686820159488";
 const generalChannelId = "236042005929656320";
 const botChannelId = "344320952991219712";
-const pointsRequestChannelId = "341370133706702860";
+const pointsRequestChannelId = "344320952991219712";
 
 var scoredb = 0;
 var accountsdb = 0;
