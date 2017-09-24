@@ -159,12 +159,16 @@ client.on('message', message => {
             };
             createCollage(options).then((canvas) => {
               let buf = canvas.toBuffer();
-              client.channels.get(generalChannelId)
-                .sendFile(buf, 'minigalleryimage.png',
-                message.author);
-              client.channels.get(pointsRequestChannelId)
-                .sendFile(buf, 'minigalleryimage.png',
-                message.author);
+              let genChan = client.channels.get(generalChannelId);
+              let pointChan = client.channels.get(pointsRequestChannelId);
+              if (genChan != null) {
+                genChan.sendFile(buf, 'minigalleryimage.png',
+                  message.author);
+              }
+              if (pointChan != null) {
+                pointChan.sendFile(buf, 'minigalleryimage.png',
+                  message.author);
+              }
             });
           });
         });
