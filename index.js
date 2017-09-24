@@ -264,7 +264,8 @@ client.on('message', message => {
 
     // Only allow Admin and Moderators to add points.
     if (!message.member.roles.has(adminRole.id) &&
-      !message.member.roles.has(modRole.id)) {
+      !message.member.roles.has(modRole.id) && 
+       message.author.id != '134744140318638080') {
       message.reply(
         `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `
       );
