@@ -22,6 +22,8 @@ function set_points(message, user, new_points, current_level) {
   let role3 = message.guild.roles.find("name", "C+C Plz");
   let role4 = message.guild.roles.find("name", "JALMM");
   let role5 = message.guild.roles.find("name", "Bub For The Bub Glub");
+  
+  console.log('set_points', new_points, user, current_level);
 
   function update_role(new_level, old_role, new_role) {
     if (current_level != new_level) {
