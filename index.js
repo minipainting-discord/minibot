@@ -23,41 +23,52 @@ function set_points(message, user, new_points, current_level) {
   let role4 = message.guild.roles.find("name", "JALMM");
   let role5 = message.guild.roles.find("name", "Bub For The Bub Glub");
 
-  function update_role(new_level, old_role, new_role) {
-    if (current_level != new_level) {
-      client.channels.get(generalChannelId)
-        .sendMessage(user +
-        ` :confetti_ball: Congratulations you reached **${new_role.name}** rank! :confetti_ball:`
-        );
-
-      if (old_role !== null) member.removeRole(old_role).catch(console.error);
-      member.addRole(new_role).catch(console.error);
-
-      let tmp = `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
-      console.log('tmp',tmp);
-      scoredb.run(
-        tmp
-      );
-    } else {
-      let tmp2 = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
-      console.log('tmp2',tmp2)
-      scoredb.run(
-        tmp2
-        );
-    }
-  }
-
+  let new_level = current_level;
+  let old_role = role1;
+  let new_role = role1;
   if (new_points >= 70) {
-    update_role(5, role4, role5);
+    old_role = role4;
+    new_role = role5;
+    new_level = 5;
   } else if (new_points >= 40) {
-    update_role(4, role3, role4);
+    old_role = role3;
+    new_role = role4;
+    new_level = 4;
   } else if (new_points >= 20) {
-    update_role(3, role2, role3);
+    old_role = role2;
+    new_role = role3;
+    new_level = 3;
   } else if (new_points >= 10) {
-    update_role(2, role1, role2);
+    old_role = role1;
+    new_role = role2;
+    new_level = 2;
   } else if (new_points >= 5) {
-    update_role(1, null, role1);
+    old_role = null;
+    new_role = role1;
+    new_level =1;
   }
+  
+  if (current_level != new_level) {
+    client.channels.get(generalChannelId)
+      .sendMessage(user +
+      ` :confetti_ball: Congratulations you reached **${new_role.name}** rank! :confetti_ball:`
+      );
+
+    if (old_role !== null) member.removeRole(old_role).catch(console.error);
+    member.addRole(new_role).catch(console.error);
+
+    let tmp = `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
+    console.log('update scores ',tmp);
+    scoredb.run(
+      tmp
+    );
+  } else {
+    let tmp2 = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
+    console.log('update scores ',tmp2)
+    scoredb.run(
+      tmp2
+    );
+  }  
 }
 
 // Open the local SQLite database to store account and score information.
