@@ -34,13 +34,16 @@ function set_points(message, user, new_points, current_level) {
       member.addRole(new_role).catch(console.error);
 
       let tmp = `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
-      console.log(tmp);
+      console.log('tmp',tmp);
       scoredb.run(
         tmp
       );
     } else {
+      let tmp2 = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
+      console.log('tmp2',tmp2)
       scoredb.run(
-        `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`);
+        tmp2
+        );
     }
   }
 
