@@ -287,7 +287,7 @@ client.on('message', message => {
           new_points += row.points;
           new_level = current_level;
         }
-        console.log('addpoints: ' + user + ' ' + new_points + ' ' + current_level);
+        console.log('addpoints: ' + user + ' ' + user.id' ' + new_points + ' ' + current_level);
 
         set_points(message, user, new_points, current_level);
         scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(
