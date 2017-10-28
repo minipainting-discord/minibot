@@ -251,7 +251,7 @@ client.on('message', message => {
 
   let ignoreMessage = true;
 
-  if (generalchannel && (bot_command == bioEndioCmd || bot_command == redpianoCmd)) {
+  if (generalchannel && (bot_command == bioEndioCmd || bot_command == redpianoCmd || bot_command == albumCmd)) {
     ignoreMessage = false;
   }
 
