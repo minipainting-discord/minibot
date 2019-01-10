@@ -12,10 +12,13 @@ const generalChannelId = "236042005929656320";
 const botChannelId = "344320952991219712";
 const pointsRequestChannelId = "344320952991219712";
 
+const adminRoleStr = "Admin";
+const modRoleStr = "Moderators";
+
 var scoredb = 0;
 var accountsdb = 0;
 
-function set_points(message, user, new_points, current_level) {
+function set_points(message, user, new_points, current_level, annual_add) {
   let member = message.guild.member(user);
   let role1 = message.guild.roles.find("name", "Dip 'N Forget");
   let role2 = message.guild.roles.find("name", "Ebay Propainted");
@@ -48,6 +51,8 @@ function set_points(message, user, new_points, current_level) {
     new_level =1;
   }
   
+  var cmd;
+  
   if (current_level != new_level) {
     client.channels.get(generalChannelId)
       .sendMessage(user +
@@ -57,18 +62,25 @@ function set_points(message, user, new_points, current_level) {
     if (old_role !== null) member.removeRole(old_role).catch(console.error);
     member.addRole(new_role).catch(console.error);
 
-    let tmp = `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`
-    console.log('update scores ',tmp);
-    scoredb.run(
-      tmp
-    );
+    cmd = `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`;
+	
   } else {
-    let tmp2 = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
-    console.log('update scores ',tmp2)
-    scoredb.run(
-      tmp2
-    );
-  }  
+    cmd = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
+  }
+  
+  console.log('update scores ',cmd)
+    scoredb.run(cmd)
+	.then(() => {
+		cmd = `UPDATE annual SET points = ${annual_add} WHERE userId = ${user.id}`;
+		console.log('update annual ',cmd);
+		scoredb.run(cmd)
+		.then(() => {
+			scoredb.get(`SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`)
+			.then(row => {
+				message.reply(user + ` has ${row.s_points} lifetime points and ${row.a_points} current points`);
+			});	
+		});
+	});	
 }
 
 // Open the local SQLite database to store account and score information.
@@ -211,6 +223,8 @@ client.on('message', message => {
   const setAlbumCmd = 13;
   const albumCmd = 14;
   const resetCmd = 15;
+  const resetAnnualCmd = 16;
+  const restoreAnnualCmd = 17;
 
   let bot_command = 0;
   if (message.content.startsWith(commandPrefix + 'addpoints')) {
@@ -243,6 +257,10 @@ client.on('message', message => {
     bot_command = albumCmd;
   } else if (message.content.startsWith(commandPrefix + 'reset')) {
     bot_command = resetCmd;
+  } else if (message.content.startsWith(commandPrefix + 'dogfart')) {
+    bot_command = resetAnnualCmd;
+  } else if (message.content.startsWith(commandPrefix + 'restoreAnnual')) {
+    bot_command = restoreAnnualCmd;
   }
 
   let pointschannel = (message.channel.id === pointsRequestChannelId);
@@ -271,12 +289,22 @@ client.on('message', message => {
     console.log('addPoints:' + message.mentions.users);
     var user = message.mentions.users.first();
     var number = 0;
-    var index = message.content.lastIndexOf(" ");
-    if (index !== -1) {
-      number = Number(message.content.substring(index + 1));
-    }
-    let adminRole = message.guild.roles.find("name", "Admin");
-    let modRole = message.guild.roles.find("name", "Moderators");
+	var annualNumber = 0;
+	
+	var args = message.content.split(" ");
+	
+	if (args.length  === 3){
+		number = Number(args[2]);
+		annualNumber = number;
+	}
+	
+	if (args.length  === 4){
+		number = Number(args[2]);
+		annualNumber = Number(args[3]);
+	}
+	
+    let adminRole = message.guild.roles.find("name", adminRoleStr);
+    let modRole = message.guild.roles.find("name", modRoleStr);
 
     // Only allow Admin and Moderators to add points.
     if (!message.member.roles.has(adminRole.id) &&
@@ -289,55 +317,82 @@ client.on('message', message => {
     }
 
     let new_points = number;
+	let annual_points = annualNumber;
     let current_level = 0;
     let new_level = 0;
 
-    scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
-      .then(row => {
-        if (!row) {
-          scoredb.run(
-            'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
-              user.id, 0, 0
-            ]);
-        } else {
-          current_level = row.level;
-          new_points += row.points;
-          new_level = current_level;
-        }
-        console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
+	scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
+	.then(row => {
+		if (!row) {
+			scoredb.run('INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [user.id, 0, 0]);
+		} else {
+			current_level = row.level;
+			new_points += row.points;
+			new_level = current_level;
+		}
+		
+		scoredb.get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
+		.then(a_row => {
+			if (!a_row) {
+				scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
+			} else {
+				annual_points += a_row.points;
+			}
+			
+			console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
 
-        set_points(message, user, new_points, current_level);
-        scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(
-          row => {
-            message.reply(user + ` has ${row.points} points`);
-          });
-      })
-      .catch(() => {
-        console.error;
-        scoredb
-          .run(
-          'CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)'
-          )
-          .then(() => {
-            scoredb.run(
-              'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
-                user.id, 0, 0
-              ]);
+			set_points(message, user, new_points, current_level, annual_points);
+		})
+		.catch(() => {
+			console.error;
+			scoredb.run('CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)')
+			.then(() => {
+				scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
+				
+				console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
 
-            set_points(message, user, new_points, current_level);
-            scoredb.get(
-              `SELECT * FROM scores WHERE userId ='${user.id}'`).then(
-              row => {
-                message.reply(user + ` has ${row.points} points`);
-              });
-          });
-      });
-    return;
+				set_points(message, user, new_points, current_level, annual_points);
+			});
+		});
+	})
+	.catch(() => {
+		console.error;
+		scoredb.run('CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)')
+		.then(() => {
+			scoredb.run('INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [user.id, 0, 0])
+			.then(() => {
+				scoredb.get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
+				.then(a_row => {
+					if (!a_row) {
+						scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
+					} else {
+						annual_points += a_row.points;
+					}
+					
+					console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
+
+					set_points(message, user, new_points, current_level, annual_points);
+				})
+				.catch(() => {
+					console.error;
+					scoredb.run('CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)')
+					.then(() => {
+						scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
+						
+						console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
+
+						set_points(message, user, new_points, current_level, annual_points);
+					});
+				});
+			});
+		});
+	});
+	return;
   } else if (bot_command == resetPointsCmd) {
     var user = message.mentions.users.first();
     var number = 0;
 
-    let myRole1 = message.guild.roles.find("name", "Admin");
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id)) {
       message.reply(
@@ -381,9 +436,10 @@ client.on('message', message => {
             user.id, number, 0
           ]);
       } else {
-        scoredb.run(
-          `UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${user.id}`
-        );
+        scoredb.run(`UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${user.id}`)
+		.then(() => {
+			scoredb.run(`UPDATE annual SET points = ${number} WHERE userId = ${user.id}`)
+		});
       }
       console.log("points-reset!");
       message.reply(user + ` reset to 0 points`);
@@ -395,12 +451,14 @@ client.on('message', message => {
     if (message.mentions.users.size > 0) {
       user = message.mentions.users.first();
     }
-    scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
+    scoredb.get(`SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`)
+	.then(row => {
       if (!row) {
         message.reply(user + ` has 0 points`);
         return;
       }
-      message.reply(user + ` has ${row.points} points`);
+	  
+      message.reply(user + ` has ${row.s_points} lifetime points and ${row.a_points} current points`);
       return;
     });
     return;
@@ -415,7 +473,9 @@ client.on('message', message => {
     );
     return;
   } else if (bot_command == leaderboardCmd) {
-    scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`).then(results => {
+	var msg;
+    scoredb.all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`)
+	.then(results => {
       if (results) {
         let userPromises = [];
         for (let i = 0; i < results.length; i++) {
@@ -423,11 +483,32 @@ client.on('message', message => {
         }
         Promise.all(userPromises).then(users => {
           let msg = '```';
+		  msg += `Lifetime Leaderboard \n`;
           for( let i = 0; i < results.length; i++) {
             msg += `${results[i].points} - ${users[i].username} \n`;
           }
-          msg += '```';
-          message.reply(msg);
+		  
+		  scoredb.all(`SELECT * FROM annual ORDER BY points DESC LIMIT 10`)
+			.then(aResults => {
+			  if (aResults) {
+				let aUserPromises = [];
+				for (let i = 0; i < aResults.length; i++) {
+					aUserPromises.push(client.fetchUser(aResults[i].userId));
+				}
+				Promise.all(aUserPromises).then(aUsers => {
+					msg += `\n`;
+					msg += `Current Leaderboard \n`;
+					for( let i = 0; i < aResults.length; i++) {
+						msg += `${aResults[i].points} - ${aUsers[i].username} \n`;
+					}
+					
+					msg += '```';
+					message.reply(msg);
+				});					
+
+			  }
+			});
+			
         });
       } else {
         message.reply("Oops, something went wrong!");
@@ -612,8 +693,8 @@ client.on('message', message => {
       message.reply('Invalid user');
       return;
     }
-  } else if (message.content.startsWith(commandPrefix + "reset")) {
-    let myRole1 = message.guild.roles.find("name", "Admin");
+  } else if (bot_command == resetCmd) {
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id) &&
       message.author.id != '134744140318638080') {
@@ -624,6 +705,72 @@ client.on('message', message => {
     setTimeout(() => {
       process.exit();
     }, 1000);
+  } else if (bot_command == resetAnnualCmd) {
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
+
+    if (!message.member.roles.has(myRole1.id) &&
+      message.author.id != '134744140318638080') {
+      return;
+    }
+	
+	let timestamp = Date.now();
+	
+	scoredb.run(`CREATE TABLE IF NOT EXISTS annual_${timestamp} (userId TEXT, points INTEGER)`)
+	.then(() => {
+		scoredb.run(`INSERT INTO annual_${timestamp} SELECT * FROM annual`)
+		.then(() => {
+			scoredb.run(`DELETE FROM annual`)
+			.then(() => {
+				message.reply('Annual scores reset and moved to annual_' + timestamp);
+			});
+		});
+	});
+	return;
+  } else if (bot_command == restoreAnnualCmd) {
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
+
+    if (!message.member.roles.has(myRole1.id) &&
+      message.author.id != '134744140318638080') {
+      return;
+    }
+	
+	var args = message.content.split(" ");
+	var tableName = args[1];
+	
+	let timestamp = Date.now();
+	
+	scoredb.run(`SELECT * FROM ${tableName} ORDER BY ROWID ASC LIMIT 1`)
+	.then(() => {
+		scoredb.run(`CREATE TABLE IF NOT EXISTS annual_${timestamp} (userId TEXT, points INTEGER)`)
+		.then(() => {
+			scoredb.run(`INSERT INTO annual_${timestamp} SELECT * FROM annual`)
+			.then(() => {
+				scoredb.run(`DELETE FROM annual`)
+				.then(() => {
+					scoredb.run(`INSERT INTO annual SELECT * FROM ${tableName}`)
+					.then(() => {
+						message.reply('Current annual score moved to annual_' + timestamp + ' and restored from ' + tableName);
+					});
+				});
+			});
+		});
+	})
+	.catch(() => {
+		scoredb.all(`SELECT name FROM sqlite_master WHERE type ='table' AND name LIKE 'annual_%' ORDER BY name DESC LIMIT 10`)
+		.then(results => {
+			if (results) {
+				let msg = '```';
+				msg += 'Last 10 restores... \n'
+				for (let i = 0; i < results.length; i++) {
+				  msg += 'Table ' + results[i].name + '\n';
+				}
+				msg += '```';
+				message.reply(msg);
+			}
+		});
+	});
+
+	return;
   }
 });
 
