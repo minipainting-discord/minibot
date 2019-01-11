@@ -701,7 +701,6 @@ client.on('message', message => {
 		!message.member.roles.has(myRole1.id) &&
 		message.author.id != '134744140318638080')
        {
-		   console.log('nope');
       return;
     }
     message.reply(`Coming back!`);
