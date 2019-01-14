@@ -290,8 +290,9 @@ client.on('message', message => {
     var user = message.mentions.users.first();
     var number = 0;
 	var annualNumber = 0;
+	var args = message.content.replace(/ +(?= )/g,'').split(" ");
 	
-	var args = message.content.split(" ");
+	console.log(args);
 	
 	if (args.length  === 3){
 		number = Number(args[2]);
@@ -460,7 +461,14 @@ client.on('message', message => {
 	  
       message.reply(user + ` has ${row.s_points} lifetime points and ${row.a_points} current points`);
       return;
-    });
+    })
+	.catch(() => {
+		console.error;
+		scoredb.run('CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)')
+		.then(() => {
+			message.reply(user + ` has 0 points`);
+		});
+	});
     return;
   } else if (bot_command == makersCmd) {
     message.reply(
@@ -701,6 +709,7 @@ client.on('message', message => {
 		!message.member.roles.has(myRole1.id) &&
 		message.author.id != '134744140318638080')
        {
+		   console.log('nope');
       return;
     }
     message.reply(`Coming back!`);
