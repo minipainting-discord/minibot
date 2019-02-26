@@ -19,68 +19,82 @@ var scoredb = 0;
 var accountsdb = 0;
 
 function set_points(message, user, new_points, current_level, annual_add) {
-  let member = message.guild.member(user);
-  let role1 = message.guild.roles.find("name", "Dip 'N Forget");
-  let role2 = message.guild.roles.find("name", "Ebay Propainted");
-  let role3 = message.guild.roles.find("name", "C+C Plz");
-  let role4 = message.guild.roles.find("name", "JALMM");
-  let role5 = message.guild.roles.find("name", "Bub For The Bub Glub");
+	message.guild.fetchMember(user)
+	.then(member => {
+		let role1 = message.guild.roles.find(x => x.name === "Dip 'N Forget");
+		let role2 = message.guild.roles.find(x => x.name === "Ebay Propainted");
+		let role3 = message.guild.roles.find(x => x.name === "C+C Plz");
+		let role4 = message.guild.roles.find(x => x.name === "JALMM");
+		let role5 = message.guild.roles.find(x => x.name === "Bub For The Bub Glub");
 
-  let new_level = current_level;
-  let old_role = role1;
-  let new_role = role1;
-  if (new_points >= 70) {
-    old_role = role4;
-    new_role = role5;
-    new_level = 5;
-  } else if (new_points >= 40) {
-    old_role = role3;
-    new_role = role4;
-    new_level = 4;
-  } else if (new_points >= 20) {
-    old_role = role2;
-    new_role = role3;
-    new_level = 3;
-  } else if (new_points >= 10) {
-    old_role = role1;
-    new_role = role2;
-    new_level = 2;
-  } else if (new_points >= 5) {
-    old_role = null;
-    new_role = role1;
-    new_level =1;
-  }
-  
-  var cmd;
-  
-  if (current_level != new_level) {
-    client.channels.get(generalChannelId)
-      .sendMessage(user +
-      ` :confetti_ball: Congratulations you reached **${new_role.name}** rank! :confetti_ball:`
-      );
+		let new_level = current_level;
+		let old_role = role1;
+		let new_role = role1;
+		if (new_points >= 70) {
+			old_role = role4;
+			new_role = role5;
+			new_level = 5;
+		} else if (new_points >= 40) {
+			old_role = role3;
+			new_role = role4;
+			new_level = 4;
+		} else if (new_points >= 20) {
+			old_role = role2;
+			new_role = role3;
+			new_level = 3;
+		} else if (new_points >= 10) {
+			old_role = role1;
+			new_role = role2;
+			new_level = 2;
+		} else if (new_points >= 5) {
+			old_role = null;
+			new_role = role1;
+			new_level =1;
+		}
 
-    if (old_role !== null) member.removeRole(old_role).catch(console.error);
-    member.addRole(new_role).catch(console.error);
+		var cmd;
 
-    cmd = `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`;
-	
-  } else {
-    cmd = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
-  }
-  
-  console.log('update scores ',cmd)
-    scoredb.run(cmd)
-	.then(() => {
-		cmd = `UPDATE annual SET points = ${annual_add} WHERE userId = ${user.id}`;
-		console.log('update annual ',cmd);
+		if (current_level != new_level) {
+			client.channels.get(generalChannelId)
+			.send(user + ` :confetti_ball: Congratulations you reached **${new_role.name}** rank! :confetti_ball:`
+			);
+
+		if (old_role !== null) member.removeRole(old_role).catch(console.error);
+		member.addRole(new_role).catch(console.error);
+
+		cmd = `UPDATE scores SET points = ${new_points}, level = ${new_level} WHERE userId = ${user.id}`;
+
+		} else {
+			cmd = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
+		}
+
 		scoredb.run(cmd)
 		.then(() => {
-			scoredb.get(`SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`)
-			.then(row => {
-				message.reply(user + ` has ${row.s_points} lifetime points and ${row.a_points} current points`);
-			});	
+			scoredb.run(`UPDATE annual SET points = ${annual_add} WHERE userId = ${user.id}`)
+			.then(() => {
+				scoredb.get(`SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`)
+				.then(row => {
+					message.reply(user + ` has ${row.s_points} lifetime points and ${row.a_points} current points`);
+				})
+				.catch(err => {
+					console.log('Unknown error selecting updated score');
+					console.error(err);
+				});
+			})
+			.catch(err => {
+				console.log('Unknown error updating annual score');
+				console.error(err);
+			});
+		})
+		.catch(err => {
+			console.log('Unknown error updating lifetime score');
+			console.error(err);
 		});
-	});	
+	})
+  .catch(err => {
+	  console.log('Unknown error retrieving GuildMember');
+	  console.error(err);
+  });
 }
 
 // Open the local SQLite database to store account and score information.
@@ -286,14 +300,11 @@ client.on('message', message => {
     return;
 
   if (bot_command == addPointsCmd) {
-    console.log('addPoints:' + message.mentions.users);
     var user = message.mentions.users.first();
     var number = 0;
 	var annualNumber = 0;
 	var args = message.content.replace(/ +(?= )/g,'').split(" ");
-	
-	console.log(args);
-	
+		
 	if (args.length  === 3){
 		number = Number(args[2]);
 		annualNumber = number;
@@ -304,8 +315,8 @@ client.on('message', message => {
 		annualNumber = Number(args[3]);
 	}
 	
-    let adminRole = message.guild.roles.find("name", adminRoleStr);
-    let modRole = message.guild.roles.find("name", modRoleStr);
+    let adminRole = message.guild.roles.find(x => x.name === adminRoleStr);
+    let modRole = message.guild.roles.find(x => x.name === modRoleStr);
 
     // Only allow Admin and Moderators to add points.
     if (!message.member.roles.has(adminRole.id) &&
@@ -321,79 +332,79 @@ client.on('message', message => {
 	let annual_points = annualNumber;
     let current_level = 0;
     let new_level = 0;
-
-	scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
-	.then(row => {
-		if (!row) {
-			scoredb.run('INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [user.id, 0, 0]);
-		} else {
-			current_level = row.level;
-			new_points += row.points;
-			new_level = current_level;
-		}
-		
+	
+	function doAnnual(){
 		scoredb.get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
-		.then(a_row => {
-			if (!a_row) {
-				scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
+		.then(row => {
+			if (!row) {
+				scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0])
+				.catch(err => {
+					console.log('Unknown error inserting new annual score record');
+					console.error(err);
+				});
 			} else {
-				annual_points += a_row.points;
+				annual_points += row.points;
 			}
-			
-			console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
-
 			set_points(message, user, new_points, current_level, annual_points);
 		})
-		.catch(() => {
-			console.error;
-			scoredb.run('CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)')
-			.then(() => {
-				scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
-				
-				console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
-
-				set_points(message, user, new_points, current_level, annual_points);
-			});
-		});
-	})
-	.catch(() => {
-		console.error;
-		scoredb.run('CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)')
-		.then(() => {
-			scoredb.run('INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [user.id, 0, 0])
-			.then(() => {
-				scoredb.get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
-				.then(a_row => {
-					if (!a_row) {
-						scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
-					} else {
-						annual_points += a_row.points;
-					}
-					
-					console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
-
-					set_points(message, user, new_points, current_level, annual_points);
+		.catch(err => {
+			if (err.message === 'SQLITE_ERROR: no such table: annual'){
+				scoredb.run('CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)')
+				.then(() => {
+					doAnnual();
 				})
-				.catch(() => {
-					console.error;
-					scoredb.run('CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)')
-					.then(() => {
-						scoredb.run('INSERT INTO annual (userId, points) VALUES (?, ?)', [user.id, 0]);
-						
-						console.log('addpoints: ' + user + ' ' + user.id + ' ' + new_points + ' ' + current_level);
-
-						set_points(message, user, new_points, current_level, annual_points);
-					});
+				.catch(err => {
+					console.log('Unknown error creating annual score table');
+					console.error(err);
 				});
-			});
+			} else {
+				console.log('Unknown error selecting annual score');
+				console.error(err);
+			}
 		});
-	});
+	}
+
+	function doLifetime() {
+		scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
+		.then(row => {
+			if (!row) {
+				scoredb.run('INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [user.id, 0, 0])
+				.catch(err => {
+					console.log('Unknown error inserting new lifetime score record');
+					console.error(err);
+				});
+			} else {
+				current_level = row.level;
+				new_points += row.points;
+				new_level = current_level;
+			}
+			doAnnual();
+		})
+		.catch(err => {
+			if (err.message === 'SQLITE_ERROR: no such table: scores'){
+				scoredb.run('CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)')
+				.then(() => {
+					doLifetime();
+				})
+				.catch(err => {
+					console.log('Unknown error creating lifetime score table');
+					console.error(err);
+				});
+			} else {
+				console.log('Unknown error selecting lifetime score');
+				console.error(err);
+			}
+		});		
+	}		
+	
+	doLifetime();
+
 	return;
   } else if (bot_command == resetPointsCmd) {
     var user = message.mentions.users.first();
     var number = 0;
 
-    let myRole1 = message.guild.roles.find("name", adminRoleStr);
+    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id)) {
       message.reply(
@@ -404,11 +415,11 @@ client.on('message', message => {
 
     let member = message.guild.member(user);
 
-    let myRole2 = message.guild.roles.find("name", "Dip 'N Forget");
-    let myRole3 = message.guild.roles.find("name", "Ebay Propainted");
-    let myRole4 = message.guild.roles.find("name", "C+C Plz");
-    let myRole5 = message.guild.roles.find("name", "JALMM");
-    let myRole6 = message.guild.roles.find("name", "Bub For The Bub Glub");
+    let myRole2 = message.guild.roles.find(x => x.name === "Dip 'N Forget");
+    let myRole3 = message.guild.roles.find(x => x.name === "Ebay Propainted");
+    let myRole4 = message.guild.roles.find(x => x.name === "C+C Plz");
+    let myRole5 = message.guild.roles.find(x => x.name === "JALMM");
+    let myRole6 = message.guild.roles.find(x => x.name === "Bub For The Bub Glub");
 
     if (member.roles.has(myRole2.id)) {
       member.removeRole(myRole2).catch(console.error);
@@ -439,7 +450,7 @@ client.on('message', message => {
       } else {
         scoredb.run(`UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${user.id}`)
 		.then(() => {
-			scoredb.run(`UPDATE annual SET points = ${number} WHERE userId = ${user.id}`)
+			scoredb.run(`DELETE FROM annual WHERE userId = ${user.id}`)
 		});
       }
       console.log("points-reset!");
@@ -702,7 +713,7 @@ client.on('message', message => {
       return;
     }
   } else if (bot_command == resetCmd) {
-    let myRole1 = message.guild.roles.find("name", adminRoleStr);
+    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
 
     if (message.author.id != '177610621121069056' && 
 		message.author.id != '391002457192398849' && 
@@ -718,7 +729,7 @@ client.on('message', message => {
       process.exit();
     }, 1000);
   } else if (bot_command == resetAnnualCmd) {
-    let myRole1 = message.guild.roles.find("name", adminRoleStr);
+    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id) &&
       message.author.id != '134744140318638080') {
@@ -739,7 +750,7 @@ client.on('message', message => {
 	});
 	return;
   } else if (bot_command == restoreAnnualCmd) {
-    let myRole1 = message.guild.roles.find("name", adminRoleStr);
+    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id) &&
       message.author.id != '134744140318638080') {
