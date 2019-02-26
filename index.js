@@ -1,31 +1,11 @@
-const Discord = require('discord.js'); // https://discord.js.org/#/ 
-const client = new Discord.Client();
-const settings = require('./settings.json');
-const sql = require('sqlite');
-const createCollage = require("photo-collage");
-const sizeOf = require('image-size');
-var url = require('url');
-var http = require('https');
-
-const miniGalleryChannelId = "236049686820159488";
-const generalChannelId = "236042005929656320";
-const botChannelId = "344320952991219712";
-const pointsRequestChannelId = "344320952991219712";
-
-const adminRoleStr = "Admin";
-const modRoleStr = "Moderators";
-
-var scoredb = 0;
-var accountsdb = 0;
-
 function set_points(message, user, new_points, current_level, annual_add) {
 	message.guild.fetchMember(user)
 	.then(member => {
-		let role1 = message.guild.roles.find(x => x.name === "Dip 'N Forget");
-		let role2 = message.guild.roles.find(x => x.name === "Ebay Propainted");
-		let role3 = message.guild.roles.find(x => x.name === "C+C Plz");
-		let role4 = message.guild.roles.find(x => x.name === "JALMM");
-		let role5 = message.guild.roles.find(x => x.name === "Bub For The Bub Glub");
+		let role1 = message.guild.roles.find("name", "Dip 'N Forget");
+		let role2 = message.guild.roles.find("name", "Ebay Propainted");
+		let role3 = message.guild.roles.find("name", "C+C Plz");
+		let role4 = message.guild.roles.find("name", "JALMM");
+		let role5 = message.guild.roles.find("name", "Bub For The Bub Glub");
 
 		let new_level = current_level;
 		let old_role = role1;
@@ -315,8 +295,8 @@ client.on('message', message => {
 		annualNumber = Number(args[3]);
 	}
 	
-    let adminRole = message.guild.roles.find(x => x.name === adminRoleStr);
-    let modRole = message.guild.roles.find(x => x.name === modRoleStr);
+    let adminRole = message.guild.roles.find("name", adminRoleStr);
+    let modRole = message.guild.roles.find("name", modRoleStr);
 
     // Only allow Admin and Moderators to add points.
     if (!message.member.roles.has(adminRole.id) &&
@@ -404,7 +384,7 @@ client.on('message', message => {
     var user = message.mentions.users.first();
     var number = 0;
 
-    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id)) {
       message.reply(
@@ -415,11 +395,11 @@ client.on('message', message => {
 
     let member = message.guild.member(user);
 
-    let myRole2 = message.guild.roles.find(x => x.name === "Dip 'N Forget");
-    let myRole3 = message.guild.roles.find(x => x.name === "Ebay Propainted");
-    let myRole4 = message.guild.roles.find(x => x.name === "C+C Plz");
-    let myRole5 = message.guild.roles.find(x => x.name === "JALMM");
-    let myRole6 = message.guild.roles.find(x => x.name === "Bub For The Bub Glub");
+    let myRole2 = message.guild.roles.find("name", "Dip 'N Forget");
+    let myRole3 = message.guild.roles.find("name", "Ebay Propainted");
+    let myRole4 = message.guild.roles.find("name", "C+C Plz");
+    let myRole5 = message.guild.roles.find("name", "JALMM");
+    let myRole6 = message.guild.roles.find("name", "Bub For The Bub Glub");
 
     if (member.roles.has(myRole2.id)) {
       member.removeRole(myRole2).catch(console.error);
@@ -713,7 +693,7 @@ client.on('message', message => {
       return;
     }
   } else if (bot_command == resetCmd) {
-    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
 
     if (message.author.id != '177610621121069056' && 
 		message.author.id != '391002457192398849' && 
@@ -729,7 +709,7 @@ client.on('message', message => {
       process.exit();
     }, 1000);
   } else if (bot_command == resetAnnualCmd) {
-    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id) &&
       message.author.id != '134744140318638080') {
@@ -750,7 +730,7 @@ client.on('message', message => {
 	});
 	return;
   } else if (bot_command == restoreAnnualCmd) {
-    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
+    let myRole1 = message.guild.roles.find("name", adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id) &&
       message.author.id != '134744140318638080') {
