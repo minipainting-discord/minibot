@@ -1,3 +1,23 @@
+const Discord = require('discord.js'); // https://discord.js.org/#/ 
+const client = new Discord.Client();
+const settings = require('./settings.json');
+const sql = require('sqlite');
+const createCollage = require("photo-collage");
+const sizeOf = require('image-size');
+var url = require('url');
+var http = require('https');
+
+const miniGalleryChannelId = "236049686820159488";
+const generalChannelId = "236042005929656320";
+const botChannelId = "344320952991219712";
+const pointsRequestChannelId = "344320952991219712";
+
+const adminRoleStr = "Admin";
+const modRoleStr = "Moderators";
+
+var scoredb = 0;
+var accountsdb = 0;
+
 function set_points(message, user, new_points, current_level, annual_add) {
 	message.guild.fetchMember(user)
 	.then(member => {
