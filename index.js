@@ -404,7 +404,7 @@ client.on('message', message => {
     var user = message.mentions.users.first();
     var number = 0;
 
-    let myRole1 = message.guild.roles.find("name", adminRoleStr);
+    let myRole1 = message.guild.roles.find(x => x.name === adminRoleStr);
 
     if (!message.member.roles.has(myRole1.id)) {
       message.reply(
@@ -413,51 +413,52 @@ client.on('message', message => {
       return;
     }
 
-    let member = message.guild.member(user);
+    message.guild.fetchMember(user)
+	.then(member => {
+		let myRole2 = message.guild.roles.find(x => x.name === "Dip 'N Forget");
+		let myRole3 = message.guild.roles.find(x => x.name === "Ebay Propainted");
+		let myRole4 = message.guild.roles.find(x => x.name === "C+C Plz");
+		let myRole5 = message.guild.roles.find(x => x.name === "JALMM");
+		let myRole6 = message.guild.roles.find(x => x.name === "Bub For The Bub Glub");
 
-    let myRole2 = message.guild.roles.find("name", "Dip 'N Forget");
-    let myRole3 = message.guild.roles.find("name", "Ebay Propainted");
-    let myRole4 = message.guild.roles.find("name", "C+C Plz");
-    let myRole5 = message.guild.roles.find("name", "JALMM");
-    let myRole6 = message.guild.roles.find("name", "Bub For The Bub Glub");
+		if (member.roles.has(myRole2.id)) {
+		  member.removeRole(myRole2).catch(console.error);
+		}
 
-    if (member.roles.has(myRole2.id)) {
-      member.removeRole(myRole2).catch(console.error);
-    }
+		if (member.roles.has(myRole3.id)) {
+		  member.removeRole(myRole3).catch(console.error);
+		}
 
-    if (member.roles.has(myRole3.id)) {
-      member.removeRole(myRole3).catch(console.error);
-    }
+		if (member.roles.has(myRole4.id)) {
+		  member.removeRole(myRole4).catch(console.error);
+		}
 
-    if (member.roles.has(myRole4.id)) {
-      member.removeRole(myRole4).catch(console.error);
-    }
+		if (member.roles.has(myRole5.id)) {
+		  member.removeRole(myRole5).catch(console.error);
+		}
 
-    if (member.roles.has(myRole5.id)) {
-      member.removeRole(myRole5).catch(console.error);
-    }
+		if (member.roles.has(myRole6.id)) {
+		  member.removeRole(myRole6).catch(console.error);
+		}
 
-    if (member.roles.has(myRole6.id)) {
-      member.removeRole(myRole6).catch(console.error);
-    }
-
-    scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
-      if (!row) {
-        scoredb.run(
-          'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
-            user.id, number, 0
-          ]);
-      } else {
-        scoredb.run(`UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${user.id}`)
-		.then(() => {
-			scoredb.run(`DELETE FROM annual WHERE userId = ${user.id}`)
+		scoredb.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
+		  if (!row) {
+			scoredb.run(
+			  'INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)', [
+				user.id, number, 0
+			  ]);
+		  } else {
+			scoredb.run(`UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${user.id}`)
+			.then(() => {
+				scoredb.run(`DELETE FROM annual WHERE userId = ${user.id}`)
+			});
+		  }
+		  console.log("points-reset!");
+		  message.reply(user + ` reset to 0 points`);
+		  return;
 		});
-      }
-      console.log("points-reset!");
-      message.reply(user + ` reset to 0 points`);
-      return;
-    });
-    return;
+	});
+	return;
   } else if (bot_command == pointsCmd) {
     var user = message.author;
     if (message.mentions.users.size > 0) {
