@@ -1,0 +1,30 @@
+{
+  "name": "minibot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "canvas": "^2.5.0",
+    "discord.js": "^11.4.2",
+    "image-size": "^0.7.4",
+    "jpeg-autorotate": "^5.0.0",
+    "resize-img": "^1.1.2",
+    "sqlite": "^3.0.3"
+  },
+  "devDependencies": {
+    "prettier": "^1.17.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/glangho/minibot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/glangho/minibot/issues"
+  },
+  "homepage": "https://github.com/glangho/minibot#readme"
+}
