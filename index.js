@@ -59,6 +59,18 @@ function set_points(message, user, new_points, current_level, annual_add) {
         }`;
       }
 
+      console.log(
+        `[info] addpoints ${
+          user.username
+        } lifetime=${new_points} annual=${annual_add}${
+          new_rank
+            ? ` new_rank="${new_rank.name}"`
+            : old_rank
+            ? ` new_rank=""`
+            : ""
+        }`
+      );
+
       scoredb
         .run(cmd)
         .then(() => {
