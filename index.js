@@ -545,45 +545,49 @@ client.on("message", message => {
     return;
   } else if (bot_command == leaderboardCmd) {
     var msg;
-    scoredb
-      .all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`)
-      .then(results => {
-        if (results) {
-          let userPromises = [];
-          for (let i = 0; i < results.length; i++) {
-            userPromises.push(client.fetchUser(results[i].userId));
-          }
-          Promise.all(userPromises).then(users => {
-            let msg = "```";
-            msg += `Lifetime Leaderboard \n`;
-            for (let i = 0; i < results.length; i++) {
-              msg += `${results[i].points} - ${users[i].username} \n`;
-            }
-
-            scoredb
-              .all(`SELECT * FROM annual ORDER BY points DESC LIMIT 10`)
-              .then(aResults => {
-                if (aResults) {
-                  let aUserPromises = [];
-                  for (let i = 0; i < aResults.length; i++) {
-                    aUserPromises.push(client.fetchUser(aResults[i].userId));
-                  }
-                  Promise.all(aUserPromises).then(aUsers => {
-                    msg += `\n`;
-                    msg += `Current Leaderboard \n`;
-                    for (let i = 0; i < aResults.length; i++) {
-                      msg += `${aResults[i].points} - ${aUsers[i].username} \n`;
-                    }
-
-                    msg += "```";
-                    message.reply(msg);
-                  });
-                }
-              });
+    Promise.all([
+      new Promise((resolve, reject) => {
+        scoredb
+          .all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`)
+          .then(results => {
+            Promise.all(results.map(r => client.fetchUser(r.userId))).then(
+              users => resolve({ results, users })
+            );
           });
-        } else {
-          message.reply("Oops, something went wrong!");
-        }
+      }),
+      new Promise((resolve, reject) => {
+        scoredb
+          .all(`SELECT * FROM annual ORDER BY points DESC LIMIT 10`)
+          .then(results => {
+            Promise.all(results.map(r => client.fetchUser(r.userId))).then(
+              users => resolve({ results, users })
+            );
+          });
+      })
+    ])
+      .then(([scores, annual]) => {
+        const embed = new Discord.RichEmbed({
+          color: "#0088aa",
+          fields: [
+            {
+              name: "Lifetime Leaderboard",
+              value: scores.results
+                .map((r, i) => `${r.points} - ${scores.users[i].username}`)
+                .join("\n")
+            },
+            {
+              name: "Annual Leaderboard",
+              value: annual.results
+                .map((r, i) => `${r.points} - ${annual.users[i].username}`)
+                .join("\n")
+            }
+          ]
+        });
+        message.reply(embed);
+      })
+      .catch(err => {
+        log_error(err);
+        message.reply("Oops, something went wrong!");
       });
     return;
   } else if (bot_command == helpCmd) {
