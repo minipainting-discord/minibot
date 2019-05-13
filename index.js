@@ -567,7 +567,7 @@ client.on("message", message => {
     ])
       .then(([scores, annual]) => {
         const embed = new Discord.RichEmbed({
-          color: "#0088aa",
+          color: 0x0088aa,
           fields: [
             {
               name: "Lifetime Leaderboard",
