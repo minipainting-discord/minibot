@@ -773,14 +773,16 @@ client.on("message", message => {
       return;
     }
   } else if (bot_command == resetCmd) {
-    let myRole1 = message.guild.roles.find(
+    let adminRole = message.guild.roles.find(
       r => r.name === settings.adminRoleStr
     );
+    let modRole = message.guild.roles.find(r => r.name === settings.modRoleStr);
 
     if (
       message.author.id != "177610621121069056" &&
       message.author.id != "391002457192398849" &&
-      !message.member.roles.has(myRole1.id) &&
+      !message.member.roles.has(adminRole.id) &&
+      !message.member.roles.has(modRole.id) &&
       message.author.id != "134744140318638080"
     ) {
       console.log("nope");
