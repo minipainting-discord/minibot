@@ -9,6 +9,10 @@ const createCollage = require("./collage");
 var scoredb = 0;
 var accountsdb = 0;
 
+function log_error(error, message = "An error occured") {
+  console.error(`[error] ${message}`, error);
+}
+
 function set_points(message, user, new_points, current_level, annual_add) {
   message.guild
     .fetchMember(user)
@@ -16,7 +20,7 @@ function set_points(message, user, new_points, current_level, annual_add) {
       let ranks = settings.ranks.map((rank, level) => ({
         ...rank,
         level: level + 1,
-        role: message.guild.roles.find("name", rank.name)
+        role: message.guild.roles.find(r => r.name === rank.name)
       }));
 
       let old_rank = ranks.find(r => r.level === current_level);
@@ -33,7 +37,7 @@ function set_points(message, user, new_points, current_level, annual_add) {
 
       if (old_rank != new_rank) {
         if (old_rank) {
-          member.removeRole(old_rank.role).catch(console.error);
+          member.removeRole(old_rank.role).catch(log_error);
         }
         if (new_rank) {
           client.channels
@@ -44,7 +48,7 @@ function set_points(message, user, new_points, current_level, annual_add) {
                   new_rank.role.name
                 }** rank! :confetti_ball:`
             );
-          member.addRole(new_rank.role).catch(console.error);
+          member.addRole(new_rank.role).catch(log_error);
         }
         cmd = `UPDATE scores SET points = ${new_points}, level = ${
           new_rank ? new_rank.level : 0
@@ -79,25 +83,17 @@ function set_points(message, user, new_points, current_level, annual_add) {
                       } current points`
                   );
                 })
-                .catch(err => {
-                  console.log("Unknown error selecting updated score");
-                  console.error(err);
-                });
+                .catch(err =>
+                  log_error(err, "Unknown error selecting updated score")
+                );
             })
-            .catch(err => {
-              console.log("Unknown error updating annual score");
-              console.error(err);
-            });
+            .catch(err =>
+              log_error(err, "Unknown error updating annual score")
+            );
         })
-        .catch(err => {
-          console.log("Unknown error updating lifetime score");
-          console.error(err);
-        });
+        .catch(err => log_error(err, "Unknown error updating lifetime score"));
     })
-    .catch(err => {
-      console.log("Unknown error retrieving GuildMember");
-      console.error(err);
-    });
+    .catch(err => log_error(err, "Unknown error retrieving GuildMember"));
 }
 
 function sendImageToChannel(channel, attachment, name, content) {
@@ -109,7 +105,7 @@ function sendImageToChannel(channel, attachment, name, content) {
     .send(content, {
       files: [{ attachment, name }]
     })
-    .catch(error => console.log(error));
+    .catch(log_error);
 }
 
 // Open the local SQLite database to store account and score information.
@@ -126,7 +122,7 @@ Promise.all([
 });
 
 client.on("ready", () => {
-  console.log("I'm Online");
+  console.log("[info] I'm online!");
 });
 
 var commandPrefix = "!";
@@ -333,8 +329,10 @@ client.on("message", message => {
       annualNumber = Number(args[3]);
     }
 
-    let adminRole = message.guild.roles.find("name", settings.adminRoleStr);
-    let modRole = message.guild.roles.find("name", settings.modRoleStr);
+    let adminRole = message.guild.roles.find(
+      r => r.name === settings.adminRoleStr
+    );
+    let modRole = message.guild.roles.find(r => r.name === settings.modRoleStr);
 
     // Only allow Admin and Moderators to add points.
     if (
@@ -364,8 +362,10 @@ client.on("message", message => {
                 0
               ])
               .catch(err => {
-                console.log("Unknown error inserting new annual score record");
-                console.error(err);
+                log_error(
+                  err,
+                  "Unknown error inserting new annual score record"
+                );
               });
           } else {
             annual_points += row.points;
@@ -382,12 +382,10 @@ client.on("message", message => {
                 doAnnual();
               })
               .catch(err => {
-                console.log("Unknown error creating annual score table");
-                console.error(err);
+                log_error(err, "Unknown error creating annual score table");
               });
           } else {
-            console.log("Unknown error selecting annual score");
-            console.error(err);
+            log_error(err, "Unknown error selecting annual score");
           }
         });
     }
@@ -403,10 +401,10 @@ client.on("message", message => {
                 [user.id, 0, 0]
               )
               .catch(err => {
-                console.log(
+                log_error(
+                  err,
                   "Unknown error inserting new lifetime score record"
                 );
-                console.error(err);
               });
           } else {
             current_level = row.level;
@@ -425,12 +423,10 @@ client.on("message", message => {
                 doLifetime();
               })
               .catch(err => {
-                console.log("Unknown error creating lifetime score table");
-                console.error(err);
+                log_error(err, "Unknown error creating lifetime score table");
               });
           } else {
-            console.log("Unknown error selecting lifetime score");
-            console.error(err);
+            log_error(err, "Unknown error selecting lifetime score");
           }
         });
     }
@@ -460,7 +456,7 @@ client.on("message", message => {
 
       for (const role of roles) {
         if (member.roles.has(role.id)) {
-          member.removeRole(role).catch(error => console.error(error));
+          member.removeRole(role).catch(log_error);
         }
       }
 
@@ -761,7 +757,9 @@ client.on("message", message => {
       return;
     }
   } else if (bot_command == resetCmd) {
-    let myRole1 = message.guild.roles.find("name", settings.adminRoleStr);
+    let myRole1 = message.guild.roles.find(
+      r => r.name === settings.adminRoleStr
+    );
 
     if (
       message.author.id != "177610621121069056" &&
@@ -778,7 +776,9 @@ client.on("message", message => {
       process.exit();
     }, 1000);
   } else if (bot_command == resetAnnualCmd) {
-    let myRole1 = message.guild.roles.find("name", settings.adminRoleStr);
+    let myRole1 = message.guild.roles.find(
+      r => r.name === settings.adminRoleStr
+    );
 
     if (
       !message.member.roles.has(myRole1.id) &&
@@ -806,7 +806,9 @@ client.on("message", message => {
       });
     return;
   } else if (bot_command == restoreAnnualCmd) {
-    let myRole1 = message.guild.roles.find("name", settings.adminRoleStr);
+    let myRole1 = message.guild.roles.find(
+      r => r.name === settings.adminRoleStr
+    );
 
     if (
       !message.member.roles.has(myRole1.id) &&
