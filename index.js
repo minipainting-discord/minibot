@@ -571,15 +571,27 @@ client.on("message", message => {
           fields: [
             {
               name: "Lifetime Leaderboard",
-              value: scores.results
-                .map((r, i) => `${r.points} - ${scores.users[i].username}`)
-                .join("\n")
+              value: [
+                "```",
+                scores.results
+                  .map((r, i) =>
+                    [r.points, scores.users[i].username].join(" - ")
+                  )
+                  .join("\n"),
+                "```"
+              ].join("\n")
             },
             {
               name: "Annual Leaderboard",
-              value: annual.results
-                .map((r, i) => `${r.points} - ${annual.users[i].username}`)
-                .join("\n")
+              value: [
+                "```",
+                annual.results
+                  .map((r, i) =>
+                    [r.points, annual.users[i].username].join(" - ")
+                  )
+                  .join("\n"),
+                "```"
+              ].join("\n")
             }
           ]
         });
