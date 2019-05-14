@@ -3,7 +3,7 @@ const resizeImg = require("resize-img");
 const ja = require("jpeg-autorotate");
 const { Canvas, Image } = require("canvas");
 
-const MAX_HEIGHT = 400;
+const MAX_HEIGHT = 1000;
 
 function sumWidths(items) {
   return items.reduce((total, item) => total + item.width, 0);
