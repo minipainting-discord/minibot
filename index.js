@@ -98,15 +98,15 @@ function set_points(message, user, new_points, current_level, annual_add) {
     .catch(err => log_error(err, "Unknown error retrieving GuildMember"));
 }
 
-function sendImageToChannel(channel, attachment, name, content) {
+function sendImageToChannel(channel, file, message, fileName) {
   if (channel == null) {
     return;
   }
 
+  const attachment = new Discord.Attachment(file, fileName);
+
   channel
-    .send(content, {
-      files: [{ attachment, name }]
-    })
+    .send(`${message.author}\n${message.url}`, attachment)
     .catch(log_error);
 }
 
@@ -219,8 +219,8 @@ client.on("message", message => {
               sendImageToChannel(
                 channel,
                 collage,
-                "minigalleryimage.png",
-                message.author
+                message,
+                "minigalleryimage.png"
               );
             }
           });
