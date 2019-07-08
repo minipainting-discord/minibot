@@ -44,9 +44,7 @@ function set_points(message, user, new_points, current_level, annual_add) {
             .get(settings.generalChannelId)
             .send(
               user +
-                ` :confetti_ball: Congratulations you reached **${
-                  new_rank.role.name
-                }** rank! :confetti_ball:`
+                ` :confetti_ball: Congratulations you reached **${new_rank.role.name}** rank! :confetti_ball:`
             );
           member.addRole(new_rank.role).catch(log_error);
         }
@@ -54,9 +52,7 @@ function set_points(message, user, new_points, current_level, annual_add) {
           new_rank ? new_rank.level : 0
         } WHERE userId = ${user.id}`;
       } else {
-        cmd = `UPDATE scores SET points = ${new_points} WHERE userId = ${
-          user.id
-        }`;
+        cmd = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`;
       }
 
       console.log(
@@ -76,23 +72,17 @@ function set_points(message, user, new_points, current_level, annual_add) {
         .then(() => {
           scoredb
             .run(
-              `UPDATE annual SET points = ${annual_add} WHERE userId = ${
-                user.id
-              }`
+              `UPDATE annual SET points = ${annual_add} WHERE userId = ${user.id}`
             )
             .then(() => {
               scoredb
                 .get(
-                  `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${
-                    user.id
-                  }'`
+                  `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`
                 )
                 .then(row => {
                   message.reply(
                     user +
-                      ` has ${row.s_points} lifetime points and ${
-                        row.a_points
-                      } current points`
+                      ` has ${row.s_points} lifetime points and ${row.a_points} current points`
                   );
                 })
                 .catch(err =>
@@ -483,9 +473,7 @@ client.on("message", message => {
           } else {
             scoredb
               .run(
-                `UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${
-                  user.id
-                }`
+                `UPDATE scores SET points = ${number}, level = ${number} WHERE userId = ${user.id}`
               )
               .then(() => {
                 scoredb.run(`DELETE FROM annual WHERE userId = ${user.id}`);
@@ -504,9 +492,7 @@ client.on("message", message => {
     }
     scoredb
       .get(
-        `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${
-          user.id
-        }'`
+        `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`
       )
       .then(row => {
         if (!row) {
@@ -516,9 +502,7 @@ client.on("message", message => {
 
         message.reply(
           user +
-            ` has ${row.s_points} lifetime points and ${
-              row.a_points
-            } current points`
+            ` has ${row.s_points} lifetime points and ${row.a_points} current points`
         );
         return;
       })
@@ -669,9 +653,7 @@ client.on("message", message => {
           );
         } else {
           accountsdb.run(
-            `UPDATE accounts SET account = "${redditAccount}" WHERE userId = ${
-              author.id
-            }`
+            `UPDATE accounts SET account = "${redditAccount}" WHERE userId = ${author.id}`
           );
         }
         console.log("set reddit account!");
