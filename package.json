@@ -12,19 +12,34 @@
     "sqlite": "^3.0.3"
   },
   "devDependencies": {
+    "husky": "^3.0.0",
+    "lint-staged": "^9.1.0",
     "prettier": "^1.17.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/glangho/minibot.git"
+    "url": "git://github.com/minipainting-discord/minibot.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/glangho/minibot/issues"
+    "url": "https://github.com/minipainting-discord/minibot/issues"
   },
-  "homepage": "https://github.com/glangho/minibot#readme"
+  "homepage": "https://github.com/minipainting-discord/minibot#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all",
+    "bracketSpacing": true
+  }
 }
