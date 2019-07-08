@@ -41,7 +41,7 @@ function set_points(message, user, new_points, current_level, annual_add) {
         }
         if (new_rank) {
           client.channels
-            .get(settings.generalChannelId)
+            .get(settings.channels.general)
             .send(
               user +
                 ` :confetti_ball: Congratulations you reached **${new_rank.role.name}** rank! :confetti_ball:`
@@ -135,7 +135,7 @@ client.on("message", message => {
 
   if (message.channel.type !== "text") return;
 
-  if (message.channel.id === settings.miniGalleryChannelId) {
+  if (message.channel.id === settings.channels.gallery) {
     let is_link = false;
 
     if (message.attachments.size == 0) {
@@ -154,10 +154,10 @@ client.on("message", message => {
 
     if (is_link) {
       client.channels
-        .get(settings.generalChannelId)
+        .get(settings.channels.general)
         .sendMessage(message.author + " : " + message.content);
       client.channels
-        .get(settings.pointsRequestChannelId)
+        .get(settings.channels.botcoms)
         .sendMessage(message.author + " : " + message.content);
       return;
     }
@@ -211,11 +211,9 @@ client.on("message", message => {
         )
           .then(buffers => createCollage(buffers))
           .then(collage => {
-            let genChan = client.channels.get(settings.generalChannelId);
-            let pointChan = client.channels.get(
-              settings.pointsRequestChannelId
-            );
-            for (const channel of [genChan, pointChan]) {
+            let genChan = client.channels.get(settings.channels.general);
+            let botcomsChan = client.channels.get(settings.channels.botcoms);
+            for (const channel of [genChan, botcomsChan]) {
               sendImageToChannel(
                 channel,
                 collage,
@@ -285,9 +283,8 @@ client.on("message", message => {
     bot_command = restoreAnnualCmd;
   }
 
-  let pointschannel = message.channel.id === settings.pointsRequestChannelId;
-  let botchannel = message.channel.id === settings.botChannelId;
-  let generalchannel = message.channel.id === settings.generalChannelId;
+  let botcomschannel = message.channel.id === settings.channels.botcoms;
+  let generalchannel = message.channel.id === settings.channels.general;
 
   let ignoreMessage = true;
 
@@ -300,16 +297,7 @@ client.on("message", message => {
     ignoreMessage = false;
   }
 
-  if (botchannel) {
-    ignoreMessage = false;
-  }
-
-  if (
-    pointschannel &&
-    (bot_command == addPointsCmd ||
-      bot_command == resetPointsCmd ||
-      bot_command == pointsCmd)
-  ) {
+  if (botcomschannel) {
     ignoreMessage = false;
   }
 
@@ -332,9 +320,9 @@ client.on("message", message => {
     }
 
     let adminRole = message.guild.roles.find(
-      r => r.name === settings.adminRoleStr
+      r => r.name === settings.roles.admin
     );
-    let modRole = message.guild.roles.find(r => r.name === settings.modRoleStr);
+    let modRole = message.guild.roles.find(r => r.name === settings.roles.mod);
 
     // Only allow Admin and Moderators to add points.
     if (
@@ -441,7 +429,7 @@ client.on("message", message => {
     var number = 0;
 
     let myRole1 = message.guild.roles.find(
-      x => x.name === settings.adminRoleStr
+      x => x.name === settings.roles.admin
     );
 
     if (!message.member.roles.has(myRole1.id)) {
@@ -768,9 +756,9 @@ client.on("message", message => {
     }
   } else if (bot_command == resetCmd) {
     let adminRole = message.guild.roles.find(
-      r => r.name === settings.adminRoleStr
+      r => r.name === settings.roles.admin
     );
-    let modRole = message.guild.roles.find(r => r.name === settings.modRoleStr);
+    let modRole = message.guild.roles.find(r => r.name === settings.roles.mod);
 
     if (
       message.author.id != "177610621121069056" &&
@@ -789,7 +777,7 @@ client.on("message", message => {
     }, 1000);
   } else if (bot_command == resetAnnualCmd) {
     let myRole1 = message.guild.roles.find(
-      r => r.name === settings.adminRoleStr
+      r => r.name === settings.roles.admin
     );
 
     if (
@@ -819,7 +807,7 @@ client.on("message", message => {
     return;
   } else if (bot_command == restoreAnnualCmd) {
     let myRole1 = message.guild.roles.find(
-      r => r.name === settings.adminRoleStr
+      r => r.name === settings.roles.admin
     );
 
     if (
