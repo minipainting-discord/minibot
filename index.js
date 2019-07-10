@@ -31,9 +31,17 @@ const bot = {
     // If the message wasn't filtered out, we detect and execute commands
     const firstWord = message.content.split(" ")[0]
 
+    function splitMessage(message) {
+      try {
+        return shellwords.split(message.cleanContent)
+      } catch (error) {
+        return message.cleanContent.split(" ")
+      }
+    }
+
     for (const command of commands) {
       if (firstWord === COMMAND_PREFIX + command.keyword) {
-        const [keyword, ...args] = shellwords.split(message.cleanContent)
+        const [keyword, ...args] = splitMessage(message)
         const commandChannels = [
           settings.channels.botcoms,
           settings.channels.mod,
