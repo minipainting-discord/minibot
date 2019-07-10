@@ -16,7 +16,7 @@ module.exports = {
     const channel = message.mentions.channels.first()
 
     const text = message.content
-      .split(" ")
+      .split(/ +/)
       .slice(2)
       .join(" ")
 

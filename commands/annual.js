@@ -1,9 +1,9 @@
 module.exports = {
   keyword: "annual",
   help: [
-    "`!annual reset`: Save current annual scores and start a new year",
-    "`!annual list`: List saved annual score tables",
-    "`!annual restore table_name`: Restore annual scores from a given table",
+    "`!annual reset`: Save current annual scores and start a new year [admin]",
+    "`!annual list`: List saved annual score tables [admin]",
+    "`!annual restore table_name`: Restore annual scores from a given table [admin]",
   ],
   mod: true,
   execute: (bot, message, ...args) => {
