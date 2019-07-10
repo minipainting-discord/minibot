@@ -33,9 +33,9 @@ const bot = {
 
     function splitMessage(message) {
       try {
-        return shellwords.split(message.cleanContent)
+        return shellwords.split(message.content)
       } catch (error) {
-        return message.cleanContent.split(" ")
+        return message.content.split(" ")
       }
     }
 
