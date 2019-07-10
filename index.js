@@ -29,9 +29,11 @@ const bot = {
     }
 
     // If the message wasn't filtered out, we detect and execute commands
-    const [keyword, ...args] = shellwords.split(message.cleanContent)
+    const firstWord = message.content.split(" ")[0]
+
     for (const command of commands) {
-      if (keyword === COMMAND_PREFIX + command.keyword) {
+      if (firstWord === COMMAND_PREFIX + command.keyword) {
+        const [keyword, ...args] = shellwords.split(message.cleanContent)
         const commandChannels = [
           settings.channels.botcoms,
           settings.channels.mod,
@@ -48,7 +50,7 @@ const bot = {
         bot.log(
           `#${message.channel.name} <${
             message.author.username
-          }> ${COMMAND_PREFIX}${command.keyword} ${args.join(" ")}`,
+          }> ${keyword} ${args.join(" ")}`,
         )
         command.execute(bot, message, ...args)
 
