@@ -3,6 +3,7 @@ const DiceExpression = require("dice-expression-evaluator")
 module.exports = {
   keyword: "roll",
   help: "`!roll dice_expression`: Roll some dice!",
+  availableInDM: true,
   execute: (bot, message, ...args) => {
     const textExpression = args.join(" ")
 

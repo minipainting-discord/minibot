@@ -3,12 +3,25 @@ const settings = require("../settings.json")
 module.exports = {
   keyword: "help",
   help: "`!help`: You're looking at it!",
+  availableInDM: true,
   execute: (bot, message) => {
     const onModChannel = message.channel.id === settings.channels.mod
 
-    const visibleCommands = bot.commands.filter(
-      c => c.help && (c.mod || c.helpMod ? onModChannel : true),
-    )
+    const visibleCommands = bot.commands.filter(command => {
+      if (!command.help) {
+        return false
+      }
+
+      if (command.mod || command.helpMod) {
+        return onModChannel
+      }
+
+      if (message.channel.type === "dm" && !command.availableInDM) {
+        return false
+      }
+
+      return true
+    })
 
     function showCommandHelp(command) {
       return Array.isArray(command.help)
