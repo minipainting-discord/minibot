@@ -8,7 +8,7 @@ module.exports = {
         : message.author
     const toSelf = user === message.author
 
-    bot.db.score
+    bot.db
       .get(
         `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`,
       )

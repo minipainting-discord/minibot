@@ -47,11 +47,11 @@ module.exports = {
     let current_level = 0
 
     function doAnnual() {
-      bot.db.score
+      bot.db
         .get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
         .then(row => {
           if (!row) {
-            bot.db.score
+            bot.db
               .run("INSERT INTO annual (userId, points) VALUES (?, ?)", [
                 user.id,
                 0,
@@ -74,30 +74,15 @@ module.exports = {
             annual_points,
           )
         })
-        .catch(err => {
-          if (err.message === "SQLITE_ERROR: no such table: annual") {
-            bot.db.score
-              .run(
-                "CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)",
-              )
-              .then(() => {
-                doAnnual()
-              })
-              .catch(err => {
-                bot.logError(err, "Unknown error creating annual score table")
-              })
-          } else {
-            bot.logError(err, "Unknown error selecting annual score")
-          }
-        })
+        .catch(err => bot.logError(err, "Unknown error selecting annual score"))
     }
 
     function doLifetime() {
-      bot.db.score
+      bot.db
         .get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
         .then(row => {
           if (!row) {
-            bot.db.score
+            bot.db
               .run(
                 "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
                 [user.id, 0, 0],
@@ -114,22 +99,9 @@ module.exports = {
           }
           doAnnual()
         })
-        .catch(err => {
-          if (err.message === "SQLITE_ERROR: no such table: scores") {
-            bot.db.score
-              .run(
-                "CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)",
-              )
-              .then(() => {
-                doLifetime()
-              })
-              .catch(err => {
-                bot.logError(err, "Unknown error creating lifetime score table")
-              })
-          } else {
-            bot.logError(err, "Unknown error selecting lifetime score")
-          }
-        })
+        .catch(err =>
+          bot.logError(err, "Unknown error selecting lifetime score"),
+        )
     }
 
     doLifetime()
@@ -203,15 +175,15 @@ function set_points(bot, message, user, new_points, current_level, annual_add) {
         }`,
       )
 
-      bot.db.score
+      bot.db
         .run(cmd)
         .then(() => {
-          bot.db.score
+          bot.db
             .run(
               `UPDATE annual SET points = ${annual_add} WHERE userId = ${user.id}`,
             )
             .then(() => {
-              bot.db.score
+              bot.db
                 .get(
                   `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`,
                 )

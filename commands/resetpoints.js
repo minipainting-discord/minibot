@@ -39,21 +39,21 @@ module.exports = {
         }
       }
 
-      bot.db.score
+      bot.db
         .get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
         .then(row => {
           if (!row) {
-            bot.db.score.run(
+            bot.db.run(
               "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
               [user.id, zero, 0],
             )
           } else {
-            bot.db.score
+            bot.db
               .run(
                 `UPDATE scores SET points = ${zero}, level = ${zero} WHERE userId = ${user.id}`,
               )
               .then(() => {
-                bot.db.score.run(`DELETE FROM annual WHERE userId = ${user.id}`)
+                bot.db.run(`DELETE FROM annual WHERE userId = ${user.id}`)
               })
           }
           message.reply(user + ` reset to 0 points`)

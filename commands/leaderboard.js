@@ -6,7 +6,7 @@ module.exports = {
   execute: (bot, message) => {
     Promise.all([
       new Promise(resolve => {
-        bot.db.score
+        bot.db
           .all(`SELECT * FROM scores ORDER BY points DESC LIMIT 10`)
           .then(results => {
             Promise.all(results.map(r => bot.client.fetchUser(r.userId))).then(
@@ -15,7 +15,7 @@ module.exports = {
           })
       }),
       new Promise(resolve => {
-        bot.db.score
+        bot.db
           .all(`SELECT * FROM annual ORDER BY points DESC LIMIT 10`)
           .then(results => {
             Promise.all(results.map(r => bot.client.fetchUser(r.userId))).then(

@@ -15,15 +15,15 @@ module.exports = {
 
     switch (args[0]) {
       case "reset":
-        bot.db.score
+        bot.db
           .run(
             `CREATE TABLE IF NOT EXISTS annual_${timestamp} (userId TEXT, points INTEGER)`,
           )
           .then(() => {
-            bot.db.score
+            bot.db
               .run(`INSERT INTO annual_${timestamp} SELECT * FROM annual`)
               .then(() => {
-                bot.db.score.run(`DELETE FROM annual`).then(() => {
+                bot.db.run(`DELETE FROM annual`).then(() => {
                   message.reply(
                     "Annual scores reset and moved to annual_" + timestamp,
                   )
@@ -32,7 +32,7 @@ module.exports = {
           })
         break
       case "list":
-        bot.db.score
+        bot.db
           .all(
             `SELECT name FROM sqlite_master WHERE type ='table' AND name LIKE 'annual_%' ORDER BY name DESC LIMIT 10`,
           )
@@ -55,19 +55,19 @@ module.exports = {
             message.reply("`!annual restore table_name`")
             return
           }
-          bot.db.score
+          bot.db
             .run(`SELECT * FROM ${tableName} ORDER BY ROWID ASC LIMIT 1`)
             .then(() => {
-              bot.db.score
+              bot.db
                 .run(
                   `CREATE TABLE IF NOT EXISTS annual_${timestamp} (userId TEXT, points INTEGER)`,
                 )
                 .then(() => {
-                  bot.db.score
+                  bot.db
                     .run(`INSERT INTO annual_${timestamp} SELECT * FROM annual`)
                     .then(() => {
-                      bot.db.score.run(`DELETE FROM annual`).then(() => {
-                        bot.db.score
+                      bot.db.run(`DELETE FROM annual`).then(() => {
+                        bot.db
                           .run(`INSERT INTO annual SELECT * FROM ${tableName}`)
                           .then(() => {
                             message.reply(

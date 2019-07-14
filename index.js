@@ -8,10 +8,7 @@ const settings = require("./settings.json")
 const COMMAND_PREFIX = "!"
 
 const bot = {
-  db: {
-    score: null,
-    accounts: null,
-  },
+  db: null,
   client: null,
   filters,
   commands,
@@ -23,23 +20,17 @@ const bot = {
     client.on("ready", bot.onReady)
     client.on("message", bot.onMessage)
 
-    Promise.all([
-      sql.open("./score.sqlite", { Promise }),
-      sql.open("./accounts.sqlite", { Promise }),
-    ])
-      .then(function([scoreDB, accountsDB]) {
-        bot.db.score = scoreDB
-        bot.db.accounts = accountsDB
+    sql
+      .open("./database.sqlite", { Promise })
+      .then(database => {
+        bot.db = database
 
         return Promise.all([
-          bot.db.score.run(
+          bot.db.run(
             "CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)",
           ),
-          bot.db.score.run(
+          bot.db.run(
             "CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)",
-          ),
-          bot.db.accounts.run(
-            "CREATE TABLE IF NOT EXISTS accounts (userId TEXT, account TEXT, album TEXT)",
           ),
         ])
       })
