@@ -2,7 +2,7 @@ const settings = require("../settings.json")
 
 // TODO: This mess should be cleaned up
 
-const USAGE = "`!resetpoints user`"
+const USAGE = "`!resetpoints USER`"
 
 module.exports = {
   keyword: "resetpoints",

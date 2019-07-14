@@ -1,4 +1,4 @@
-const USAGE = "`!say channel something`"
+const USAGE = "`!say CHANNEL SOMETHING`"
 
 module.exports = {
   keyword: "say",

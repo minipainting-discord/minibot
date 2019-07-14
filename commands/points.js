@@ -1,6 +1,6 @@
 module.exports = {
   keyword: "points",
-  help: "`!points [user]`: Check a user's points",
+  help: "`!points [USER]`: Check a user's points",
   execute: (bot, message) => {
     const user =
       message.mentions.users.size > 0

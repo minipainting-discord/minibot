@@ -4,7 +4,7 @@ const settings = require("../settings.json")
 
 // TODO: This mess should be cleaned up
 
-const USAGE = "`!addpoints user amount [annual]`"
+const USAGE = "`!addpoints USER AMOUNT [ANNUAL]`"
 
 const RANK_UP_GIFS = [
   "images/addpoints/rank-up-1.gif",
