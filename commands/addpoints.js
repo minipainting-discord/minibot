@@ -1,8 +1,21 @@
+const Discord = require("discord.js")
+const { randomItem } = require("../utils")
 const settings = require("../settings.json")
 
 // TODO: This mess should be cleaned up
 
 const USAGE = "`!addpoints user amount [annual]`"
+
+const RANK_UP_GIFS = [
+  "images/addpoints/rank-up-1.gif",
+  "images/addpoints/rank-up-2.gif",
+]
+
+const RANK_DOWN_GIFS = [
+  "images/addpoints/rank-down-1.gif",
+  "images/addpoints/rank-down-2.gif",
+  "images/addpoints/rank-down-3.gif",
+]
 
 module.exports = {
   keyword: "addpoints",
@@ -148,14 +161,28 @@ function set_points(bot, message, user, new_points, current_level, annual_add) {
         if (old_rank) {
           member.removeRole(old_rank.role).catch(bot.logError)
         }
-        if (new_rank) {
+        if (new_rank || old_rank) {
+          const { message, gif } = new_rank
+            ? new_rank.level > current_level
+              ? {
+                  message: ` :confetti_ball: Congratulations you reached **${new_rank.role.name}** rank! :confetti_ball:`,
+                  gif: randomItem(RANK_UP_GIFS),
+                }
+              : {
+                  message: ` SKREEEOONK!!! DEMOTED TO **${new_rank.role.name}**`,
+                  gif: randomItem(RANK_DOWN_GIFS),
+                }
+            : {
+                message: ` SKREEEOONK!!! ANNIHILATED`,
+                gif: randomItem(RANK_DOWN_GIFS),
+              }
           bot.client.channels
             .get(settings.channels.general)
-            .send(
-              user +
-                ` :confetti_ball: Congratulations you reached **${new_rank.role.name}** rank! :confetti_ball:`,
-            )
-          member.addRole(new_rank.role).catch(bot.logError)
+            .send(user + message, new Discord.Attachment(gif))
+
+          if (new_rank) {
+            member.addRole(new_rank.role).catch(bot.logError)
+          }
         }
         cmd = `UPDATE scores SET points = ${new_points}, level = ${
           new_rank ? new_rank.level : 0
