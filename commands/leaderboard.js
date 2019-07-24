@@ -1,12 +1,10 @@
 const Discord = require("discord.js")
 
-function retrieveScores(bot, all = false) {
+function retrieveScores(bot, amount = 10) {
   return Promise.all([
     new Promise(resolve => {
       bot.db
-        .all(
-          `SELECT * FROM scores ORDER BY points DESC ${all ? "" : "LIMIT 10"}`,
-        )
+        .all(`SELECT * FROM scores ORDER BY points DESC LIMIT ${amount}`)
         .then(results => {
           Promise.all(results.map(r => bot.client.fetchUser(r.userId))).then(
             users => resolve({ results, users }),
@@ -15,9 +13,7 @@ function retrieveScores(bot, all = false) {
     }),
     new Promise(resolve => {
       bot.db
-        .all(
-          `SELECT * FROM annual ORDER BY points DESC ${all ? "" : "LIMIT 10"}`,
-        )
+        .all(`SELECT * FROM annual ORDER BY points DESC LIMIT ${amount}`)
         .then(results => {
           Promise.all(results.map(r => bot.client.fetchUser(r.userId))).then(
             users => resolve({ results, users }),
@@ -33,7 +29,7 @@ module.exports = {
 
   web: (app, bot) => {
     app.get("/leaderboard", (req, res) => {
-      retrieveScores(bot, true).then(([scores, annual]) => {
+      retrieveScores(bot, 100).then(([scores, annual]) => {
         res.render("leaderboard", { scores, annual })
       })
     })
