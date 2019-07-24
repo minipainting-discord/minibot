@@ -1,11 +1,9 @@
-const settings = require("../settings.json")
-
 module.exports = {
   keyword: "help",
   help: "`!help`: You're looking at it!",
   availableInDM: true,
   execute: (bot, message) => {
-    const onModChannel = message.channel.id === settings.channels.mod
+    const onModChannel = message.channel.id === bot.settings.channels.mod
 
     const visibleCommands = bot.commands.filter(command => {
       if (!command.help) {

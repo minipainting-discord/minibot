@@ -1,6 +1,5 @@
 const Discord = require("discord.js")
 const { randomItem } = require("../utils")
-const settings = require("../settings.json")
 
 // TODO: This mess should be cleaned up
 
@@ -112,7 +111,7 @@ function set_points(bot, message, user, new_points, current_level, annual_add) {
   message.guild
     .fetchMember(user)
     .then(member => {
-      let ranks = settings.ranks.map((rank, level) => ({
+      let ranks = bot.settings.ranks.map((rank, level) => ({
         ...rank,
         level: level + 1,
         role: message.guild.roles.find(r => r.name === rank.name),
@@ -149,7 +148,7 @@ function set_points(bot, message, user, new_points, current_level, annual_add) {
                 gif: randomItem(RANK_DOWN_GIFS),
               }
           bot.client.channels
-            .get(settings.channels.general)
+            .get(bot.settings.channels.general)
             .send(user + message, new Discord.Attachment(gif))
 
           if (new_rank) {

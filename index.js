@@ -10,6 +10,7 @@ const COMMAND_PREFIX = "!"
 const bot = {
   db: null,
   client: null,
+  settings,
   filters,
   commands,
 

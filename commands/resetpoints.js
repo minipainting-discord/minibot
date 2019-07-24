@@ -1,5 +1,3 @@
-const settings = require("../settings.json")
-
 // TODO: This mess should be cleaned up
 
 const USAGE = "`!resetpoints USER`"
@@ -29,7 +27,7 @@ module.exports = {
     }
 
     message.guild.fetchMember(user).then(member => {
-      const roles = settings.ranks.map(rank =>
+      const roles = bot.settings.ranks.map(rank =>
         message.guild.roles.find(role => role.name === rank.name),
       )
 
