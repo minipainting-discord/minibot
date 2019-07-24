@@ -1,6 +1,7 @@
 const Discord = require("discord.js")
 const sql = require("sqlite")
 const shellwords = require("shellwords")
+const express = require("express")
 const filters = require("./filters")
 const commands = require("./commands")
 const settings = require("./settings.json")
@@ -8,6 +9,7 @@ const settings = require("./settings.json")
 const COMMAND_PREFIX = "!"
 
 const bot = {
+  app: null,
   db: null,
   client: null,
   settings,
@@ -20,6 +22,12 @@ const bot = {
 
     client.on("ready", bot.onReady)
     client.on("message", bot.onMessage)
+
+    const app = express()
+    commands.filter(c => c.web).forEach(c => c.web(app, bot))
+    app.set("view engine", "pug")
+    app.use(express.static("public"))
+    app.listen(4567, "0.0.0.0")
 
     sql
       .open("./database.sqlite", { Promise })

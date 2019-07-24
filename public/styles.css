@@ -1,0 +1,64 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: sans-serif;
+  color: rgb(185, 187, 190);
+}
+
+a:link {
+  color: rgb(114, 137, 218);
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+body {
+  background-color: rgb(32, 34, 37);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body > section {
+  background-color: rgb(54, 57, 63);
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  width: 580px;
+  padding: 40px;
+}
+
+header {
+  text-align: center;
+}
+
+main > article > p {
+  line-height: 22px;
+}
+
+section.cta {
+  margin: 20px 0;
+  text-align: center;
+}
+
+section.cta a {
+  background-color: rgb(114, 137, 218);
+  display: inline-block;
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  line-height: 40px;
+  padding: 0 16px;
+  border-radius: 3px;
+  transition: background-color 0.17s ease;
+}
+
+section.cta a:hover {
+  background-color: rgb(114, 137, 218);
+}

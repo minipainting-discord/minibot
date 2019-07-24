@@ -1,0 +1,12 @@
+extends layout.pug
+
+block content
+  h2 Lifetime Leaderboard
+  ul
+    each result, index in scores.results
+      li #{result.points} - #{scores.users[index].username}
+
+  h2 Annual Leaderboard
+  ul
+    each result, index in annual.results
+      li #{result.points} - #{annual.users[index].username}

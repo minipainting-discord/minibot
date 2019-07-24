@@ -7,8 +7,10 @@
     "canvas": "^2.5.0",
     "dice-expression-evaluator": "^0.1.2",
     "discord.js": "^11.4.2",
+    "express": "^4.17.1",
     "image-size": "^0.7.4",
     "jpeg-autorotate": "^5.0.0",
+    "pug": "^2.0.4",
     "resize-img": "^1.1.2",
     "shellwords": "^0.1.1",
     "sqlite": "^3.0.3"
