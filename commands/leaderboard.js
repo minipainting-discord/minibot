@@ -29,6 +29,7 @@ module.exports = {
 
   web: (app, bot) => {
     app.get("/leaderboard", (req, res) => {
+      bot.log("WEB /leaderboard")
       retrieveScores(bot, 100).then(([scores, annual]) => {
         res.render("leaderboard", { scores, annual })
       })

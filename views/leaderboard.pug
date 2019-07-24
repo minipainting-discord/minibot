@@ -4,11 +4,17 @@ block content
   section.leaderboard
     .col
       h2 Lifetime Leaderboard
-      ul
-        each result, index in scores.results
-          li #{result.points} - #{scores.users[index].username}
+      table
+        tbody
+          each result, index in scores.results
+            tr
+              td= result.points
+              td= scores.users[index].username
     .col
       h2 Annual Leaderboard
-      ul
-        each result, index in annual.results
-          li #{result.points} - #{annual.users[index].username}
+      table
+        tbody
+          each result, index in annual.results
+            tr
+              td= result.points
+              td= annual.users[index].username

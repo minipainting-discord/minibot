@@ -25,56 +25,94 @@ a:hover {
 
 body {
   background-color: rgb(32, 34, 37);
+  margin: 0 auto;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   font-size: 1.6rem;
-}
-
-body > section {
-  background-color: rgb(54, 57, 63);
-  box-shadow: 0 0.2rem 1rem 0 rgba(0, 0, 0, 0.2);
-  border-radius: 0.5rem;
-  min-width: 58rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  /* min-width: 58rem; */
   max-width: 72rem;
 }
 
-header {
+body > header,
+body > main,
+body > footer {
+  width: 100%;
+  padding: 4rem;
+  box-shadow: 0 0.2rem 1rem 0 rgba(0, 0, 0, 0.2);
+}
+
+@media screen and (max-width: 720px) {
+  body {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  body > header,
+  body > footer {
+    border-radius: 0;
+  }
+}
+
+/* Header */
+body > header {
+  background-color: rgb(54, 57, 63);
+  padding-bottom: 2rem;
   text-align: center;
-  padding: 4rem 4rem 2rem;
+  border-top-left-radius: 1.1rem;
+  border-top-right-radius: 1.1rem;
 }
 
-main {
-  padding: 2rem 4rem;
-  box-shadow: inset 0 0 1rem rgba(0, 0, 0, 0.5);
+body > header > img {
+  max-width: 100%;
 }
 
-footer {
-  padding: 2rem 4rem 4rem;
-  background-color: rgba(255, 255, 255, 0.1);
+/* Main */
+body > main {
+  background-color: rgb(20, 21, 23);
 }
 
-footer > p {
+/* Footer */
+body > footer {
+  background-color: rgb(46, 48, 54);
+  padding-top: 2rem;
+  border-bottom-left-radius: 1.1rem;
+  border-bottom-right-radius: 1.1rem;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+body > footer > p {
   line-height: 2.2rem;
+  margin: 0;
+}
+body > footer > p + p {
+  margin: 1rem 0 0;
 }
 
-footer > section.cta {
+body > footer > a.cta {
   margin: 2rem 0;
   text-align: center;
-}
-
-footer > section.cta a {
   background-color: rgb(114, 137, 218);
+  align-self: center;
+  border: none;
   display: inline-block;
   color: white;
   text-decoration: none;
   font-size: 2rem;
-  line-height: 4rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 4rem;
+  line-height: 2.8rem;
   padding: 0 1.6rem;
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   transition: background-color 0.17s ease;
 }
 
-footer > section.cta a:hover {
+body > footer > a.cta:hover {
   background-color: rgb(114, 137, 218);
 }
 
@@ -86,4 +124,47 @@ footer > section.cta a:hover {
 
 .leaderboard > .col {
   flex: 1;
+}
+
+.leaderboard > .col > h2 {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: lighter;
+}
+
+.leaderboard > .col > table {
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.leaderboard > .col > table td {
+  padding: 0.4rem 0.6rem;
+}
+
+.leaderboard > .col:first-of-type {
+  padding-right: 2rem;
+}
+
+.leaderboard > .col:last-of-type {
+  padding-left: 2rem;
+  border-left: 1px solid rgb(185, 187, 190);
+}
+
+@media screen and (max-width: 720px) {
+  .leaderboard {
+    flex-direction: column;
+  }
+
+  .leaderboard > .col > h2 {
+    text-align: left;
+  }
+
+  .leaderboard > .col:first-of-type {
+    padding-right: 0;
+  }
+
+  .leaderboard > .col:last-of-type {
+    padding-left: 0;
+    border-left: none;
+  }
 }
