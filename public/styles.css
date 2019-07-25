@@ -141,6 +141,10 @@ body > footer > a.cta:hover {
   padding: 0.4rem 0.6rem;
 }
 
+.leaderboard > .col > table td:first-of-type {
+  text-align: right;
+}
+
 .leaderboard > .col:first-of-type {
   padding-right: 2rem;
 }
