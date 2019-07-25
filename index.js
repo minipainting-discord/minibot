@@ -107,6 +107,10 @@ const bot = {
   onReady() {
     const guild = bot.client.guilds.first()
 
+    bot.client.user.setPresence({
+      game: { name: "you", type: "WATCHING" },
+    })
+
     bot.roles = Object.keys(settings.roles).reduce(
       (roles, key) => ({
         ...roles,
