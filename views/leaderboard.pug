@@ -25,3 +25,10 @@ block content
             tr(data-user-id=score.user.id, class=`rank-${scores.find(s => s.userId === score.userId).level}`)
               td= score.points
               td= score.user.displayName
+
+  section.ranks
+    h2 Ranks
+    ul
+      each rank in ranks
+        li(class=`rank-${rank.level}`)= rank.name
+

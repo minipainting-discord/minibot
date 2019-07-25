@@ -127,7 +127,6 @@ body > footer > a.cta:hover {
 }
 
 .leaderboard > .col > h2 {
-  text-align: center;
   text-transform: uppercase;
   font-weight: lighter;
 }
@@ -152,6 +151,17 @@ body > footer > a.cta:hover {
 .leaderboard > .col:last-of-type {
   padding-left: 2rem;
   border-left: 1px solid rgb(185, 187, 190);
+}
+
+.ranks > h2 {
+  text-transform: uppercase;
+  font-weight: lighter;
+}
+
+.ranks ul {
+  margin: 1rem 0;
+  padding: 0 0 0 2rem;
+  line-height: 2.2rem;
 }
 
 @media screen and (max-width: 720px) {
