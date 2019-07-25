@@ -6,15 +6,15 @@ block content
       h2 Lifetime Leaderboard
       table
         tbody
-          each result, index in scores.results
-            tr
-              td= result.points
-              td= scores.users[index].displayName
+          each score, index in scores
+            tr(data-user-id=score.user.id)
+              td= score.points
+              td= score.user.displayName
     .col
       h2 Annual Leaderboard
       table
         tbody
-          each result, index in annual.results
-            tr
-              td= result.points
-              td= annual.users[index].displayName
+          each score, index in scores
+            tr(data-user-id=score.user.id)
+              td= score.points
+              td= score.user.displayName

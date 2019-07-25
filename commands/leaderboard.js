@@ -1,26 +1,39 @@
 const Discord = require("discord.js")
 
-function retrieveScores(bot, amount = 10) {
+function retrieveScores(bot, all = false) {
   const guild = bot.client.guilds.first()
+  const limit = all ? "" : "LIMIT 10"
   return guild.fetchMembers().then(() => {
     return Promise.all([
       new Promise(resolve => {
         bot.db
-          .all(`SELECT * FROM scores ORDER BY points DESC LIMIT ${amount}`)
-          .then(results => {
+          .all(`SELECT * FROM scores ORDER BY points DESC ${limit}`)
+          .then(results =>
             Promise.all(
               results.map(r => guild.members.find(u => u.id === r.userId)),
-            ).then(users => resolve({ results, users }))
-          })
+            ).then(users =>
+              resolve(
+                results
+                  .map((r, i) => ({ ...r, user: users[i] }))
+                  .filter(r => r.user),
+              ),
+            ),
+          )
       }),
       new Promise(resolve => {
         bot.db
-          .all(`SELECT * FROM annual ORDER BY points DESC LIMIT ${amount}`)
-          .then(results => {
+          .all(`SELECT * FROM annual ORDER BY points DESC ${limit}`)
+          .then(results =>
             Promise.all(
               results.map(r => guild.members.find(u => u.id === r.userId)),
-            ).then(users => resolve({ results, users }))
-          })
+            ).then(users =>
+              resolve(
+                results
+                  .map((r, i) => ({ ...r, user: users[i] }))
+                  .filter(r => r.user),
+              ),
+            ),
+          )
       }),
     ])
   })
@@ -33,7 +46,7 @@ module.exports = {
   web: (app, bot) => {
     app.get("/leaderboard", (req, res) => {
       bot.log("WEB /leaderboard")
-      retrieveScores(bot, 10).then(([scores, annual]) => {
+      retrieveScores(bot, "all").then(([scores, annual]) => {
         res.render("leaderboard", { scores, annual })
       })
     })
@@ -50,10 +63,8 @@ module.exports = {
               name: "Lifetime Leaderboard",
               value: [
                 "```",
-                scores.results
-                  .map((r, i) =>
-                    [r.points, scores.users[i].displayName].join(" - "),
-                  )
+                scores
+                  .map(s => [s.points, s.user.displayName].join(" - "))
                   .join("\n"),
                 "```",
               ].join("\n"),
@@ -62,10 +73,8 @@ module.exports = {
               name: "Annual Leaderboard",
               value: [
                 "```",
-                annual.results
-                  .map((r, i) =>
-                    [r.points, annual.users[i].displayName].join(" - "),
-                  )
+                annual
+                  .map(s => [s.points, s.user.displayName].join(" - "))
                   .join("\n"),
                 "```",
               ].join("\n"),
