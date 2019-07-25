@@ -14,21 +14,22 @@ block content
       table
         tbody
           each score, index in scores
-            tr(data-user-id=score.user.id, class=`rank-${score.level}`)
+            tr(data-user-id=score.user.id)
               td= score.points
-              td= score.user.displayName
+              td(class=`rank-${score.level}`)= score.user.displayName
     .col
       h2 Annual Leaderboard
       table
         tbody
           each score, index in annual
-            tr(data-user-id=score.user.id, class=`rank-${scores.find(s => s.userId === score.userId).level}`)
+            tr(data-user-id=score.user.id)
               td= score.points
-              td= score.user.displayName
+              td(class=`rank-${scores.find(s => s.userId === score.userId).level}`)= score.user.displayName
 
   section.ranks
     h2 Ranks
     ul
       each rank in ranks
-        li(class=`rank-${rank.level}`)= rank.name
+        li
+          span(class=`rank-${rank.level}`)= rank.name
 
