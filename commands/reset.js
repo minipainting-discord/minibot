@@ -11,8 +11,9 @@ module.exports = {
       return
     }
 
-    message.reply("Coming back!")
-
-    setTimeout(() => process.exit(), 1000)
+    message
+      .reply("Coming back!")
+      .then(() => bot.client.destroy())
+      .then(() => process.exit())
   },
 }
