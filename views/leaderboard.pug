@@ -1,13 +1,20 @@
 extends layout.pug
 
 block content
+  style
+    each rank in ranks
+      .
+        .rank-#{rank.level} {
+          color: rgb(#{colorToRGB(rank.role.color)});
+        }
+
   section.leaderboard
     .col
       h2 Lifetime Leaderboard
       table
         tbody
           each score, index in scores
-            tr(data-user-id=score.user.id)
+            tr(data-user-id=score.user.id, class=`rank-${score.level}`)
               td= score.points
               td= score.user.displayName
     .col

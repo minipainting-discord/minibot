@@ -47,7 +47,18 @@ module.exports = {
     app.get("/leaderboard", (req, res) => {
       bot.log("WEB /leaderboard")
       retrieveScores(bot, "all").then(([scores, annual]) => {
-        res.render("leaderboard", { scores, annual })
+        const colorToRGB = color =>
+          [
+            (color & 0xff0000) >> 16,
+            (color & 0x00ff00) >> 8,
+            (color & 0x0000ff) >> 0,
+          ].join(",")
+        res.render("leaderboard", {
+          scores,
+          annual,
+          ranks: bot.ranks,
+          colorToRGB,
+        })
       })
     })
   },
