@@ -28,8 +28,13 @@ module.exports = {
       return
     }
 
-    const amount = parseInt(args[1], 10)
-    const annual = args.length > 2 ? parseInt(args[2], 10) : amount
+    const amount = parseFloat(args[1], 10)
+    const annual = args.length > 2 ? parseFloat(args[2], 10) : amount
+
+    if (isNaN(amount) || isNaN(annual)) {
+      message.reply("Is that even a number?")
+      return
+    }
 
     if (
       !message.member.roles.has(bot.roles.admin.id) &&
