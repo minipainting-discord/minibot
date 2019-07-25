@@ -116,16 +116,10 @@ function set_points(bot, message, user, new_points, current_level, annual_add) {
   message.guild
     .fetchMember(user)
     .then(member => {
-      let ranks = bot.settings.ranks.map((rank, level) => ({
-        ...rank,
-        level: level + 1,
-        role: message.guild.roles.find(r => r.name === rank.name),
-      }))
-
-      let old_rank = ranks.find(r => r.level === current_level)
+      let old_rank = bot.ranks.find(r => r.level === current_level)
       let new_rank = null
 
-      for (let rank of ranks) {
+      for (let rank of bot.ranks) {
         if (new_points >= rank.minPoints) {
           new_rank = rank
         }

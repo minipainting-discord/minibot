@@ -119,6 +119,12 @@ const bot = {
       {},
     )
 
+    bot.ranks = settings.ranks.map((rank, level) => ({
+      ...rank,
+      level: level + 1,
+      role: guild.roles.find(r => r.name === rank.name),
+    }))
+
     bot.emojis = guild.emojis.reduce(
       (emojis, emoji) => ({ ...emojis, [emoji.name]: emoji }),
       {},

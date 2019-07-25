@@ -4,7 +4,7 @@ module.exports = {
   execute: (bot, message) => {
     const reply = [
       "**RANKS**",
-      ...bot.settings.ranks.map(
+      ...bot.ranks.map(
         (rank, index) =>
           `    ${index + 1}. ${rank.name} - ${rank.minPoints}pts`,
       ),
