@@ -9,7 +9,7 @@ block content
           each result, index in scores.results
             tr
               td= result.points
-              td= scores.users[index].username
+              td= scores.users[index].displayName
     .col
       h2 Annual Leaderboard
       table
@@ -17,4 +17,4 @@ block content
           each result, index in annual.results
             tr
               td= result.points
-              td= annual.users[index].username
+              td= annual.users[index].displayName

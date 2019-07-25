@@ -1,26 +1,29 @@
 const Discord = require("discord.js")
 
 function retrieveScores(bot, amount = 10) {
-  return Promise.all([
-    new Promise(resolve => {
-      bot.db
-        .all(`SELECT * FROM scores ORDER BY points DESC LIMIT ${amount}`)
-        .then(results => {
-          Promise.all(results.map(r => bot.client.fetchUser(r.userId))).then(
-            users => resolve({ results, users }),
-          )
-        })
-    }),
-    new Promise(resolve => {
-      bot.db
-        .all(`SELECT * FROM annual ORDER BY points DESC LIMIT ${amount}`)
-        .then(results => {
-          Promise.all(results.map(r => bot.client.fetchUser(r.userId))).then(
-            users => resolve({ results, users }),
-          )
-        })
-    }),
-  ])
+  const guild = bot.client.guilds.first()
+  return guild.fetchMembers().then(() => {
+    return Promise.all([
+      new Promise(resolve => {
+        bot.db
+          .all(`SELECT * FROM scores ORDER BY points DESC LIMIT ${amount}`)
+          .then(results => {
+            Promise.all(
+              results.map(r => guild.members.find(u => u.id === r.userId)),
+            ).then(users => resolve({ results, users }))
+          })
+      }),
+      new Promise(resolve => {
+        bot.db
+          .all(`SELECT * FROM annual ORDER BY points DESC LIMIT ${amount}`)
+          .then(results => {
+            Promise.all(
+              results.map(r => guild.members.find(u => u.id === r.userId)),
+            ).then(users => resolve({ results, users }))
+          })
+      }),
+    ])
+  })
 }
 
 module.exports = {
@@ -49,7 +52,7 @@ module.exports = {
                 "```",
                 scores.results
                   .map((r, i) =>
-                    [r.points, scores.users[i].username].join(" - "),
+                    [r.points, scores.users[i].displayName].join(" - "),
                   )
                   .join("\n"),
                 "```",
@@ -61,7 +64,7 @@ module.exports = {
                 "```",
                 annual.results
                   .map((r, i) =>
-                    [r.points, annual.users[i].username].join(" - "),
+                    [r.points, annual.users[i].displayName].join(" - "),
                   )
                   .join("\n"),
                 "```",
