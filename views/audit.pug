@@ -14,26 +14,27 @@ block content
   style
     .
       body {
-        max-width: 70%;
+        max-width: 90%;
       }
 
       .logs {
         display: grid;
         grid-template-columns: 
-          [date] max-content 
+          [date] min-content 
           [user] min-content 
           [channel] max-content 
           [command] 1fr;
         grid-column-gap: 0.8rem;
         grid-row-gap: 1.2rem;
+        align-items: center;
       }
 
       .logs dt.date {
+        text-align: center;
         font-weight: normal;
         color: rgb(54, 57, 63);
-        font-size: 1.4rem;
+        font-size: 1.2rem;
         grid-column: date;
-        padding-top: 0.2rem;
       }
 
       .logs dt.user {
