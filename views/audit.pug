@@ -34,6 +34,10 @@ block content
       .logs dt.user {
         font-weight: bold;
         grid-column: user;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis,
+        max-width: 15rem;
       }
 
       .logs dd {
