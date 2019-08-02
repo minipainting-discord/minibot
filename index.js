@@ -33,6 +33,8 @@ const bot = {
     app.use(express.static("public"))
     app.listen(4567, "0.0.0.0")
 
+    bot.log(`Loaded plugins: ${plugins.map(p => p.name).join(", ")}`)
+
     sql
       .open("./database.sqlite", { Promise })
       .then(database => {

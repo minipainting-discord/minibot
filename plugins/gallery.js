@@ -11,6 +11,7 @@ const MAX_HEIGHT = 1000
 const waitingUsers = []
 
 module.exports = {
+  name: "gallery",
   filter(bot, message) {
     if (message.channel.id !== settings.channels.gallery) {
       return false
