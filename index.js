@@ -41,6 +41,9 @@ const bot = {
           bot.db.run(
             "CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)",
           ),
+          bot.db.run(
+            "CREATE TABLE IF NOT EXISTS log (userId TEXT, location TEXT, command TEXT, arguments TEXT, date TEXT DEFAULT CURRENT_TIMESTAMP)",
+          ),
         ])
       })
       .then(() => client.login(settings.token))
@@ -58,6 +61,7 @@ const bot = {
       }
 
       bot.log(`DM <${message.author.username}> ${firstWord} ${args.join(" ")}`)
+      bot.logCommand(message, command, args)
       command.execute(bot, message, ...args)
     }
   },
@@ -100,6 +104,7 @@ const bot = {
       )
 
       command.execute(bot, message, ...args)
+      bot.logCommand(message, command, args)
       break
     }
   },
@@ -139,6 +144,20 @@ const bot = {
 
   logError(error, message = "An error occured") {
     bot.log(`[ERROR] ${message}`, error)
+  },
+
+  logCommand(message, command, args) {
+    bot.db
+      .run(
+        "INSERT INTO log (userId, location, command, arguments) VALUES (?, ?, ?, ?)",
+        [
+          message.author.id,
+          message.channel.id,
+          command.keyword,
+          JSON.stringify(args),
+        ],
+      )
+      .catch(err => bot.logError(err, "Error while logging command"))
   },
 }
 
