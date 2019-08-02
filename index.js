@@ -2,7 +2,7 @@ const Discord = require("discord.js")
 const sql = require("sqlite")
 const shellwords = require("shellwords")
 const express = require("express")
-const filters = require("./filters")
+const plugins = require("./plugins")
 const commands = require("./commands")
 const settings = require("./settings.json")
 
@@ -13,7 +13,7 @@ const bot = {
   db: null,
   client: null,
   settings,
-  filters,
+  plugins,
   commands,
 
   start() {
@@ -24,7 +24,11 @@ const bot = {
     client.on("message", bot.onMessage)
 
     const app = express()
-    commands.filter(c => c.web).forEach(c => c.web(app, bot))
+    const hasWeb = x => x.web
+    commands
+      .filter(hasWeb)
+      .concat(plugins.filter(hasWeb))
+      .forEach(c => c.web(app, bot))
     app.set("view engine", "pug")
     app.use(express.static("public"))
     app.listen(4567, "0.0.0.0")
@@ -76,8 +80,8 @@ const bot = {
     }
 
     // First we apply each filter and we stop if the filter returns true
-    for (const filter of filters) {
-      if (filter(bot, message)) {
+    for (const plugin of bot.plugins) {
+      if (plugin.filter && plugin.filter(bot, message)) {
         break
       }
     }
