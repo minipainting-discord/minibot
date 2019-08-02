@@ -1,0 +1,43 @@
+extends layout.pug
+
+block content
+  h2 Command Log
+
+  dl.logs
+    each entry in log
+      dt.date= entry.date
+      dt.user(data-user-id=entry.userId)= entry.user
+      dd #{entry.location} #{entry.command} #{JSON.parse(entry.arguments).join(" ")}
+
+
+  style
+    .
+      body {
+        max-width: 70%;
+      }
+
+      .logs {
+        display: grid;
+        grid-template-columns: [date] max-content [user] min-content [command] 1fr;
+        grid-column-gap: 0.8rem;
+        grid-row-gap: 1.2rem;
+      }
+
+      .logs dt.date {
+        font-weight: normal;
+        color: rgb(54, 57, 63);
+        font-size: 1.4rem;
+        grid-column: date;
+        padding-top: 0.2rem;
+      }
+
+      .logs dt.user {
+        font-weight: bold;
+        grid-column: user;
+      }
+
+      .logs dd {
+        grid-column: command;
+        margin: 0;
+        font-family: monospace;
+      }
