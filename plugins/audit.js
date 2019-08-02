@@ -15,6 +15,19 @@ module.exports = {
             results.map(r => ({
               ...r,
               user: guild.members.find(u => u.id === r.userId).displayName,
+              message: [
+                r.command,
+                ...JSON.parse(r.arguments).map(arg =>
+                  arg.replace(
+                    /^<@(\d+)>/,
+                    (_, id) =>
+                      `<mark>${
+                        guild.members.find(u => u.id === id).displayName
+                      }</mark>`,
+                  ),
+                ),
+              ].join(" "),
+              channel: bot.client.channels.find(c => c.id === r.location),
             })),
           ),
         )

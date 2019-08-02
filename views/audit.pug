@@ -7,7 +7,8 @@ block content
     each entry in log
       dt.date= entry.date
       dt.user(data-user-id=entry.userId)= entry.user
-      dd #{entry.location} #{entry.command} #{JSON.parse(entry.arguments).join(" ")}
+      dt.channel(data-channel=entry.location)= entry.channel ? "#" + entry.channel.name : "DM"
+      dd!= entry.message
 
 
   style
@@ -18,7 +19,11 @@ block content
 
       .logs {
         display: grid;
-        grid-template-columns: [date] max-content [user] min-content [command] 1fr;
+        grid-template-columns: 
+          [date] max-content 
+          [user] min-content 
+          [channel] max-content 
+          [command] 1fr;
         grid-column-gap: 0.8rem;
         grid-row-gap: 1.2rem;
       }
@@ -40,8 +45,22 @@ block content
         max-width: 15rem;
       }
 
+      .logs dt.channel {
+        grid-column: channel;
+        color: rgb(74, 77, 83);
+      }
+
       .logs dd {
         grid-column: command;
         margin: 0;
         font-family: monospace;
+      }
+
+      .logs dd mark {
+        color: rgb(114, 137, 218);
+        background-color: transparent;
+      }
+
+      .logs dd mark::before {
+        content: "@";
       }
