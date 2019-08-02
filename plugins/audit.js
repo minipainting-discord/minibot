@@ -18,13 +18,21 @@ module.exports = {
               message: [
                 r.command,
                 ...JSON.parse(r.arguments).map(arg =>
-                  arg.replace(
-                    /^<@(\d+)>/,
-                    (_, id) =>
-                      `<mark>${
-                        guild.members.find(u => u.id === id).displayName
-                      }</mark>`,
-                  ),
+                  arg
+                    .replace(
+                      /^<@(\d+)>/,
+                      (_, id) =>
+                        `<mark>@${
+                          guild.members.find(u => u.id === id).displayName
+                        }</mark>`,
+                    )
+                    .replace(
+                      /^<#(\d+)>/,
+                      (_, id) =>
+                        `<mark>#${
+                          guild.channels.find(c => c.id === id).name
+                        }</mark>`,
+                    ),
                 ),
               ].join(" "),
               channel: bot.client.channels.find(c => c.id === r.location),
