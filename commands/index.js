@@ -8,6 +8,7 @@ const resetpoints = require("./resetpoints")
 const reset = require("./reset")
 const annual = require("./annual")
 const say = require("./say")
+const presence = require("./presence")
 
 module.exports = [
   help,
@@ -20,4 +21,5 @@ module.exports = [
   reset,
   annual,
   say,
+  presence,
 ]
