@@ -5,16 +5,15 @@ const { randomItem } = require("../utils")
 
 const USAGE = "`!addpoints USER AMOUNT [ANNUAL]`"
 
-const RANK_UP_GIFS = [
-  "images/addpoints/rank-up-1.gif",
-  "images/addpoints/rank-up-2.gif",
-]
+const RANK_UP_GIFS = Array.from(
+  { length: 13 },
+  (_, i) => `images/addpoints/rank-up-${i + 1}.gif`,
+)
 
-const RANK_DOWN_GIFS = [
-  "images/addpoints/rank-down-1.gif",
-  "images/addpoints/rank-down-2.gif",
-  "images/addpoints/rank-down-3.gif",
-]
+const RANK_DOWN_GIFS = Array.from(
+  { length: 9 },
+  (_, i) => `images/addpoints/rank-down-${i + 1}.gif`,
+)
 
 module.exports = {
   keyword: "addpoints",
