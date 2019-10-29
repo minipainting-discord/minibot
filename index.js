@@ -3,10 +3,13 @@ const sql = require("sqlite")
 const shellwords = require("shellwords")
 const express = require("express")
 const plugins = require("./plugins")
-const commands = require("./commands")
 const settings = require("./settings.json")
 
 const COMMAND_PREFIX = "!"
+
+const commands = plugins.flatMap(p => p.commands || [])
+
+console.log(plugins, commands)
 
 const bot = {
   app: null,
@@ -24,11 +27,7 @@ const bot = {
     client.on("message", bot.onMessage)
 
     const app = express()
-    const hasWeb = x => x.web
-    commands
-      .filter(hasWeb)
-      .concat(plugins.filter(hasWeb))
-      .forEach(c => c.web(app, bot))
+    plugins.filter(p => p.web).forEach(p => p.web(app, bot))
     app.set("view engine", "pug")
     app.use(express.static("public"))
     app.listen(4567, "0.0.0.0")

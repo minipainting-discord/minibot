@@ -1,8 +1,6 @@
 const Discord = require("discord.js")
 const { randomItem } = require("../utils")
 
-// TODO: This mess should be cleaned up
-
 const USAGE = "`!addpoints USER AMOUNT [ANNUAL]`"
 
 const RANK_UP_GIFS = Array.from(
@@ -16,102 +14,100 @@ const RANK_DOWN_GIFS = Array.from(
 )
 
 module.exports = {
-  keyword: "addpoints",
-  help: `${USAGE}: Add or remove user points`,
-  helpMod: true,
-  execute: (bot, message, ...args) => {
-    const user = message.mentions.users.first()
-
-    if (args.length < 2 || !user) {
-      message.reply(USAGE)
-      return
-    }
-
-    const amount = parseFloat(args[1], 10)
-    const annual = args.length > 2 ? parseFloat(args[2], 10) : amount
-
-    if (isNaN(amount) || isNaN(annual)) {
-      message.reply("Is that even a number?")
-      return
-    }
-
-    if (
-      !message.member.roles.has(bot.roles.admin.id) &&
-      !message.member.roles.has(bot.roles.mod.id)
-    ) {
-      message.reply(
-        `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `,
-      )
-      return
-    }
-
-    let new_points = amount
-    let annual_points = annual
-    let current_level = 0
-
-    function doAnnual() {
-      bot.db
-        .get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
-        .then(row => {
-          if (!row) {
-            bot.db
-              .run("INSERT INTO annual (userId, points) VALUES (?, ?)", [
-                user.id,
-                0,
-              ])
-              .catch(err => {
-                bot.logError(
-                  err,
-                  "Unknown error inserting new annual score record",
-                )
-              })
-          } else {
-            annual_points += row.points
-          }
-          set_points(
-            bot,
-            message,
-            user,
-            new_points,
-            current_level,
-            annual_points,
-          )
-        })
-        .catch(err => bot.logError(err, "Unknown error selecting annual score"))
-    }
-
-    function doLifetime() {
-      bot.db
-        .get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
-        .then(row => {
-          if (!row) {
-            bot.db
-              .run(
-                "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
-                [user.id, 0, 0],
-              )
-              .catch(err => {
-                bot.logError(
-                  err,
-                  "Unknown error inserting new lifetime score record",
-                )
-              })
-          } else {
-            current_level = row.level
-            new_points += row.points
-          }
-          doAnnual()
-        })
-        .catch(err =>
-          bot.logError(err, "Unknown error selecting lifetime score"),
-        )
-    }
-
-    doLifetime()
-  },
+  name: "addpoints",
+  commands: [
+    {
+      keyword: "addpoints",
+      help: `${USAGE}: Add or remove user points`,
+      helpMod: true,
+      execute: addpoints,
+    },
+  ],
 }
 
-function set_points(bot, message, user, new_points, current_level, annual_add) {
+function addpoints(bot, message, ...args) {
+  const user = message.mentions.users.first()
+
+  if (args.length < 2 || !user) {
+    message.reply(USAGE)
+    return
+  }
+
+  const amount = parseFloat(args[1], 10)
+  const annual = args.length > 2 ? parseFloat(args[2], 10) : amount
+
+  if (isNaN(amount) || isNaN(annual)) {
+    message.reply("Is that even a number?")
+    return
+  }
+
+  if (
+    !message.member.roles.has(bot.roles.admin.id) &&
+    !message.member.roles.has(bot.roles.mod.id)
+  ) {
+    message.reply(
+      `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `,
+    )
+    return
+  }
+
+  let new_points = amount
+  let annual_points = annual
+  let current_level = 0
+
+  function doAnnual() {
+    bot.db
+      .get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
+      .then(row => {
+        if (!row) {
+          bot.db
+            .run("INSERT INTO annual (userId, points) VALUES (?, ?)", [
+              user.id,
+              0,
+            ])
+            .catch(err => {
+              bot.logError(
+                err,
+                "Unknown error inserting new annual score record",
+              )
+            })
+        } else {
+          annual_points += row.points
+        }
+        setPoints(bot, message, user, new_points, current_level, annual_points)
+      })
+      .catch(err => bot.logError(err, "Unknown error selecting annual score"))
+  }
+
+  function doLifetime() {
+    bot.db
+      .get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
+      .then(row => {
+        if (!row) {
+          bot.db
+            .run(
+              "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
+              [user.id, 0, 0],
+            )
+            .catch(err => {
+              bot.logError(
+                err,
+                "Unknown error inserting new lifetime score record",
+              )
+            })
+        } else {
+          current_level = row.level
+          new_points += row.points
+        }
+        doAnnual()
+      })
+      .catch(err => bot.logError(err, "Unknown error selecting lifetime score"))
+  }
+
+  doLifetime()
+}
+
+function setPoints(bot, message, user, new_points, current_level, annual_add) {
   message.guild
     .fetchMember(user)
     .then(member => {
