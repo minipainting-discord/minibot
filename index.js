@@ -9,8 +9,6 @@ const COMMAND_PREFIX = "!"
 
 const commands = plugins.flatMap(p => p.commands || [])
 
-console.log(plugins, commands)
-
 const bot = {
   app: null,
   db: null,
