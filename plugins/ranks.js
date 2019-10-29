@@ -4,6 +4,7 @@ module.exports = {
     {
       keyword: "ranks",
       help: "`!ranks`: Display the ranks",
+      availableInDM: true,
       execute: ranks,
     },
   ],

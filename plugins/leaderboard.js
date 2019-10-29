@@ -26,6 +26,7 @@ module.exports = {
     {
       keyword: "leaderboard",
       help: "`!leaderboard`: Check the points leaderboard",
+      availableInDM: true,
       execute: leaderboard,
     },
   ],
