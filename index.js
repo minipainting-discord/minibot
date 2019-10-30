@@ -56,6 +56,13 @@ const bot = {
   onDM(message) {
     const [firstWord, ...args] = splitMessage(message)
 
+    // First we apply each dmFilter and we stop if the filter returns true
+    for (const plugin of bot.plugins) {
+      if (plugin.dmFilter && plugin.dmFilter(bot, message)) {
+        break
+      }
+    }
+
     for (const command of commands) {
       if (
         !command.availableInDM ||
