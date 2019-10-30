@@ -38,7 +38,7 @@ function roll(bot, message, ...args) {
       return
     }
 
-    message.reply(reply)
+    message.reply(`> \`${reply}\``)
   } catch (error) {
     message.reply(`I can't roll that ${bot.emojis.whut}`)
     bot.logError(error)

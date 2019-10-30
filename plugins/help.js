@@ -42,5 +42,5 @@ function help(bot, message) {
     ...visibleCommands.filter(c => c.mod || c.helpMod).map(showCommandHelp),
   ].join("\n")
 
-  message.reply(reply)
+  message.reply(`>>> ${reply}`)
 }
