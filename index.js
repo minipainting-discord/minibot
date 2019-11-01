@@ -12,6 +12,7 @@ const commands = plugins.flatMap(p => p.commands || [])
 const bot = {
   app: null,
   db: null,
+  data: new Map(),
   client: null,
   settings,
   plugins,
