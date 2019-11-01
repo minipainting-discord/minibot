@@ -38,19 +38,26 @@ const bot = {
       .then(database => {
         bot.db = database
 
-        return Promise.all([
-          bot.db.run(
-            "CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)",
-          ),
-          bot.db.run(
-            "CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)",
-          ),
-          bot.db.run(
-            "CREATE TABLE IF NOT EXISTS log (userId TEXT, location TEXT, command TEXT, arguments TEXT, date TEXT DEFAULT CURRENT_TIMESTAMP)",
-          ),
-        ])
+        return Promise.all(
+          plugins
+            .filter(p => p.setup)
+            .map(
+              plugin =>
+                new Promise((resolve, reject) => {
+                  bot.log(`Run setup for ${plugin.name}`)
+                  plugin
+                    .setup(bot)
+                    .then(resolve)
+                    .catch(reject)
+                }),
+            ),
+        )
       })
       .then(() => client.login(settings.token))
+      .catch(err => {
+        console.error("Bot startup failed")
+        console.error(err)
+      })
   },
 
   onDM(message) {

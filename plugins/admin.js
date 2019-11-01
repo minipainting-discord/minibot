@@ -5,6 +5,10 @@ const ACTIVITIES = ["playing", "streaming", "listening", "watching"]
 module.exports = {
   name: "admin",
   description: "Bot administration and control commands and tools",
+  setup: bot =>
+    bot.db.run(
+      "CREATE TABLE IF NOT EXISTS log (userId TEXT, location TEXT, command TEXT, arguments TEXT, date TEXT DEFAULT CURRENT_TIMESTAMP)",
+    ),
   commands: [
     {
       keyword: "say",

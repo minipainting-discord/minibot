@@ -1,5 +1,9 @@
 module.exports = {
   name: "points",
+  setup: bot =>
+    bot.db.run(
+      "CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)",
+    ),
   commands: [
     {
       keyword: "points",

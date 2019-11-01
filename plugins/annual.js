@@ -1,5 +1,9 @@
 module.exports = {
   name: "annual",
+  setup: bot =>
+    bot.db.run(
+      "CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)",
+    ),
   commands: [
     {
       keyword: "annual",
