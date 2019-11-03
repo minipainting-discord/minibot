@@ -170,6 +170,9 @@ function santa(bot, message, command) {
     case "pair":
       santaPair(bot, message)
       break
+    case "status":
+      santaStatus(bot, message)
+      break
     default:
       message.reply(SANTA_USAGE)
   }
@@ -249,4 +252,27 @@ function santaHandler(bot) {
       })
       .catch(() => res.status(500).send("Internal server error"))
   }
+}
+
+async function santaStatus(bot, message) {
+  const guild = bot.client.guilds.first()
+
+  const pendingLetters = bot.data.get("secret-santa:pending")
+
+  if (!pendingLetters.size) {
+    message.reply("There are currently no letters being written")
+    return
+  }
+
+  const users = await Promise.all(
+    Array.from(pendingLetters.keys()).map(
+      async id => await guild.members.find(u => u.id === id),
+    ),
+  )
+
+  message.reply(
+    `There are currently ${
+      pendingLetters.size
+    } letters being written. (${users.map(u => u.displayName).join(", ")})`,
+  )
 }
