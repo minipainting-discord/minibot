@@ -1,6 +1,7 @@
 const SAY_USAGE = "`!say CHANNEL SOMETHING`"
 const PRESENCE_USAGE = "`!presence ACTIVITY VALUE`"
 const ACTIVITIES = ["playing", "streaming", "listening", "watching"]
+const WEB_ROUTE = "/admin/audit"
 
 module.exports = {
   name: "admin",
@@ -31,7 +32,7 @@ module.exports = {
   ],
 
   web: (app, bot) => {
-    app.get("/admin/audit", auditHandler(bot))
+    app.get(WEB_ROUTE, auditHandler(bot))
   },
 }
 
@@ -89,6 +90,7 @@ function reset(bot, message) {
 
 function auditHandler(bot) {
   return (req, res) => {
+    bot.log(`WEB ${WEB_ROUTE}`, req.query)
     if (!(bot.settings.adminPassword in req.query)) {
       return res.status(401).send("SKREEEOOOONK!!!")
     }

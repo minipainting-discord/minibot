@@ -1,10 +1,12 @@
 const Discord = require("discord.js")
 
+const WEB_ROUTE = "/leaderboard"
+
 module.exports = {
   name: "leaderboard",
   web: (app, bot) => {
-    app.get("/leaderboard", (req, res) => {
-      bot.log("WEB /leaderboard")
+    app.get(WEB_ROUTE, (req, res) => {
+      bot.log(`WEB ${WEB_ROUTE}`)
       retrieveScores(bot, "all").then(([scores, annual]) => {
         const colorToRGB = color =>
           [
@@ -37,7 +39,8 @@ function leaderboard(bot, message) {
     .then(([scores, annual]) => {
       const embed = new Discord.RichEmbed({
         color: 0x0088aa,
-        description: `[See full leaderboard](${bot.settings.serverUrl}/leaderboard)`,
+        description: `[See full leaderboard](${bot.settings.serverUrl +
+          WEB_ROUTE})`,
         fields: [
           {
             name: "Lifetime Leaderboard",
