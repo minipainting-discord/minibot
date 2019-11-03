@@ -178,6 +178,18 @@ const bot = {
       )
       .catch(err => bot.logError(err, "Error while logging command"))
   },
+
+  moderatorOnly(message) {
+    if (
+      !message.member.roles.has(bot.roles.admin.id) &&
+      !message.member.roles.has(bot.roles.mod.id)
+    ) {
+      message.reply(`Nope ${bot.emojis.LUL}`)
+      return true
+    }
+
+    return false
+  },
 }
 
 function splitMessage(message) {

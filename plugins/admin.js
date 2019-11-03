@@ -36,11 +36,7 @@ module.exports = {
 }
 
 function say(bot, message) {
-  if (
-    !message.member.roles.has(bot.roles.admin.id) &&
-    !message.member.roles.has(bot.roles.mod.id)
-  ) {
-    message.reply(`Nope ${bot.emojis.LUL}`)
+  if (bot.moderatorOnly(message)) {
     return
   }
 
@@ -60,11 +56,7 @@ function say(bot, message) {
 }
 
 function presence(bot, message, activity, ...words) {
-  if (
-    !message.member.roles.has(bot.roles.admin.id) &&
-    !message.member.roles.has(bot.roles.mod.id)
-  ) {
-    message.reply(`Nope ${bot.emojis.LUL}`)
+  if (bot.moderatorOnly(message)) {
     return
   }
 
@@ -85,11 +77,7 @@ function presence(bot, message, activity, ...words) {
 }
 
 function reset(bot, message) {
-  if (
-    !message.member.roles.has(bot.roles.admin.id) &&
-    !message.member.roles.has(bot.roles.mod.id)
-  ) {
-    message.reply(`Nope ${bot.emojis.LUL}`)
+  if (bot.moderatorOnly(message)) {
     return
   }
 

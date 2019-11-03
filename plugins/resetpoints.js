@@ -15,6 +15,10 @@ module.exports = {
 }
 
 function resetpoints(bot, message, ...args) {
+  if (bot.moderatorOnly(message)) {
+    return
+  }
+
   const user = message.mentions.users.first()
 
   if (args.length < 1 || !user) {
@@ -23,16 +27,6 @@ function resetpoints(bot, message, ...args) {
   }
 
   const zero = 0
-
-  if (
-    !message.member.roles.has(bot.roles.admin.id) &&
-    !message.member.roles.has(bot.roles.mod.id)
-  ) {
-    message.reply(
-      `:japanese_goblin:  Haha! Being sneaky are we? :japanese_goblin: `,
-    )
-    return
-  }
 
   message.guild.fetchMember(user).then(member => {
     const roles = bot.settings.ranks.map(rank =>
