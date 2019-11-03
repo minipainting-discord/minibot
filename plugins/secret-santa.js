@@ -4,7 +4,7 @@ const SANTA_USAGE = "`!santa list | !santa pair`"
 
 const TIER_THRESHOLD = 4000
 const NICE_TIER = "nice"
-const NAUGHTY_TIER = "nice"
+const NAUGHTY_TIER = "naughty"
 const WEB_ROUTE = "/admin/santa"
 
 module.exports = {
@@ -81,10 +81,12 @@ module.exports = {
 
       if (!letter.tier) {
         const count = parseInt(message.content.replace(/[^0-9]/g, ""), 10)
+
         if (isNaN(count)) {
           message.reply(":thinking: Please enter a number")
           return true
         }
+
         letter.tier = count >= TIER_THRESHOLD ? NICE_TIER : NAUGHTY_TIER
         recap(message, letter)
         return true
