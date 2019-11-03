@@ -32,71 +32,71 @@ block content
         .rank-#{rank.level} {
           color: rgb(#{colorToRGB(rank.role.color)});
         }
+    .
+      /* Leaderboard */
 
-        /* Leaderboard */
+      .leaderboard {
+        display: flex;
+      }
 
+      .leaderboard > .col {
+        flex: 1;
+      }
+
+      .leaderboard > .col > h2 {
+        text-transform: uppercase;
+        font-weight: lighter;
+      }
+
+      .leaderboard > .col > table {
+        margin: 1rem 0;
+        border-collapse: collapse;
+      }
+
+      .leaderboard > .col > table td {
+        padding: 0.4rem 0.6rem;
+      }
+
+      .leaderboard > .col > table td:first-of-type {
+        text-align: right;
+      }
+
+      .leaderboard > .col:first-of-type {
+        padding-right: 2rem;
+      }
+
+      .leaderboard > .col:last-of-type {
+        padding-left: 2rem;
+        border-left: 1px solid rgb(185, 187, 190);
+      }
+
+      .ranks > h2 {
+        text-transform: uppercase;
+        font-weight: lighter;
+      }
+
+      .ranks ul {
+        margin: 1rem 0;
+        padding: 0 0 0 2rem;
+        line-height: 2.2rem;
+      }
+
+      @media screen and (max-width: 720px) {
         .leaderboard {
-          display: flex;
-        }
-
-        .leaderboard > .col {
-          flex: 1;
+          flex-direction: column;
         }
 
         .leaderboard > .col > h2 {
-          text-transform: uppercase;
-          font-weight: lighter;
-        }
-
-        .leaderboard > .col > table {
-          margin: 1rem 0;
-          border-collapse: collapse;
-        }
-
-        .leaderboard > .col > table td {
-          padding: 0.4rem 0.6rem;
-        }
-
-        .leaderboard > .col > table td:first-of-type {
-          text-align: right;
+          text-align: left;
         }
 
         .leaderboard > .col:first-of-type {
-          padding-right: 2rem;
+          padding-right: 0;
         }
 
         .leaderboard > .col:last-of-type {
-          padding-left: 2rem;
-          border-left: 1px solid rgb(185, 187, 190);
+          padding-left: 0;
+          border-left: none;
         }
-
-        .ranks > h2 {
-          text-transform: uppercase;
-          font-weight: lighter;
-        }
-
-        .ranks ul {
-          margin: 1rem 0;
-          padding: 0 0 0 2rem;
-          line-height: 2.2rem;
-        }
-
-        @media screen and (max-width: 720px) {
-          .leaderboard {
-            flex-direction: column;
-          }
-
-          .leaderboard > .col > h2 {
-            text-align: left;
-          }
-
-          .leaderboard > .col:first-of-type {
-            padding-right: 0;
-          }
-
-          .leaderboard > .col:last-of-type {
-            padding-left: 0;
-            border-left: none;
-          }
-        }
+      }
 
