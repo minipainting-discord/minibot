@@ -1,0 +1,58 @@
+extends layout.pug
+
+block footer
+
+block content
+  section.santa
+    h2 Secret Santa participants
+    each user in results
+      .participant
+        header
+          h3= guildMembers.get(user.userId).displayName
+          span(class=user.tier) #{user.tier} tier
+        blockquote.letter!= user.letter .replace(/&/g, "&amp;") .replace(/</g, "&lt;") .replace(/>/g, "&gt;") .replace(/"/g, "&quot;") .replace(/'/g, "&#039;") .replace(/\n/g, "<br />")
+        blockquote.address= user.address
+
+  style
+    .
+      .santa > h2 {
+        text-transform: uppercase;
+        font-weight: lighter;
+      }
+
+      .participant {
+        margin-bottom: 3rem;
+      }
+
+      .participant header {
+        display: flex;
+        align-items: center;
+      }
+
+      .participant header h3 {
+        font-weight: normal;
+        flex: 1;
+      }
+
+      .participant header span {
+      }
+      .participant header span.nice {
+        color: rgb(46,204,113);
+      }
+      .participant header span.naughty {
+        color: rgb(233,30,99);
+      }
+
+      .participant .letter {
+        margin: 1rem 1rem 1rem 2rem;
+        padding-left: 2rem;
+        border-left: 1px solid rgb(185, 187, 190);
+      }
+
+      .santa .address {
+        margin: 1rem 1rem 1rem 2rem;
+        padding-left: 2rem;
+        border-left: 1px solid rgb(185, 187, 190);
+      }
+
+
