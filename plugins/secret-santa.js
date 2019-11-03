@@ -2,7 +2,7 @@ const settings = require("../settings.json")
 
 const SANTA_USAGE = "`!santa list | !santa pair`"
 
-const TIER_THRESHOLD = 3000
+const TIER_THRESHOLD = 4000
 const NICE_TIER = "nice"
 const NAUGHTY_TIER = "nice"
 const WEB_ROUTE = "/admin/santa"
