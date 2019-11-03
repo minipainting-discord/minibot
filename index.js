@@ -131,6 +131,9 @@ const bot = {
   onReady() {
     const guild = bot.client.guilds.first()
 
+    // Prefetch members
+    guild.fetchMembers()
+
     bot.client.user.setPresence({
       game: { name: "you", type: "WATCHING" },
     })
