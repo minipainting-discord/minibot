@@ -28,7 +28,7 @@ module.exports = {
   ],
 
   web: (app, bot) => {
-    app.get(WEB_ROUTE, santaHandler(bot))
+    app.get(WEB_ROUTE, bot.requireWebAuth(), santaHandler(bot))
   },
 
   async dmFilter(bot, message) {
@@ -225,8 +225,7 @@ function santaList(bot, message) {
           "\n>>> ```",
           volunteerList,
           "```",
-          `See full Secret Santa info at ${bot.settings.serverUrl +
-            WEB_ROUTE}?${bot.settings.adminPassword}`,
+          `See full Secret Santa info at ${bot.settings.serverUrl + WEB_ROUTE}`,
         ].join("\n"),
       )
     })
@@ -238,33 +237,6 @@ function santaPair(bot, message) {
   }
 
   message.reply("Not yet!")
-}
-
-function santaHandler(bot) {
-  return (req, res) => {
-    bot.log(`WEB ${WEB_ROUTE}`, req.query)
-    if (!(bot.settings.adminPassword in req.query)) {
-      return res.status(401).send("SKREEEOOOONK!!!")
-    }
-
-    const guild = bot.client.guilds.first()
-
-    bot.db
-      .all(`SELECT * FROM secretSanta ORDER BY region, tier DESC`)
-      .then(async results => {
-        const guildMembers = new Map(
-          await Promise.all(
-            results.map(r => [
-              r.userId,
-              guild.members.find(u => u.id === r.userId),
-            ]),
-          ),
-        )
-
-        res.render("santa", { results, guildMembers })
-      })
-      .catch(() => res.status(500).send("Internal server error"))
-  }
 }
 
 async function santaStatus(bot, message) {
@@ -288,4 +260,28 @@ async function santaStatus(bot, message) {
       pendingLetters.size
     } letters being written. (${users.map(u => u.displayName).join(", ")})`,
   )
+}
+
+function santaHandler(bot) {
+  return (req, res) => {
+    bot.log(`WEB ${WEB_ROUTE}`)
+
+    const guild = bot.client.guilds.first()
+
+    bot.db
+      .all(`SELECT * FROM secretSanta ORDER BY region, tier DESC`)
+      .then(async results => {
+        const guildMembers = new Map(
+          await Promise.all(
+            results.map(r => [
+              r.userId,
+              guild.members.find(u => u.id === r.userId),
+            ]),
+          ),
+        )
+
+        res.render("santa", { results, guildMembers })
+      })
+      .catch(() => res.status(500).send("Internal server error"))
+  }
 }

@@ -32,7 +32,7 @@ module.exports = {
   ],
 
   web: (app, bot) => {
-    app.get(WEB_ROUTE, auditHandler(bot))
+    app.get(WEB_ROUTE, bot.requireWebAuth(), auditHandler(bot))
   },
 }
 
@@ -90,10 +90,7 @@ function reset(bot, message) {
 
 function auditHandler(bot) {
   return (req, res) => {
-    bot.log(`WEB ${WEB_ROUTE}`, req.query)
-    if (!(bot.settings.adminPassword in req.query)) {
-      return res.status(401).send("SKREEEOOOONK!!!")
-    }
+    bot.log(`WEB ${WEB_ROUTE}`)
 
     const guild = bot.client.guilds.first()
 

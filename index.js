@@ -2,6 +2,7 @@ const Discord = require("discord.js")
 const sql = require("sqlite")
 const shellwords = require("shellwords")
 const express = require("express")
+const basicAuth = require("express-basic-auth")
 const plugins = require("./plugins")
 const settings = require("./settings.json")
 
@@ -192,6 +193,15 @@ const bot = {
     }
 
     return false
+  },
+
+  requireWebAuth() {
+    return basicAuth({
+      users: { minipainting: settings.adminPassword },
+      challenge: true,
+      realm: "minipainting",
+      unauthorizedResponse: () => "SKREEEOOOONK!!!",
+    })
   },
 }
 
