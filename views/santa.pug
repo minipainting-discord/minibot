@@ -11,7 +11,7 @@ block content
           h3= guildMembers.get(user.userId).displayName
           span(class=user.tier) #{user.tier} tier
         blockquote.letter!= user.letter.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, "<br />")
-        blockquote.address= user.address.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, "<br />")
+        blockquote.address!= user.address.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, "<br />")
 
   style
     .
