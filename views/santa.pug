@@ -10,6 +10,8 @@ block content
         header
           h3= guildMembers.get(user.userId).displayName
           span(class=user.tier) #{user.tier} tier
+          span.region
+            img(src=`/flags/${user.region.toLowerCase()}.svg` width="45" height="45")
         blockquote.letter!= user.letter.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, "<br />")
         blockquote.address!= user.address.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, "<br />")
 
@@ -36,11 +38,17 @@ block content
 
       .participant header span {
       }
+
       .participant header span.nice {
         color: rgb(46,204,113);
       }
+
       .participant header span.naughty {
         color: rgb(233,30,99);
+      }
+
+      .participant header span.region {
+        margin-left: 1rem;
       }
 
       .participant .letter {
