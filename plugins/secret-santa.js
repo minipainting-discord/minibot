@@ -117,7 +117,7 @@ module.exports = {
             bot.client.channels
               .get(settings.channels.mod)
               .send(`:santa: New letter from ${guildMember.displayName}`)
-            bot.log(`Saved secret santa letter for ${message.author.username}`)
+            bot.log(`[santa] Saved letter for ${message.author.username}`)
           })
           .catch(err =>
             bot.logError(
@@ -140,6 +140,7 @@ module.exports = {
         return true
       }
       pendingLetters.set(message.author.id, { content: message.content })
+      bot.log(`[santa] Started list for ${message.author.username}`)
       message.reply(
         [
           "Ho ho ho! I got your letter little hooman!",
