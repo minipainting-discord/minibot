@@ -151,7 +151,11 @@ function recap(message, letter) {
       "Good! Let's recap!",
       `You are willing to ship to **${letter.region}**`,
       "Your letter to Santa is:",
-      letter.content.replace(/^/gm, "> "),
+    ].join("\n"),
+  )
+  message.reply(">>> " + letter.content)
+  message.reply(
+    [
       "Your full address is:",
       letter.address.replace(/^/gm, "> "),
       `You will be matched with people from the **${letter.tier}** tier`,
