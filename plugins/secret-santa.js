@@ -3,6 +3,7 @@ const settings = require("../settings.json")
 const SANTA_USAGE = "`!santa list | !santa pair`"
 
 const TIER_THRESHOLD = 4000
+const MAX_LETTER_SIZE = 1996 // 2000 chars discord limit - length of ">>> "
 const NICE_TIER = "nice"
 const NAUGHTY_TIER = "naughty"
 const WEB_ROUTE = "/admin/santa"
@@ -132,6 +133,12 @@ module.exports = {
     }
 
     if (message.content.match(/^dear\s+santa/i)) {
+      if (message.content.length > MAX_LETTER_SIZE) {
+        message.reply(
+          `Your letter is wayyyyyyy too long, please shorten it a bit (${MAX_LETTER_SIZE} chars max)`,
+        )
+        return true
+      }
       pendingLetters.set(message.author.id, { content: message.content })
       message.reply(
         [
