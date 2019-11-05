@@ -182,6 +182,11 @@ const bot = {
         ? bot.findMember(message.author.id)
         : message.member
 
+    if (!guildMember) {
+      message.reply(`Who are you?`)
+      return false
+    }
+
     if (
       !guildMember.roles.has(bot.roles.admin.id) &&
       !guildMember.roles.has(bot.roles.mod.id)
