@@ -1,6 +1,11 @@
 const settings = require("../settings.json")
 
-const SANTA_USAGE = "`!santa list | !santa pair`"
+const SANTA_USAGE = {
+  LIST: "`!santa list`",
+  MATCH: "`!santa match`",
+  STATUS: "`!santa status`",
+  SHORT: "`!santa list | match | status`",
+}
 
 const TIER_THRESHOLD = 4000
 const MAX_LETTER_SIZE = 1996 // 2000 chars discord limit - length of ">>> "
@@ -14,15 +19,27 @@ module.exports = {
   setup: bot => {
     bot.data.set("secret-santa:pending", new Map())
     return bot.db.run(
-      "CREATE TABLE IF NOT EXISTS secretSanta (userId TEXT PRIMARY KEY, letter TEXT, address TEXT, region TEXT, tier TEXT)",
+      `CREATE TABLE IF NOT EXISTS secretSanta (
+         userId TEXT PRIMARY KEY,
+         letter TEXT,
+         address TEXT,
+         region TEXT,
+         tier TEXT,
+         matchWith TEXT
+       )`,
     )
   },
 
   commands: [
     {
       keyword: "santa",
+      availableInDM: true,
       mod: true,
-      help: `${SANTA_USAGE}: Secret Santa specific command`,
+      help: [
+        `${SANTA_USAGE.LIST}: List current participants`,
+        `${SANTA_USAGE.MATCH}: Generate matches`,
+        `${SANTA_USAGE.STATUS}: Check if some people are writing letters`,
+      ],
       execute: santa,
     },
   ],
@@ -37,9 +54,7 @@ module.exports = {
       return
     }
 
-    const guildMember = await bot.guild.members.find(
-      u => u.id === message.author.id,
-    )
+    const guildMember = await bot.findMember(message.author.id)
 
     if (!guildMember) {
       message.reply("Join us at https://discord.gg/WREsGYF")
@@ -179,29 +194,26 @@ function santa(bot, message, command) {
     case "list":
       santaList(bot, message)
       break
-    case "pair":
-      santaPair(bot, message)
+    case "match":
+      santaMatch(bot, message)
       break
     case "status":
       santaStatus(bot, message)
       break
     default:
-      message.reply(SANTA_USAGE)
+      message.reply(SANTA_USAGE.SHORT)
   }
 }
 
 function santaList(bot, message) {
   bot.db
     .all(
-      `SELECT userId, region, tier FROM secretSanta ORDER BY region, tier DESC`,
+      `SELECT userId, region, tier, matchWith FROM secretSanta ORDER BY region, tier DESC`,
     )
     .then(async results => {
       const guildMembers = new Map(
         await Promise.all(
-          results.map(r => [
-            r.userId,
-            bot.guild.members.find(u => u.id === r.userId),
-          ]),
+          results.map(r => [r.userId, bot.findMember(r.userId)]),
         ),
       )
 
@@ -213,7 +225,9 @@ function santaList(bot, message) {
       const volunteerList = results
         .map(
           r =>
-            `[${r.tier}] ${r.region} ${guildMembers.get(r.userId).displayName}`,
+            `${r.tier.padEnd(7, " ")} | ${r.region.padEnd(4, " ")} | ${
+              guildMembers.get(r.userId).displayName
+            }`,
         )
         .join("\n")
 
@@ -228,12 +242,52 @@ function santaList(bot, message) {
     })
 }
 
-function santaPair(bot, message) {
-  if (bot.moderatorOnly(message)) {
-    return
+async function santaMatch(bot, message) {
+  const letters = await bot.db.all(`SELECT * FROM secretSanta`)
+  letters.forEach(l => {
+    l.user = bot.findMember(l.userId)
+  })
+
+  const groups = {
+    naughty: { NA: [], EU: [], INTL: [] },
+    nice: { NA: [], EU: [], INTL: [] },
   }
 
-  message.reply("Not yet!")
+  for (const letter of letters) {
+    groups[letter.tier][letter.region].push(letter)
+  }
+
+  // SPECIAL RULE: If some one is alone in nice/intl, rematch with the admin
+  if (groups.nice.INTL.length === 1) {
+    const admin = bot.guild.members.find(m => m.roles.has(bot.roles.admin.id))
+    const adminLetter = letters.find(l => l.userId === admin.user.id)
+    const group = groups[adminLetter.tier][adminLetter.region]
+    group.splice(group.indexOf(adminLetter), 1)
+    groups.nice.INTL.push(adminLetter)
+    bot.log("[santa] rematched admin to Nice/INTL")
+  }
+
+  for (const tier of [NAUGHTY_TIER, NICE_TIER]) {
+    for (const region of Object.keys(groups[tier])) {
+      const group = groups[tier][region]
+      const shuffled = bot.utils.shuffle(group)
+      groups[tier][region] = shuffled
+
+      if (!shuffled.length) {
+        continue
+      }
+
+      shuffled.forEach(async (member, i) => {
+        const match = shuffled[(i + 1) % shuffled.length]
+        await bot.db.run(
+          "UPDATE secretSanta set matchWith = ? WHERE userId = ?",
+          [match.user.id, member.user.id],
+        )
+      })
+    }
+  }
+
+  message.reply("Generated matches, use !santa send to notify users")
 }
 
 async function santaStatus(bot, message) {
@@ -245,9 +299,7 @@ async function santaStatus(bot, message) {
   }
 
   const users = await Promise.all(
-    Array.from(pendingLetters.keys()).map(
-      async id => await bot.guild.members.find(u => u.id === id),
-    ),
+    Array.from(pendingLetters.keys()).map(async id => await bot.findMember(id)),
   )
 
   message.reply(
@@ -266,10 +318,7 @@ function santaHandler(bot) {
       .then(async results => {
         const guildMembers = new Map(
           await Promise.all(
-            results.map(r => [
-              r.userId,
-              bot.guild.members.find(u => u.id === r.userId),
-            ]),
+            results.map(r => [r.userId, bot.findMember(r.userId)]),
           ),
         )
 
