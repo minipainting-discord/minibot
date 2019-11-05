@@ -17,5 +17,5 @@ function ranks(bot, message) {
       (rank, index) => `    ${index + 1}. ${rank.name} - ${rank.minPoints}pts`,
     ),
   ].join("\n")
-  message.reply(`>>> ${reply}`)
+  message.reply(`\n>>> ${reply}`)
 }
