@@ -57,7 +57,7 @@ module.exports = {
           (a, m) => [...a, ...Array.from(m.attachments.values())],
           [],
         )
-        const images = attachments.slice(0, 3).map(a => a.url)
+        const images = attachments.slice(0, 6).map(a => a.url)
 
         Promise.all(
           images.map(
@@ -97,6 +97,7 @@ module.exports = {
               `Processed gallery upload from ${message.author.username} [${message.id}]`,
             )
           })
+          .catch(bot.logError)
       })
 
     return null
@@ -128,16 +129,19 @@ function createCollage(buffers) {
   )
     .then(thumbs => {
       const canvasWidth = sumWidths(thumbs) + thumbs.length * 3
-      const canvasHeight = MAX_HEIGHT
+      const canvasHeight = buffers.length > 3 ? 2 * MAX_HEIGHT : MAX_HEIGHT
       const canvas = new Canvas(canvasWidth, canvasHeight)
       const ctx = canvas.getContext("2d")
 
       thumbs.forEach((thumb, position) => {
-        const offset = sumWidths(thumbs.slice(0, position)) + position * 3
+        const y = Math.floor(position / 3)
+        const xOffset = sumWidths(thumbs.slice(y * 3, position)) + position * 3
+        const yOffset = y * MAX_HEIGHT
+
         const img = new Image()
         img.src = thumb.image
 
-        ctx.drawImage(img, offset, 0)
+        ctx.drawImage(img, xOffset, yOffset)
       })
 
       return canvas.toBuffer()
