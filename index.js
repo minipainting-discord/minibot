@@ -172,10 +172,14 @@ const bot = {
     bot.log("I'm online!")
   },
 
+  findMember(id) {
+    return bot.guild.members.find(u => u.id === id)
+  },
+
   fromModerator(message) {
     const guildMember =
       message.channel.type === "dm"
-        ? bot.guild.members.find(u => u.id === message.author.id)
+        ? bot.findMember(message.author.id)
         : message.member
 
     if (

@@ -98,7 +98,7 @@ function auditHandler(bot) {
         Promise.all(
           results.map(r => ({
             ...r,
-            user: bot.guild.members.find(u => u.id === r.userId).displayName,
+            user: bot.findMember(r.userId).displayName,
             message: [
               r.command,
               ...JSON.parse(r.arguments).map(arg =>
@@ -106,9 +106,7 @@ function auditHandler(bot) {
                   .replace(
                     /^<@(\d+)>/,
                     (_, id) =>
-                      `<mark>@${
-                        bot.guild.members.find(u => u.id === id).displayName
-                      }</mark>`,
+                      `<mark>@${bot.findMember(id).displayName}</mark>`,
                   )
                   .replace(
                     /^<#(\d+)>/,

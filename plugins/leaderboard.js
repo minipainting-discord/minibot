@@ -81,14 +81,13 @@ function retrieveScores(bot, all = false) {
         bot.db
           .all(`SELECT * FROM scores ORDER BY points DESC ${limit}`)
           .then(results =>
-            Promise.all(
-              results.map(r => bot.guild.members.find(u => u.id === r.userId)),
-            ).then(users =>
-              resolve(
-                results
-                  .map((r, i) => ({ ...r, user: users[i] }))
-                  .filter(r => r.user),
-              ),
+            Promise.all(results.map(r => bot.findMember(r.userId))).then(
+              users =>
+                resolve(
+                  results
+                    .map((r, i) => ({ ...r, user: users[i] }))
+                    .filter(r => r.user),
+                ),
             ),
           )
       }),
@@ -96,14 +95,13 @@ function retrieveScores(bot, all = false) {
         bot.db
           .all(`SELECT * FROM annual ORDER BY points DESC ${limit}`)
           .then(results =>
-            Promise.all(
-              results.map(r => bot.guild.members.find(u => u.id === r.userId)),
-            ).then(users =>
-              resolve(
-                results
-                  .map((r, i) => ({ ...r, user: users[i] }))
-                  .filter(r => r.user),
-              ),
+            Promise.all(results.map(r => bot.findMember(r.userId))).then(
+              users =>
+                resolve(
+                  results
+                    .map((r, i) => ({ ...r, user: users[i] }))
+                    .filter(r => r.user),
+                ),
             ),
           )
       }),
