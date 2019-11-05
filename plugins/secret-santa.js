@@ -28,7 +28,7 @@ module.exports = {
   ],
 
   web: (app, bot) => {
-    app.get(WEB_ROUTE, bot.requireWebAuth(), santaHandler(bot))
+    app.get(WEB_ROUTE, bot.utils.requireWebAuth(), santaHandler(bot))
   },
 
   async dmFilter(bot, message) {
@@ -173,7 +173,7 @@ function recap(message, letter) {
 }
 
 function santa(bot, message, command) {
-  if (bot.moderatorOnly(message)) {
+  if (!bot.fromModerator(message)) {
     return
   }
 

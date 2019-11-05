@@ -1,5 +1,4 @@
 const Discord = require("discord.js")
-const { randomItem } = require("../utils")
 
 const USAGE = "`!addpoints USER AMOUNT [ANNUAL]`"
 
@@ -26,7 +25,7 @@ module.exports = {
 }
 
 function addpoints(bot, message, ...args) {
-  if (bot.moderatorOnly(message)) {
+  if (!bot.fromModerator(message)) {
     return
   }
 
@@ -125,15 +124,15 @@ function setPoints(bot, message, user, new_points, current_level, annual_add) {
             ? new_rank.level > current_level
               ? {
                   message: ` :confetti_ball: Congratulations you reached **${new_rank.role.name}** rank! :confetti_ball:`,
-                  gif: randomItem(RANK_UP_GIFS),
+                  gif: bot.utils.randomItem(RANK_UP_GIFS),
                 }
               : {
                   message: ` SKREEEOONK!!! DEMOTED TO **${new_rank.role.name}**`,
-                  gif: randomItem(RANK_DOWN_GIFS),
+                  gif: bot.utils.randomItem(RANK_DOWN_GIFS),
                 }
             : {
                 message: ` SKREEEOONK!!! ANNIHILATED`,
-                gif: randomItem(RANK_DOWN_GIFS),
+                gif: bot.utils.randomItem(RANK_DOWN_GIFS),
               }
           bot.client.channels
             .get(bot.settings.channels.general)

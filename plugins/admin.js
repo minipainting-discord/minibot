@@ -32,12 +32,12 @@ module.exports = {
   ],
 
   web: (app, bot) => {
-    app.get(WEB_ROUTE, bot.requireWebAuth(), auditHandler(bot))
+    app.get(WEB_ROUTE, bot.utils.requireWebAuth(), auditHandler(bot))
   },
 }
 
 function say(bot, message) {
-  if (bot.moderatorOnly(message)) {
+  if (!bot.fromModerator(message)) {
     return
   }
 
@@ -57,7 +57,7 @@ function say(bot, message) {
 }
 
 function presence(bot, message, activity, ...words) {
-  if (bot.moderatorOnly(message)) {
+  if (!bot.fromModerator(message)) {
     return
   }
 
@@ -78,7 +78,7 @@ function presence(bot, message, activity, ...words) {
 }
 
 function reset(bot, message) {
-  if (bot.moderatorOnly(message)) {
+  if (!bot.fromModerator(message)) {
     return
   }
 

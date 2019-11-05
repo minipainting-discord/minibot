@@ -15,7 +15,7 @@ module.exports = {
 }
 
 function resetpoints(bot, message, ...args) {
-  if (bot.moderatorOnly(message)) {
+  if (!bot.fromModerator(message)) {
     return
   }
 

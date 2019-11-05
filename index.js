@@ -3,6 +3,7 @@ const sql = require("sqlite")
 const shellwords = require("shellwords")
 const express = require("express")
 const basicAuth = require("express-basic-auth")
+const utils = require("./utils")
 const plugins = require("./plugins")
 const settings = require("./settings.json")
 
@@ -18,6 +19,7 @@ const bot = {
   settings,
   plugins,
   commands,
+  utils,
 
   start() {
     const client = new Discord.Client()
@@ -168,6 +170,23 @@ const bot = {
     bot.log("I'm online!")
   },
 
+  fromModerator(message) {
+    const guildMember =
+      message.channel.type === "dm"
+        ? bot.guild.members.find(u => u.id === message.author.id)
+        : message.member
+
+    if (
+      !guildMember.roles.has(bot.roles.admin.id) &&
+      !guildMember.roles.has(bot.roles.mod.id)
+    ) {
+      message.reply(`Nope ${bot.emojis.LUL}`)
+      return false
+    }
+
+    return true
+  },
+
   log(message, ...args) {
     console.log(`[${new Date().toISOString()}] ${message}`, ...args)
   },
@@ -188,27 +207,6 @@ const bot = {
         ],
       )
       .catch(err => bot.logError(err, "Error while logging command"))
-  },
-
-  moderatorOnly(message) {
-    if (
-      !message.member.roles.has(bot.roles.admin.id) &&
-      !message.member.roles.has(bot.roles.mod.id)
-    ) {
-      message.reply(`Nope ${bot.emojis.LUL}`)
-      return true
-    }
-
-    return false
-  },
-
-  requireWebAuth() {
-    return basicAuth({
-      users: { minipainting: settings.adminPassword },
-      challenge: true,
-      realm: "minipainting",
-      unauthorizedResponse: () => "SKREEEOOOONK!!!",
-    })
   },
 }
 
