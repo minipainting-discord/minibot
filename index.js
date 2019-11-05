@@ -87,10 +87,17 @@ const bot = {
   },
 
   onMessage(message) {
-    // We are only interested in text messages from real users
+    // Ignore the bot's own messages
+    if (message.author === bot.client.user) {
+      return
+    }
+
+    // Handle DM messages separately
     if (message.channel.type === "dm") {
       return bot.onDM(message)
     }
+
+    // We are only interested in text messages from real users
     if (message.author.bot || message.channel.type !== "text") {
       return
     }
