@@ -14,18 +14,21 @@ module.exports = {
     {
       keyword: "say",
       mod: true,
+      availableInDM: true,
       help: `${SAY_USAGE}: Say something in a channel`,
       execute: say,
     },
     {
       keyword: "presence",
       mod: true,
+      availableInDM: true,
       help: `${PRESENCE_USAGE}: Set the bot presence message`,
       execute: presence,
     },
     {
       keyword: "reset",
       helpMod: true,
+      availableInDM: true,
       help: "`!reset`: Restart the bot",
       execute: reset,
     },

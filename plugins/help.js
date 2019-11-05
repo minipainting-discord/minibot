@@ -18,6 +18,17 @@ function help(bot, message) {
       return false
     }
 
+    if (message.channel.type === "dm") {
+      if (!command.availableInDM) {
+        return false
+      }
+
+      if (command.mod || command.helpMod) {
+        return bot.fromModerator(message)
+      }
+      return true
+    }
+
     if (command.mod || command.helpMod) {
       return onModChannel
     }
@@ -35,10 +46,16 @@ function help(bot, message) {
       : `- ${command.help}`
   }
 
+  const modHeader =
+    (message.channel.type === "dm" && bot.fromModerator(message)) ||
+    onModChannel
+      ? "\n**MOD ONLY**"
+      : null
+
   const reply = [
     "**COMMAND LIST**",
     ...visibleCommands.filter(c => !c.mod && !c.helpMod).map(showCommandHelp),
-    onModChannel ? "\n**MOD ONLY**" : null,
+    modHeader,
     ...visibleCommands.filter(c => c.mod || c.helpMod).map(showCommandHelp),
   ].join("\n")
 
