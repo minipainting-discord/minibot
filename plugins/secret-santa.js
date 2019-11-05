@@ -32,14 +32,12 @@ module.exports = {
   },
 
   async dmFilter(bot, message) {
-    const guild = bot.client.guilds.first()
-
     const pendingLetters = bot.data.get("secret-santa:pending")
     if (message.author === bot.client.user) {
       return
     }
 
-    const guildMember = await guild.members.find(
+    const guildMember = await bot.guild.members.find(
       u => u.id === message.author.id,
     )
 
@@ -193,8 +191,6 @@ function santa(bot, message, command) {
 }
 
 function santaList(bot, message) {
-  const guild = bot.client.guilds.first()
-
   bot.db
     .all(
       `SELECT userId, region, tier FROM secretSanta ORDER BY region, tier DESC`,
@@ -204,7 +200,7 @@ function santaList(bot, message) {
         await Promise.all(
           results.map(r => [
             r.userId,
-            guild.members.find(u => u.id === r.userId),
+            bot.guild.members.find(u => u.id === r.userId),
           ]),
         ),
       )
@@ -241,8 +237,6 @@ function santaPair(bot, message) {
 }
 
 async function santaStatus(bot, message) {
-  const guild = bot.client.guilds.first()
-
   const pendingLetters = bot.data.get("secret-santa:pending")
 
   if (!pendingLetters.size) {
@@ -252,7 +246,7 @@ async function santaStatus(bot, message) {
 
   const users = await Promise.all(
     Array.from(pendingLetters.keys()).map(
-      async id => await guild.members.find(u => u.id === id),
+      async id => await bot.guild.members.find(u => u.id === id),
     ),
   )
 
@@ -267,8 +261,6 @@ function santaHandler(bot) {
   return (req, res) => {
     bot.log(`WEB ${WEB_ROUTE}`)
 
-    const guild = bot.client.guilds.first()
-
     bot.db
       .all(`SELECT * FROM secretSanta ORDER BY region, tier DESC`)
       .then(async results => {
@@ -276,7 +268,7 @@ function santaHandler(bot) {
           await Promise.all(
             results.map(r => [
               r.userId,
-              guild.members.find(u => u.id === r.userId),
+              bot.guild.members.find(u => u.id === r.userId),
             ]),
           ),
         )

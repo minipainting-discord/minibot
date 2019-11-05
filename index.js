@@ -144,6 +144,8 @@ const bot = {
     // Prefetch members
     guild.fetchMembers()
 
+    bot.guild = guild
+
     bot.client.user.setPresence({
       game: { name: "you", type: "WATCHING" },
     })

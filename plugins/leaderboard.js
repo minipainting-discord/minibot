@@ -74,16 +74,15 @@ function leaderboard(bot, message) {
 }
 
 function retrieveScores(bot, all = false) {
-  const guild = bot.client.guilds.first()
   const limit = all ? "" : "LIMIT 10"
-  return guild.fetchMembers().then(() => {
+  return bot.guild.fetchMembers().then(() => {
     return Promise.all([
       new Promise(resolve => {
         bot.db
           .all(`SELECT * FROM scores ORDER BY points DESC ${limit}`)
           .then(results =>
             Promise.all(
-              results.map(r => guild.members.find(u => u.id === r.userId)),
+              results.map(r => bot.guild.members.find(u => u.id === r.userId)),
             ).then(users =>
               resolve(
                 results
@@ -98,7 +97,7 @@ function retrieveScores(bot, all = false) {
           .all(`SELECT * FROM annual ORDER BY points DESC ${limit}`)
           .then(results =>
             Promise.all(
-              results.map(r => guild.members.find(u => u.id === r.userId)),
+              results.map(r => bot.guild.members.find(u => u.id === r.userId)),
             ).then(users =>
               resolve(
                 results

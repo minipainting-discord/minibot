@@ -92,15 +92,13 @@ function auditHandler(bot) {
   return (req, res) => {
     bot.log(`WEB ${WEB_ROUTE}`)
 
-    const guild = bot.client.guilds.first()
-
     bot.db
       .all("SELECT * FROM log ORDER BY date DESC")
       .then(results =>
         Promise.all(
           results.map(r => ({
             ...r,
-            user: guild.members.find(u => u.id === r.userId).displayName,
+            user: bot.guild.members.find(u => u.id === r.userId).displayName,
             message: [
               r.command,
               ...JSON.parse(r.arguments).map(arg =>
@@ -109,14 +107,14 @@ function auditHandler(bot) {
                     /^<@(\d+)>/,
                     (_, id) =>
                       `<mark>@${
-                        guild.members.find(u => u.id === id).displayName
+                        bot.guild.members.find(u => u.id === id).displayName
                       }</mark>`,
                   )
                   .replace(
                     /^<#(\d+)>/,
                     (_, id) =>
                       `<mark>#${
-                        guild.channels.find(c => c.id === id).name
+                        bot.guild.channels.find(c => c.id === id).name
                       }</mark>`,
                   ),
               ),
