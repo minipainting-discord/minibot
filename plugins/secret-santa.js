@@ -3,6 +3,7 @@ const settings = require("../settings.json")
 const SANTA_USAGE = {
   LIST: "`!santa list`",
   MATCH: "`!santa match`",
+  SEND: "`!santa send`",
   STATUS: "`!santa status`",
   SHORT: "`!santa list | match | status`",
 }
@@ -12,6 +13,8 @@ const MAX_LETTER_SIZE = 1996 // 2000 chars discord limit - length of ">>> "
 const NICE_TIER = "nice"
 const NAUGHTY_TIER = "naughty"
 const WEB_ROUTE = "/admin/santa"
+
+const DEADLINE = "December 15th"
 
 module.exports = {
   name: "secret-santa",
@@ -38,6 +41,7 @@ module.exports = {
       help: [
         `${SANTA_USAGE.LIST}: List current participants`,
         `${SANTA_USAGE.MATCH}: Generate matches`,
+        `${SANTA_USAGE.SEND}: Send letters after matching`,
         `${SANTA_USAGE.STATUS}: Check if some people are writing letters`,
       ],
       execute: santa,
@@ -197,6 +201,9 @@ function santa(bot, message, command) {
     case "match":
       santaMatch(bot, message)
       break
+    case "send":
+      santaSend(bot, message)
+      break
     case "status":
       santaStatus(bot, message)
       break
@@ -210,23 +217,32 @@ function santaList(bot, message) {
     .all(
       `SELECT userId, region, tier, matchWith FROM secretSanta ORDER BY region, tier DESC`,
     )
-    .then(async results => {
-      const guildMembers = new Map(
-        await Promise.all(
-          results.map(r => [r.userId, bot.findMember(r.userId)]),
-        ),
-      )
-
+    .then(results =>
+      results.map(r => ({
+        ...r,
+        member: bot.findMember(r.userId),
+        match: bot.findMember(r.matchWith),
+      })),
+    )
+    .then(results => {
       if (!results.length) {
         message.reply(":shrug:")
         return
       }
 
+      const longestNameLength = results
+        .map(r => [...r.member.displayName].length)
+        .sort((a, b) => b - a)
+        .shift()
+
       const volunteerList = results
         .map(
           r =>
-            `${r.tier.padEnd(7, " ")} | ${r.region.padEnd(4, " ")} | ${
-              guildMembers.get(r.userId).displayName
+            `${r.tier.padEnd(7, " ")} | ${r.region.padEnd(
+              4,
+              " ",
+            )} | ${r.member.displayName.padEnd(longestNameLength, " ")}${
+              r.match ? ` 🎁 by ${r.match.displayName}` : ""
             }`,
         )
         .join("\n")
@@ -287,14 +303,56 @@ async function santaMatch(bot, message) {
     }
   }
 
-  message.reply("Generated matches, use !santa send to notify users")
+  message.reply("Generated matches, use `!santa send` to notify users.")
+}
+
+async function santaSend(bot, message) {
+  const letters = await bot.db.all(`SELECT * FROM secretSanta`)
+
+  for (const letter of letters) {
+    if (!letter.matchWith) {
+      message.reply("Not everyone is matched! Please match people first.")
+      return
+    }
+  }
+
+  for (const letter of letters) {
+    const user = bot.findMember(letter.userId)
+    const match = bot.findMember(letter.matchWith)
+    const { letter: content, address } = letter
+
+    match.user.createDM().then(dmChannel => {
+      dmChannel.send(
+        [
+          "Hello dear minipainter,",
+          "You volunteered to take part in our annual Secret Santa and we thank you for that!",
+          "",
+          `I picked a giftee for you and it is **${user.displayName}**!`,
+          "Here is their Santa letter:",
+        ].join("\n"),
+      )
+      dmChannel.send(`>>> ${content}`)
+      dmChannel.send([
+        "Pick at least one item in this list, buy it and send it to this address:",
+        address.replace(/^/gm, "> "),
+        "You can of course buy more than one item and/or throw in whatever additional gift you think would please that person.",
+        "",
+        "You also have been picked as a giftee for someone else!",
+        "",
+        `Last thing, please don't forget to send your package before **${DEADLINE}**.`,
+      ])
+      bot.log(`Sent letter to ${match.displayName}`)
+    })
+  }
+
+  message.reply("Letters sent! :snowflake: :rocket:")
 }
 
 async function santaStatus(bot, message) {
   const pendingLetters = bot.data.get("secret-santa:pending")
 
   if (!pendingLetters.size) {
-    message.reply("There are currently no letters being written")
+    message.reply("There are currently no letters being written.")
     return
   }
 
