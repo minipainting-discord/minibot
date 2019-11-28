@@ -152,7 +152,7 @@ const bot = {
     bot.roles = Object.keys(settings.roles).reduce(
       (roles, key) => ({
         ...roles,
-        [key]: guild.roles.find(role => role.name === settings.roles[key]),
+        [key]: guild.roles.find(role => role.id === settings.roles[key]),
       }),
       {},
     )
