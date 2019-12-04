@@ -1,9 +1,9 @@
 const SQL = require("sql-template-strings")
 
+const pluralize = require("../utils")
+
 const TRACK_USAGE = "`!track shame|painted CATEGORY COUNT`"
-
 const CATEGORIES = ["small", "large", "bust", "diorama", "modelkit"]
-
 const CATEGORY_DESCRIPTIONS = {
   small: "Up to and including 54mm scale minis",
   large: "Larger than 54mm scale minis",
@@ -11,7 +11,6 @@ const CATEGORY_DESCRIPTIONS = {
   diorama: "Dioramas",
   modelkit: "Model Kits",
 }
-
 const BLANK_TRACKER = CATEGORIES.reduce((a, e) => ({ ...a, [e]: 0 }), {})
 
 module.exports = {
@@ -89,7 +88,12 @@ async function track(bot, message, db, category, count) {
        ON CONFLICT(userId) DO
        UPDATE SET ${category} = ${category} + ${numCount}`,
     )
-    message.reply(`Added ${count} ${category} models to your shame pile.`)
+    message.reply(
+      `Added ${count} ${category} ${pluralize(
+        "model",
+        count,
+      )} to your shame pile.`,
+    )
   } catch (err) {
     console.error(err)
   }

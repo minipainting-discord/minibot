@@ -32,9 +32,14 @@ function requireWebAuth() {
   })
 }
 
+function pluralize(word, count, plural = null) {
+  return count === 1 ? word : plural || word + "s"
+}
+
 module.exports = {
   randomInt,
   randomItem,
   shuffle,
   requireWebAuth,
+  pluralize,
 }
