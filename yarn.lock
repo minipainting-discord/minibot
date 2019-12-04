@@ -2072,6 +2072,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jstransformer-cdata-js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/jstransformer-cdata-js/-/jstransformer-cdata-js-1.0.0.tgz#f0465aa6522eaee6e28dc9772f5f70e193af1ef1"
+  integrity sha1-8EZaplIurubijcl3L19w4ZOvHvE=
+
 jstransformer@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/jstransformer/-/jstransformer-1.0.0.tgz#ed8bf0921e2f3f1ed4d5c1a44f68709ed24722c3"

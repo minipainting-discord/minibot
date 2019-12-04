@@ -11,6 +11,7 @@
     "express-basic-auth": "^1.2.0",
     "image-size": "^0.8.3",
     "jpeg-autorotate": "^5.0.2",
+    "jstransformer-cdata-js": "^1.0.0",
     "pug": "^2.0.4",
     "resize-img": "^2.0.0",
     "shellwords": "^0.1.1",

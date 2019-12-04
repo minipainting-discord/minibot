@@ -1,3 +1,5 @@
+const WEB_ROUTE = "/stats"
+
 module.exports = {
   name: "stats",
 
@@ -14,26 +16,50 @@ module.exports = {
       )`,
     ),
 
-  filter(bot, message) {
-    const date = new Date()
+  filter,
 
-    bot.db
-      .run(
-        `INSERT INTO stats (userId, channelId, year, month, day, count)
+  web: (app, bot) => {
+    app.get(WEB_ROUTE, bot.utils.requireWebAuth(), statsHandler(bot))
+  },
+}
+
+function filter(bot, message) {
+  const date = new Date()
+
+  bot.db
+    .run(
+      `INSERT INTO stats (userId, channelId, year, month, day, count)
          VALUES (?, ?, ?, ?, ?, ?)
          ON CONFLICT(userId, channelId, year, month, day) DO
          UPDATE SET count = count + 1`,
-        [
-          message.author.id,
-          message.channel.id,
-          date.getFullYear(),
-          date.getMonth() + 1,
-          date.getDate(),
-          1,
-        ],
+      [
+        message.author.id,
+        message.channel.id,
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate(),
+        1,
+      ],
+    )
+    .catch(err => {
+      bot.logError(err, "Error updating stats")
+    })
+}
+
+function statsHandler(bot) {
+  return (req, res) => {
+    bot.log(`WEB ${WEB_ROUTE}`)
+    bot.db
+      .all(
+        `SELECT channelId, year, month, day, sum(count) as dailyCount FROM stats GROUP BY channelId, year, month, day`,
       )
-      .catch(err => {
-        bot.logError(err, "Error updating stats")
+      .then(stats => {
+        for (const channelStat of stats) {
+          channelStat.channelName = bot.guild.channels.get(
+            channelStat.channelId,
+          ).name
+        }
+        res.render("stats", { stats })
       })
-  },
+  }
 }
