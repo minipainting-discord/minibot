@@ -89,10 +89,9 @@ async function track(bot, message, db, category, count) {
        UPDATE SET ${category} = ${category} + ${numCount}`,
     )
     message.reply(
-      `Added ${count} ${category} ${pluralize(
-        "model",
-        numCount,
-      )} to your shame pile.`,
+      `Added ${count} ${category} ${pluralize("model", numCount)} to ${
+        db === "shame" ? "your shame pile" : "your painted models"
+      }.`,
     )
   } catch (err) {
     console.error(err)
