@@ -91,7 +91,7 @@ async function track(bot, message, db, category, count) {
     message.reply(
       `Added ${count} ${category} ${pluralize(
         "model",
-        count,
+        numCount,
       )} to your shame pile.`,
     )
   } catch (err) {
