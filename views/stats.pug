@@ -36,7 +36,6 @@ block content
             series: channelNames.map(channelName => ({
               name: channelName,
               type: "line",
-              step: "middle",
               data: Array.from({length: 30}, (_, i) => {
                 const d = dayjs().subtract(29 - i, 'days')
                 const cs = statsByChannel[channelName].find(cs => cs.year === d.year() && cs.month - 1 === d.month() && cs.day === d.date())
