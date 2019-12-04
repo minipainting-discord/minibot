@@ -37,23 +37,17 @@ const bot = {
     bot.log(`Loaded plugins: ${plugins.map(p => p.name).join(", ")}`)
 
     sql
-      .open("./database.sqlite", { Promise })
+      .open("./database.sqlite")
       .then(database => {
         bot.db = database
 
         return Promise.all(
           plugins
             .filter(p => p.setup)
-            .map(
-              plugin =>
-                new Promise((resolve, reject) => {
-                  bot.log(`Run setup for ${plugin.name}`)
-                  plugin
-                    .setup(bot)
-                    .then(resolve)
-                    .catch(reject)
-                }),
-            ),
+            .map(async plugin => {
+              bot.log(`Run setup for ${plugin.name}`)
+              await plugin.setup(bot)
+            }),
         )
       })
       .then(() => client.login(settings.token))
