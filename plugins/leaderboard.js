@@ -31,6 +31,12 @@ module.exports = {
       availableInDM: true,
       execute: leaderboard,
     },
+    {
+      keyword: "ranks",
+      help: "`!ranks`: Display the ranks",
+      availableInDM: true,
+      execute: ranks,
+    },
   ],
 }
 
@@ -81,13 +87,14 @@ function retrieveScores(bot, all = false) {
         bot.db
           .all(`SELECT * FROM scores ORDER BY points DESC ${limit}`)
           .then(results =>
-            Promise.all(results.map(r => bot.findMember(r.userId))).then(
-              users =>
-                resolve(
-                  results
-                    .map((r, i) => ({ ...r, user: users[i] }))
-                    .filter(r => r.user),
-                ),
+            Promise.all(
+              results.map(r => bot.findMember(r.userId)),
+            ).then(users =>
+              resolve(
+                results
+                  .map((r, i) => ({ ...r, user: users[i] }))
+                  .filter(r => r.user),
+              ),
             ),
           )
       }),
@@ -95,16 +102,27 @@ function retrieveScores(bot, all = false) {
         bot.db
           .all(`SELECT * FROM annual ORDER BY points DESC ${limit}`)
           .then(results =>
-            Promise.all(results.map(r => bot.findMember(r.userId))).then(
-              users =>
-                resolve(
-                  results
-                    .map((r, i) => ({ ...r, user: users[i] }))
-                    .filter(r => r.user),
-                ),
+            Promise.all(
+              results.map(r => bot.findMember(r.userId)),
+            ).then(users =>
+              resolve(
+                results
+                  .map((r, i) => ({ ...r, user: users[i] }))
+                  .filter(r => r.user),
+              ),
             ),
           )
       }),
     ])
   })
+}
+
+function ranks(bot, message) {
+  const reply = [
+    "**RANKS**",
+    ...bot.ranks.map(
+      (rank, index) => `    ${index + 1}. ${rank.name} - ${rank.minPoints}pts`,
+    ),
+  ].join("\n")
+  message.reply(`\n>>> ${reply}`)
 }
