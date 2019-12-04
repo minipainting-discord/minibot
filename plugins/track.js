@@ -1,6 +1,6 @@
 const SQL = require("sql-template-strings")
 
-const pluralize = require("../utils")
+const { pluralize } = require("../utils")
 
 const TRACK_USAGE = "`!track shame|painted CATEGORY COUNT`"
 const CATEGORIES = ["small", "large", "bust", "diorama", "modelkit"]
