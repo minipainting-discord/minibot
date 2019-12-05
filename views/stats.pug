@@ -12,7 +12,7 @@ block content
   script
     | const stats = !{JSON.stringify(stats)}
     :cdata-js
-      const chart = echarts.init(document.getElementById("chart"))
+      const chart = echarts.init(document.getElementById("chart"), "dark")
       const groupBy = (xs, key) => {
         return xs.reduce((rv, x) => {
           (rv[x[key]] = rv[x[key]] || []).push(x)
