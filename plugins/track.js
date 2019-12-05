@@ -88,11 +88,15 @@ async function track(bot, message, db, category, count) {
        ON CONFLICT(userId) DO
        UPDATE SET ${category} = ${category} + ${numCount}`,
     )
-    message.reply(
+    const reply = await message.reply(
       `Added ${count} ${category} ${pluralize("model", numCount)} to ${
         db === "shame" ? "your shame pile" : "your painted models"
       }.`,
     )
+    setTimeout(async () => {
+      await message.delete()
+      await reply.delete()
+    }, 10 * 1000)
   } catch (err) {
     console.error(err)
   }
