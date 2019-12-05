@@ -28,6 +28,17 @@ block content
             tooltip: {},
             legend: {
               data: channelNames,
+              type: "scroll",
+              orient: "vertical",
+              right: 10,
+              top: 10,
+              bottom: 10,
+              itemWidth: 20,
+              formatter: name =>
+                name.length > 12 ? name.slice(0, 9) + "..." : name
+            },
+            grid: {
+              right: 120,
             },
             xAxis: {
               data: Array.from({length: 30}, (_, i) => dayjs().subtract(29 - i, 'days').format("MM/DD"))
