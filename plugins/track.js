@@ -101,7 +101,6 @@ async function trackShow(bot, message, db = null) {
   const shame = await bot.db.all(
     SQL`SELECT * FROM shame WHERE userId = ${userId}`,
   )
-  console.log(painted, shame)
 
   const showPainted = db === null || db === "painted"
   const showShame = db === null || db === "shame"
@@ -113,10 +112,12 @@ async function trackShow(bot, message, db = null) {
       "",
       showPainted &&
         `Painted models: **${totalPainted}** (${painted
+          .filter(c => c.amount > 0)
           .map(c => `\`${c.category}\`: ${c.amount}`)
           .join(", ")})`,
       showShame &&
         `Pile of shame: **${totalShame}** (${shame
+          .filter(c => c.amount > 0)
           .map(c => `\`${c.category}\`: ${c.amount}`)
           .join(", ")})`,
     ]
