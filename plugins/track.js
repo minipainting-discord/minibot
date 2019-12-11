@@ -3,16 +3,14 @@ const SQL = require("sql-template-strings")
 const { pluralize } = require("../utils")
 
 const TRACK_USAGE = "`!track shame|painted CATEGORY COUNT`"
-const CATEGORIES = ["small", "large", "bust", "diorama", "terrain", "modelkit"]
-const CATEGORY_DESCRIPTIONS = {
-  small: "Up to and including 54mm scale minis",
-  large: "Larger than 54mm scale minis",
-  bust: "Busts",
-  diorama: "Dioramas",
-  terrain: "Terrain",
-  modelkit: "Model Kits",
-}
-const BLANK_TRACKER = CATEGORIES.reduce((a, e) => ({ ...a, [e]: 0 }), {})
+const EXAMPLE_CATEGORIES = [
+  "small",
+  "large",
+  "bust",
+  "diorama",
+  "terrain",
+  "modelkit",
+]
 
 module.exports = {
   name: "track",
@@ -21,25 +19,17 @@ module.exports = {
     await bot.db.run(
       `CREATE TABLE IF NOT EXISTS shame (
         userId   TEXT,
-        small    INTEGER DEFAULT 0,
-        large    INTEGER DEFAULT 0,
-        bust     INTEGER DEFAULT 0,
-        diorama  INTEGER DEFAULT 0,
-        terrain  INTEGER DEFAULT 0,
-        modelkit INTEGER DEFAULT 0,
-        PRIMARY KEY (userId)
+        category TEXT,
+        amount   INTEGER DEFAULT 0,
+        PRIMARY KEY (userId, category)
       )`,
     )
     await bot.db.run(
       `CREATE TABLE IF NOT EXISTS painted (
         userId   TEXT,
-        small    INTEGER DEFAULT 0,
-        large    INTEGER DEFAULT 0,
-        bust     INTEGER DEFAULT 0,
-        diorama  INTEGER DEFAULT 0,
-        terrain  INTEGER DEFAULT 0,
-        modelkit INTEGER DEFAULT 0,
-        PRIMARY KEY (userId)
+        category TEXT,
+        amount   INTEGER DEFAULT 0,
+        PRIMARY KEY (userId, category)
       )`,
     )
   },
@@ -77,19 +67,17 @@ async function track(bot, message, db, category, count) {
     return message.reply(TRACK_USAGE)
   }
 
-  if (!CATEGORIES.includes(category)) {
-    return message.reply(
-      `Unknown category \`${category}\`. Use \`!track help\` to see available categories.`,
-    )
+  if (!category.match(/^[a-zA-Z0-9_-]+$/)) {
+    return message.reply(TRACK_USAGE)
   }
 
   try {
     const userId = message.author.id
     await bot.db.run(
-      `INSERT INTO ${db} (userId, ${category})
-       VALUES (${userId}, ${numCount})
-       ON CONFLICT(userId) DO
-       UPDATE SET ${category} = ${category} + ${numCount}`,
+      SQL`INSERT INTO `.append(db).append(SQL` (userId, category, amount)
+       VALUES (${userId}, ${category}, ${numCount})
+       ON CONFLICT(userId, category) DO
+       UPDATE SET amount = amount + ${numCount}`),
     )
     const reply = await message.reply(
       `Added ${count} ${category} ${pluralize("model", numCount)} to ${
@@ -107,34 +95,30 @@ async function track(bot, message, db, category, count) {
 
 async function trackShow(bot, message, db = null) {
   const userId = message.author.id
-  const painted =
-    (await bot.db.get(SQL`SELECT * FROM painted WHERE userId = ${userId}`)) ||
-    BLANK_TRACKER
-  const shame =
-    (await bot.db.get(SQL`SELECT * FROM shame WHERE userId = ${userId}`)) ||
-    BLANK_TRACKER
+  const painted = await bot.db.all(
+    SQL`SELECT * FROM painted WHERE userId = ${userId}`,
+  )
+  const shame = await bot.db.all(
+    SQL`SELECT * FROM shame WHERE userId = ${userId}`,
+  )
+  console.log(painted, shame)
 
   const showPainted = db === null || db === "painted"
   const showShame = db === null || db === "shame"
-  const { totalPainted, totalShame } = CATEGORIES.reduce(
-    (a, e) => ({
-      totalPainted: a.totalPainted + painted[e],
-      totalShame: a.totalShame + shame[e],
-    }),
-    { totalPainted: 0, totalShame: 0 },
-  )
+  const totalPainted = painted.reduce((a, e) => a + e.amount, 0)
+  const totalShame = shame.reduce((a, e) => a + e.amount, 0)
 
   message.reply(
     [
       "",
       showPainted &&
-        `Painted models: **${totalPainted}** (${CATEGORIES.map(
-          c => `\`${c}\`: ${painted[c]}`,
-        ).join(", ")})`,
+        `Painted models: **${totalPainted}** (${painted
+          .map(c => `\`${c.category}\`: ${c.amount}`)
+          .join(", ")})`,
       showShame &&
-        `Pile of shame: **${totalShame}** (${CATEGORIES.map(
-          c => `\`${c}\`: ${shame[c]}`,
-        ).join(", ")})`,
+        `Pile of shame: **${totalShame}** (${shame
+          .map(c => `\`${c.category}\`: ${c.amount}`)
+          .join(", ")})`,
     ]
       .filter(s => s !== false)
       .join("\n"),
@@ -145,10 +129,7 @@ function trackHelp(bot, message) {
   return message.reply(
     [
       TRACK_USAGE,
-      "Where `CATEGORY` is one of:",
-      ...CATEGORIES.map(
-        category => `  - \`${category}\`: ${CATEGORY_DESCRIPTIONS[category]}`,
-      ),
+      `Examples for \`CATEGORY\`: ${EXAMPLE_CATEGORIES.join(", ")}`,
       "Without any argument, it shows both your painted models and pile of shame.",
     ].join("\n"),
   )
