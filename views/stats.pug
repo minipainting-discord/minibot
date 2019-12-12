@@ -7,56 +7,96 @@ block content
   script(src="https://unpkg.com/dayjs")
   section.stats
     h2 Server Stats
-    #chart(style="width: 100%; height: 400px; background: white;")
+    #sevendays(style="width: 100%; height: 400px; background: white;")
+    #dailytotal(style="width: 100%; height: 400px; background: white;")
 
   script
     | const stats = !{JSON.stringify(stats)}
     :cdata-js
-      const chart = echarts.init(document.getElementById("chart"), "dark")
-      const groupBy = (xs, key) => {
-        return xs.reduce((rv, x) => {
-          (rv[x[key]] = rv[x[key]] || []).push(x)
-          return rv
-        }, {})
-      }
-      const statsByChannel = groupBy(stats, 'channelName')
-      const channelNames = Object.keys(statsByChannel).sort()
-      const options = {
-        title: {
-          text: "msg/day (last 30 days)"
-            },
-            tooltip: {},
-            legend: {
-              data: channelNames,
-              type: "scroll",
-              orient: "vertical",
-              right: 10,
-              top: 10,
-              bottom: 10,
-              itemWidth: 20,
-              formatter: name =>
-                name.length > 12 ? name.slice(0, 9) + "..." : name
-            },
-            grid: {
-              right: 120,
-            },
-            xAxis: {
-              data: Array.from({length: 30}, (_, i) => dayjs().subtract(29 - i, 'days').format("MM/DD"))
-            },
-            yAxis: {},
-            series: channelNames.map(channelName => ({
-              name: channelName,
-              type: "line",
-              data: Array.from({length: 30}, (_, i) => {
-                const d = dayjs().subtract(29 - i, 'days')
-                const cs = statsByChannel[channelName].find(cs => cs.year === d.year() && cs.month - 1 === d.month() && cs.day === d.date())
-                return cs ? cs.dailyCount : null
-              })
-            }))
+      void (() => {
+        const sevendays = echarts.init(document.getElementById("sevendays"), "dark")
+        const groupBy = (xs, key) => {
+          return xs.reduce((rv, x) => {
+            (rv[x[key]] = rv[x[key]] || []).push(x)
+            return rv
+          }, {})
+        }
+        const statsByChannel = groupBy(stats, 'channelName')
+        const channelNames = Object.keys(statsByChannel).sort()
+        const options = {
+          title: {
+            text: "msg/day (last 7 days)"
+          },
+          tooltip: {},
+          legend: {
+            data: channelNames,
+            type: "scroll",
+            orient: "vertical",
+            right: 10,
+            top: 10,
+            bottom: 10,
+            itemWidth: 20,
+            formatter: name =>
+              name.length > 12 ? name.slice(0, 9) + "..." : name
+          },
+          grid: {
+            right: 120,
+          },
+          xAxis: {
+            data: Array.from({length: 14}, (_, i) => dayjs().subtract(13 - i, 'days').format("MM/DD"))
+          },
+          yAxis: {},
+          series: channelNames.map(channelName => ({
+            name: channelName,
+            type: "line",
+            data: Array.from({length: 14}, (_, i) => {
+              const d = dayjs().subtract(13 - i, 'days')
+              const cs = statsByChannel[channelName].find(cs => cs.year === d.year() && cs.month - 1 === d.month() && cs.day === d.date())
+              return cs ? cs.dailyCount : null
+            })
+          }))
         }
 
         // use configuration item and data specified to show chart
-        chart.setOption(options);
+        sevendays.setOption(options);
+      })()
+
+      void (() => {
+        const dailytotal = echarts.init(document.getElementById("dailytotal"), "dark")
+        const groupBy = (xs, key) => {
+          return xs.reduce((rv, x) => {
+            (rv[x[key]] = rv[x[key]] || []).push(x)
+            return rv
+          }, {})
+        }
+        const statsByChannel = groupBy(stats, 'channelName')
+        const channelNames = Object.keys(statsByChannel).sort()
+        const options = {
+          title: {
+            text: "total/day (last 14 days)"
+          },
+          tooltip: {},
+          xAxis: {
+            data: Array.from({length: 14}, (_, i) => dayjs().subtract(13 - i, 'days').format("MM/DD"))
+          },
+          yAxis: {},
+          series: [{
+            name: "daily total",
+            type: "bar",
+            data: Array.from({length: 14}, (_, i) => {
+              const d = dayjs().subtract(13 - i, 'days')
+              return stats
+                .filter(cs => cs.year === d.year() && cs.month - 1 === d.month() && cs.day === d.date())
+                .reduce((a, e) => a + e.dailyCount, 0)
+            })
+          }]
+        }
+
+        // use configuration item and data specified to show chart
+        dailytotal.setOption(options);
+
+        console.log(stats)
+      })()
 
 
   style
