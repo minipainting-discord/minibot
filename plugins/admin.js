@@ -101,7 +101,10 @@ function auditHandler(bot) {
         Promise.all(
           results.map(r => ({
             ...r,
-            user: bot.findMember(r.userId).displayName,
+            user: (() => {
+              const member = bot.findMember(r.userId)
+              return member ? member.displayName : `deleted user (${r.userId})`
+            })(),
             message: [
               r.command,
               ...JSON.parse(r.arguments).map(arg =>
