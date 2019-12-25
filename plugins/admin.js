@@ -109,11 +109,10 @@ function auditHandler(bot) {
               r.command,
               ...JSON.parse(r.arguments).map(arg =>
                 arg
-                  .replace(
-                    /^<@(\d+)>/,
-                    (_, id) =>
-                      `<mark>@${bot.findMember(id).displayName}</mark>`,
-                  )
+                  .replace(/^<@(\d+)>/, (_, id) => {
+                    const member = bot.findMember(id)
+                    return `<mark>@${member ? member.displayName : id}</mark>`
+                  })
                   .replace(
                     /^<#(\d+)>/,
                     (_, id) =>
