@@ -113,13 +113,10 @@ function auditHandler(bot) {
                     const member = bot.findMember(id)
                     return `<mark>@${member ? member.displayName : id}</mark>`
                   })
-                  .replace(
-                    /^<#(\d+)>/,
-                    (_, id) =>
-                      `<mark>#${
-                        bot.guild.channels.find(c => c.id === id).name
-                      }</mark>`,
-                  ),
+                  .replace(/^<#(\d+)>/, (_, id) => {
+                    const channel = bot.guild.channels.find(c => c.id === id)
+                    return `<mark>#${channel ? channel.name : id}</mark>`
+                  }),
               ),
             ].join(" "),
             channel: bot.client.channels.find(c => c.id === r.location),
