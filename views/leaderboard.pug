@@ -4,6 +4,8 @@ block content
   section.leaderboard
     .col
       h2 Lifetime Leaderboard
+      form(action="", method="GET")
+        select(style="visibility: hidden")
       table
         tbody
           each score, index in scores
@@ -12,6 +14,12 @@ block content
               td(class=`rank-${score.level}`)= score.user.displayName
     .col
       h2 Annual Leaderboard
+
+      form(action="", method="GET")
+        select(name="table", onchange="this.form.submit()")
+          each table in annualTables
+            option(selected=annualTable==table.name)= table.name
+
       table
         tbody
           each score, index in annual

@@ -1,13 +1,25 @@
 const Discord = require("discord.js")
 
 const WEB_ROUTE = "/leaderboard"
+const ANNUAL_TABLE_RE = /^annual(?:_[0-9]+)?$/
 
 module.exports = {
   name: "leaderboard",
   web: (app, bot) => {
-    app.get(WEB_ROUTE, (req, res) => {
+    app.get(WEB_ROUTE, async (req, res) => {
       bot.log(`WEB ${WEB_ROUTE}`)
-      retrieveScores(bot, "all").then(([scores, annual]) => {
+      const annualTables = await bot.db.all(`
+        SELECT name
+        FROM sqlite_master
+        WHERE type='table' AND name LIKE 'annual%'
+      `)
+
+      const annualTable =
+        req.query.table && req.query.table.match(ANNUAL_TABLE_RE)
+          ? req.query.table
+          : "annual"
+
+      retrieveScores(bot, "all", annualTable).then(([scores, annual]) => {
         const colorToRGB = color =>
           [
             (color & 0xff0000) >> 16,
@@ -19,6 +31,8 @@ module.exports = {
           annual,
           ranks: bot.ranks,
           colorToRGB,
+          annualTables,
+          annualTable,
         })
       })
     })
@@ -79,7 +93,7 @@ function leaderboard(bot, message) {
   return
 }
 
-function retrieveScores(bot, all = false) {
+function retrieveScores(bot, all = false, annualTable = "annual") {
   const limit = all ? "" : "LIMIT 10"
   return bot.guild.fetchMembers().then(() => {
     return Promise.all([
@@ -100,7 +114,7 @@ function retrieveScores(bot, all = false) {
       }),
       new Promise(resolve => {
         bot.db
-          .all(`SELECT * FROM annual ORDER BY points DESC ${limit}`)
+          .all(`SELECT * FROM ${annualTable} ORDER BY points DESC ${limit}`)
           .then(results =>
             Promise.all(
               results.map(r => bot.findMember(r.userId)),
