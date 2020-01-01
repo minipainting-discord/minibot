@@ -1,23 +1,25 @@
 const Discord = require("discord.js")
 
 const WEB_ROUTE = "/leaderboard"
-const ANNUAL_TABLE_RE = /^annual(?:_[0-9]+)?$/
+const MIN_YEAR = 2019
 
 module.exports = {
   name: "leaderboard",
   web: (app, bot) => {
     app.get(WEB_ROUTE, async (req, res) => {
       bot.log(`WEB ${WEB_ROUTE}`)
-      const annualTables = await bot.db.all(`
-        SELECT name
-        FROM sqlite_master
-        WHERE type='table' AND name LIKE 'annual%'
-      `)
 
-      const annualTable =
-        req.query.table && req.query.table.match(ANNUAL_TABLE_RE)
-          ? req.query.table
-          : "annual"
+      const currentYear = new Date().getFullYear()
+      const selectedYear = (() => {
+        if (req.query.year && req.query.year.match(/^[0-9]+$/)) {
+          const year = parseInt(req.query.year, 10)
+          return year >= MIN_YEAR && year < currentYear ? year : null
+        }
+        return null
+      })()
+      const annualTable = selectedYear ? `annual_${selectedYear}` : "annual"
+
+      console.log(selectedYear, annualTable)
 
       retrieveScores(bot, "all", annualTable).then(([scores, annual]) => {
         const colorToRGB = color =>
@@ -31,8 +33,9 @@ module.exports = {
           annual,
           ranks: bot.ranks,
           colorToRGB,
-          annualTables,
-          annualTable,
+          currentYear,
+          selectedYear,
+          MIN_YEAR,
         })
       })
     })

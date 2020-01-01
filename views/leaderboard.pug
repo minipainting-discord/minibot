@@ -4,7 +4,7 @@ block content
   section.leaderboard
     .col
       h2 Lifetime Leaderboard
-      form(action="", method="GET")
+      form
         select(style="visibility: hidden")
       table
         tbody
@@ -16,9 +16,9 @@ block content
       h2 Annual Leaderboard
 
       form(action="", method="GET")
-        select(name="table", onchange="this.form.submit()")
-          each table in annualTables
-            option(selected=annualTable==table.name)= table.name
+        select(name="year", onchange="this.form.submit()")
+          each year in Array.from({length: currentYear - MIN_YEAR + 1}, (_, i) => MIN_YEAR + i).reverse()
+            option(selected=year==selectedYear || year==currentYear)= year
 
       table
         tbody
