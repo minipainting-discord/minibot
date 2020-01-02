@@ -5,6 +5,7 @@ const url = require("url")
 const sizeOf = require("image-size")
 const resizeImg = require("resize-img")
 const ja = require("jpeg-autorotate")
+const SQL = require("sql-template-strings")
 const { Canvas, Image } = require("canvas")
 
 const MAX_HEIGHT = 1000
@@ -12,6 +13,17 @@ const waitingUsers = []
 
 module.exports = {
   name: "gallery",
+
+  setup: bot =>
+    bot.db.run(
+      `CREATE TABLE IF NOT EXISTS pictures (
+         id TEXT PRIMARY KEY,
+         userId TEXT,
+         url TEXT,
+         description TEXT
+       )`,
+    ),
+
   filter(bot, message) {
     if (message.channel.id !== settings.channels.gallery) {
       return false
@@ -48,7 +60,7 @@ module.exports = {
       .awaitMessages(m => m.attachments.size > 0 && m.author.id == authorId, {
         time: 10e3,
       })
-      .then(collected => {
+      .then(async collected => {
         const idx = waitingUsers.indexOf(authorId)
         waitingUsers.splice(idx, 1)
 
@@ -57,6 +69,24 @@ module.exports = {
           (a, m) => [...a, ...Array.from(m.attachments.values())],
           [],
         )
+
+        try {
+          const values = attachments.map(
+            attachment =>
+              SQL`(${attachment.id}, ${message.author.id}, ${attachment.url}, ${message.content})`,
+          )
+          const baseInsert = SQL`INSERT INTO pictures (id, userId, url, description) VALUES`
+          const query = values.reduce((a, e, i) => {
+            return i === values.length - 1
+              ? a.append(e)
+              : a.append(e).append(", ")
+          }, baseInsert)
+
+          await bot.db.run(query)
+        } catch (error) {
+          console.error("[gallery] Error while saving to database", error)
+        }
+
         const images = attachments.slice(0, 6).map(a => a.url)
 
         Promise.all(
