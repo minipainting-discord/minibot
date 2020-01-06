@@ -19,8 +19,6 @@ module.exports = {
       })()
       const annualTable = selectedYear ? `annual_${selectedYear}` : "annual"
 
-      console.log(selectedYear, annualTable)
-
       retrieveScores(bot, "all", annualTable).then(([scores, annual]) => {
         const colorToRGB = color =>
           [
