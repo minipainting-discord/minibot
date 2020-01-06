@@ -11,6 +11,8 @@ const sortBy = require("lodash/sortBy")
 
 const WEB_ROUTE = "/gallery"
 const MAX_HEIGHT = 1000
+const CDN_HOST = "cdn.discordapp.com"
+const RESIZER_HOST = "media.discordapp.net"
 const waitingUsers = []
 
 module.exports = {
@@ -21,7 +23,9 @@ module.exports = {
          id TEXT PRIMARY KEY,
          userId TEXT,
          url TEXT,
-         description TEXT
+         description TEXT,
+         width INTEGER,
+         height INTEGER
        )`,
     ),
   filter,
@@ -74,62 +78,8 @@ function filter(bot, message) {
         [],
       )
 
-      try {
-        const values = attachments.map(
-          attachment =>
-            SQL`(${attachment.id}, ${message.author.id}, ${attachment.url}, ${message.content})`,
-        )
-        const baseInsert = SQL`INSERT INTO pictures (id, userId, url, description) VALUES`
-        const query = values.reduce((a, e, i) => {
-          return i === values.length - 1
-            ? a.append(e)
-            : a.append(e).append(", ")
-        }, baseInsert)
-
-        await bot.db.run(query)
-      } catch (error) {
-        console.error("[gallery] Error while saving to database", error)
-      }
-
-      const images = attachments.slice(0, 6).map(a => a.url)
-
-      Promise.all(
-        images.map(
-          image =>
-            new Promise(resolve => {
-              const options = url.parse(image)
-              http.get(options, response => {
-                const chunks = []
-                response
-                  .on("data", chunk => chunks.push(chunk))
-                  .on("end", () => resolve(Buffer.concat(chunks)))
-              })
-            }),
-        ),
-      )
-        .then(buffers => createCollage(buffers))
-        .then(collage => {
-          const genChan = bot.client.channels.get(settings.channels.general)
-          const botcomsChan = bot.client.channels.get(settings.channels.botcoms)
-          for (const channel of [genChan, botcomsChan]) {
-            if (channel == null) {
-              continue
-            }
-
-            const attachment = new Discord.Attachment(
-              collage,
-              "minigalleryimage.png",
-            )
-
-            channel
-              .send(`${message.author}\n${message.url}`, attachment)
-              .catch(bot.logError)
-          }
-          bot.log(
-            `Processed gallery upload from ${message.author.username} [${message.id}]`,
-          )
-        })
-        .catch(bot.logError)
+      await savePictures(bot, message, attachments)
+      await processPictures(bot, message, attachments)
     })
 
   return null
@@ -144,9 +94,13 @@ function web(app, bot) {
     const userId = req.query.user
 
     if (userId) {
-      const pictures = await bot.db.all(
+      const picturesQuery = await bot.db.all(
         SQL`SELECT * FROM pictures WHERE userId = ${userId}`,
       )
+      const pictures = picturesQuery.map(picture => ({
+        ...picture,
+        thumbUrl: picture.url.replace(CDN_HOST, RESIZER_HOST),
+      }))
       return res.render("gallery", {
         user: bot.findMember(userId),
         pictures,
@@ -168,6 +122,53 @@ function web(app, bot) {
       WEB_ROUTE,
     })
   })
+}
+
+async function savePictures(bot, message, attachments) {
+  try {
+    const values = await Promise.all(
+      attachments.map(async attachment => {
+        const imageSize = await prefetchImageSize(attachment.url)
+        const { width, height } = imageSize
+        return SQL`(${attachment.id}, ${message.author.id}, ${attachment.url}, ${message.content}, ${width}, ${height})`
+      }),
+    )
+    const baseInsert = SQL`INSERT OR REPLACE INTO pictures (id, userId, url, description, width, height) VALUES`
+    const query = values.reduce((a, e, i) => {
+      return i === values.length - 1 ? a.append(e) : a.append(e).append(", ")
+    }, baseInsert)
+
+    await bot.db.run(query)
+  } catch (error) {
+    console.error("[gallery] Error while saving to database", error)
+  }
+}
+
+async function processPictures(bot, message, attachments) {
+  const images = attachments.slice(0, 6).map(a => a.url)
+
+  try {
+    const buffers = await Promise.all(images.map(async i => downloadImage(i)))
+    const collage = await createCollage(buffers)
+    const genChan = bot.client.channels.get(settings.channels.general)
+    const botcomsChan = bot.client.channels.get(settings.channels.botcoms)
+
+    for (const channel of [genChan, botcomsChan]) {
+      if (channel == null) {
+        continue
+      }
+
+      const attachment = new Discord.Attachment(collage, "minigalleryimage.png")
+
+      await channel.send(`${message.author}\n${message.url}`, attachment)
+    }
+
+    bot.log(
+      `Processed gallery upload from ${message.author.username} [${message.id}]`,
+    )
+  } catch (error) {
+    bot.logError(error)
+  }
 }
 
 function sumWidths(items) {
@@ -213,4 +214,39 @@ function createCollage(buffers) {
       return canvas.toBuffer()
     })
     .catch(error => console.error(error))
+}
+
+function downloadImage(imageUrl) {
+  return new Promise(resolve => {
+    const options = url.parse(imageUrl)
+    http.get(options, response => {
+      const chunks = []
+      response
+        .on("data", chunk => chunks.push(chunk))
+        .on("end", () => resolve(Buffer.concat(chunks)))
+    })
+  })
+}
+
+function prefetchImageSize(cdnImageUrl) {
+  return new Promise(resolve => {
+    const options = url.parse(cdnImageUrl)
+
+    http.get(options, response => {
+      const chunks = []
+
+      const onChunk = chunk => {
+        chunks.push(chunk)
+
+        const buffer = Buffer.concat(chunks)
+        if (buffer.length > 10 * 1024) {
+          response.off("data", onChunk)
+          response.destroy()
+          resolve(sizeOf(buffer))
+        }
+      }
+
+      response.on("data", onChunk)
+    })
+  })
 }

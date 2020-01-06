@@ -7,7 +7,7 @@ block content
       p: a(href=WEB_ROUTE) Back to gallery index
       ul.pictures: each picture in pictures
         li: a(href=picture.url)
-          img(src=picture.url, alt=picture.description, width=200)
+          img(src=picture.thumbUrl, alt=picture.description, width=200)
     else
       h1 Galleries
       ul.users: each user in users
@@ -17,6 +17,7 @@ block content
       .
         .pictures {
           display: flex;
+          flex-wrap: wrap;
           list-style-type: none;
           margin: 0;
           padding: 0;
