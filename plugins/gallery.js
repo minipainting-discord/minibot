@@ -71,9 +71,6 @@ function filter(bot, message) {
       time: 10e3,
     })
     .then(async collected => {
-      bot.log(
-        `[gallery] Received ${collected.size} pictures from ${message.author.username} [${message.id}]`,
-      )
       const idx = waitingUsers.indexOf(authorId)
       waitingUsers.splice(idx, 1)
 
@@ -81,6 +78,10 @@ function filter(bot, message) {
       const attachments = messages.reduce(
         (a, m) => [...a, ...Array.from(m.attachments.values())],
         [],
+      )
+
+      bot.log(
+        `[gallery] Received ${attachments.length} pictures from ${message.author.username} [${message.id}]`,
       )
 
       await savePictures(bot, message, attachments)
@@ -196,7 +197,8 @@ async function createCollage(buffers) {
     buffers.map(async buffer => {
       let image
       try {
-        image = await ja.rotate(buffer, { quality: 85 })
+        const rotated = await ja.rotate(buffer, { quality: 85 })
+        image = rotated.buffer
       } catch (error) {
         image = buffer
       }
