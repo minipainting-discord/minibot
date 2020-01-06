@@ -27,7 +27,8 @@ module.exports = {
          url TEXT,
          description TEXT,
          width INTEGER,
-         height INTEGER
+         height INTEGER,
+         date TEXT
        )`,
     ),
   filter,
@@ -144,10 +145,10 @@ async function savePictures(bot, message, attachments) {
       attachments.map(async attachment => {
         const imageSize = await probeImageSize(attachment.url)
         const { width, height } = imageSize
-        return SQL`(${attachment.id}, ${message.author.id}, ${attachment.url}, ${message.content}, ${width}, ${height})`
+        return SQL`(${attachment.id}, ${message.author.id}, ${attachment.url}, ${message.content}, ${width}, ${height}, datetime('now'))`
       }),
     )
-    const baseInsert = SQL`INSERT OR REPLACE INTO pictures (id, userId, url, description, width, height) VALUES`
+    const baseInsert = SQL`INSERT OR REPLACE INTO pictures (id, userId, url, description, width, height, date) VALUES`
     const query = values.reduce((a, e, i) => {
       return i === values.length - 1 ? a.append(e) : a.append(e).append(", ")
     }, baseInsert)
