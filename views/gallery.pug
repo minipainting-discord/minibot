@@ -1,5 +1,17 @@
 extends layout.pug
 
+block title
+  if user
+    title Gallery for #{user.displayName} - MiniPainting Discord
+  else
+    title User Galleries - MiniPainting Discord
+
+block description
+  if user
+    meta(name="description" content=`Gallery of pictures submitted by ${user.displayName} on the MiniPainting Discord`)
+  else
+    meta(name="description" content="Galleries of user submitted pictures for the MiniPainting Discord")
+
 block content
   section.gallery
     if user
