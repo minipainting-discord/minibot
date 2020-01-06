@@ -1,0 +1,31 @@
+extends layout.pug
+
+block content
+  section.gallery
+    if user
+      h1 Gallery for #{user.displayName}
+      p: a(href=WEB_ROUTE) Back to gallery index
+      ul.pictures: each picture in pictures
+        li: a(href=picture.url)
+          img(src=picture.url, alt=picture.description, width=200)
+    else
+      h1 Galleries
+      ul.users: each user in users
+        li: a(href=`${WEB_ROUTE}?user=${user.id}`)= user.displayName
+
+    style
+      .
+        .pictures {
+          display: flex;
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .pictures > li {
+          margin: 1rem;
+        }
+
+        .users {
+        }
+
