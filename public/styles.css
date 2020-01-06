@@ -15,7 +15,8 @@ body {
   color: rgb(185, 187, 190);
 }
 
-a:link {
+a:link,
+a:visited {
   color: rgb(114, 137, 218);
 }
 

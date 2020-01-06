@@ -12,6 +12,7 @@ const sortBy = require("lodash/sortBy")
 
 const WEB_ROUTE = "/gallery"
 const MAX_HEIGHT = 1000
+const WEB_THUMB_WIDTH = 250
 const CDN_HOST = "cdn.discordapp.com"
 const RESIZER_HOST = "media.discordapp.net"
 const waitingUsers = []
@@ -101,10 +102,18 @@ function web(app, bot) {
       const picturesQuery = await bot.db.all(
         SQL`SELECT * FROM pictures WHERE userId = ${userId}`,
       )
-      const pictures = picturesQuery.map(picture => ({
-        ...picture,
-        thumbUrl: picture.url.replace(CDN_HOST, RESIZER_HOST),
-      }))
+      const pictures = picturesQuery.map(picture => {
+        const thumbHeight = Math.round(
+          (WEB_THUMB_WIDTH * picture.height) / picture.width,
+        )
+
+        return {
+          ...picture,
+          thumbUrl:
+            picture.url.replace(CDN_HOST, RESIZER_HOST) +
+            `?width=${WEB_THUMB_WIDTH}&height=${thumbHeight}`,
+        }
+      })
       return res.render("gallery", {
         user: bot.findMember(userId),
         pictures,

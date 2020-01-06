@@ -11,22 +11,69 @@ block content
     else
       h1 Galleries
       ul.users: each user in users
-        li: a(href=`${WEB_ROUTE}?user=${user.id}`)= user.displayName
+        li: a(href=`${WEB_ROUTE}?user=${user.id}`)
+          figure
+            img(src=`https://cdn.discordapp.com/avatars/${user.id}/${user.user.avatar}.png?size=64`, width=64, height=64)
+            figcaption= user.displayName
 
     style
       .
-        .pictures {
+        body {
+          max-width: calc(100% - 4rem);
+        }
+
+        @media screen and (max-width: 720px) {
+          body {
+            margin-top: 0;
+            margin-bottom: 0;
+            max-width: 100%;
+          }
+
+          body > header,
+          body > footer {
+            border-radius: 0;
+          }
+        }
+
+        .pictures,
+        .users
+        {
           display: flex;
           flex-wrap: wrap;
+          justify-content: center;
           list-style-type: none;
           margin: 0;
           padding: 0;
         }
 
-        .pictures > li {
+        .users {
+          justify-content: flex-start;
+        }
+
+        .pictures > li,
+        .users > li {
           margin: 1rem;
         }
 
-        .users {
+        .users > li figure {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 2rem;
+          margin: 2rem 3rem;
         }
 
+        .users > li figure > img {
+        border-radius: 50%;
+        margin-bottom: 1rem;
+        }
+
+        .users > li a {
+          text-decoration: none;
+          display: inline-block;
+          border-radius: 1rem;
+        }
+
+        .users > li a:hover {
+          background-color: rgb(46, 48, 54);
+        }
