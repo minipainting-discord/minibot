@@ -3,6 +3,7 @@ const settings = require("../settings.json")
 const http = require("https")
 const url = require("url")
 const sizeOf = require("image-size")
+const probeImageSize = require("probe-image-size")
 const resizeImg = require("resize-img")
 const ja = require("jpeg-autorotate")
 const SQL = require("sql-template-strings")
@@ -69,6 +70,9 @@ function filter(bot, message) {
       time: 10e3,
     })
     .then(async collected => {
+      bot.log(
+        `[gallery] Received ${collected.size} pictures from ${message.author.username} [${message.id}]`,
+      )
       const idx = waitingUsers.indexOf(authorId)
       waitingUsers.splice(idx, 1)
 
@@ -128,7 +132,7 @@ async function savePictures(bot, message, attachments) {
   try {
     const values = await Promise.all(
       attachments.map(async attachment => {
-        const imageSize = await prefetchImageSize(attachment.url)
+        const imageSize = await probeImageSize(attachment.url)
         const { width, height } = imageSize
         return SQL`(${attachment.id}, ${message.author.id}, ${attachment.url}, ${message.content}, ${width}, ${height})`
       }),
@@ -139,8 +143,11 @@ async function savePictures(bot, message, attachments) {
     }, baseInsert)
 
     await bot.db.run(query)
+    bot.log(
+      `[gallery] Saved ${attachments.length} pictures for ${message.author.username}`,
+    )
   } catch (error) {
-    console.error("[gallery] Error while saving to database", error)
+    bot.logError(error, "[gallery] Error while saving to database")
   }
 }
 
@@ -164,7 +171,7 @@ async function processPictures(bot, message, attachments) {
     }
 
     bot.log(
-      `Processed gallery upload from ${message.author.username} [${message.id}]`,
+      `[gallery] Processed upload from ${message.author.username} [${message.id}]`,
     )
   } catch (error) {
     bot.logError(error)
@@ -175,45 +182,46 @@ function sumWidths(items) {
   return items.reduce((total, item) => total + item.width, 0)
 }
 
-function createCollage(buffers) {
-  return Promise.all(
-    buffers.map(buffer =>
-      ja
-        .rotate(buffer, { quality: 85 }) // Automatically rotate JPEGs based on orientation
-        .catch(() => ({ buffer })) // Ignore rotate fails
-        .then(({ buffer }) => {
-          const size = sizeOf(buffer)
-          const ratio = MAX_HEIGHT / size.height
-          const width = Math.round(ratio * size.width)
-          const height = MAX_HEIGHT
-          return new Promise(resolve =>
-            resizeImg(buffer, { width, height }).then(image =>
-              resolve({ width, height, image }),
-            ),
-          )
-        }),
-    ),
+async function createCollage(buffers) {
+  const thumbs = await Promise.all(
+    buffers.map(async buffer => {
+      let image
+      try {
+        image = await ja.rotate(buffer, { quality: 85 })
+      } catch (error) {
+        image = buffer
+      }
+
+      const size = await probeImageSize.sync(buffer)
+      const ratio = MAX_HEIGHT / size.height
+      const width = Math.round(ratio * size.width)
+      const height = MAX_HEIGHT
+      const data = await resizeImg(image, { width, height })
+
+      return {
+        width,
+        height,
+        data,
+      }
+    }),
   )
-    .then(thumbs => {
-      const canvasWidth = sumWidths(thumbs) + thumbs.length * 3
-      const canvasHeight = buffers.length > 3 ? 2 * MAX_HEIGHT : MAX_HEIGHT
-      const canvas = new Canvas(canvasWidth, canvasHeight)
-      const ctx = canvas.getContext("2d")
+  const canvasWidth = sumWidths(thumbs) + thumbs.length * 3
+  const canvasHeight = buffers.length > 3 ? 2 * MAX_HEIGHT : MAX_HEIGHT
+  const canvas = new Canvas(canvasWidth, canvasHeight)
+  const ctx = canvas.getContext("2d")
 
-      thumbs.forEach((thumb, position) => {
-        const y = Math.floor(position / 3)
-        const xOffset = sumWidths(thumbs.slice(y * 3, position)) + position * 3
-        const yOffset = y * MAX_HEIGHT
+  thumbs.forEach((thumb, position) => {
+    const y = Math.floor(position / 3)
+    const xOffset = sumWidths(thumbs.slice(y * 3, position)) + position * 3
+    const yOffset = y * MAX_HEIGHT
 
-        const img = new Image()
-        img.src = thumb.image
+    const img = new Image()
+    img.src = thumb.data
 
-        ctx.drawImage(img, xOffset, yOffset)
-      })
+    ctx.drawImage(img, xOffset, yOffset)
+  })
 
-      return canvas.toBuffer()
-    })
-    .catch(error => console.error(error))
+  return canvas.toBuffer()
 }
 
 function downloadImage(imageUrl) {
@@ -224,29 +232,6 @@ function downloadImage(imageUrl) {
       response
         .on("data", chunk => chunks.push(chunk))
         .on("end", () => resolve(Buffer.concat(chunks)))
-    })
-  })
-}
-
-function prefetchImageSize(cdnImageUrl) {
-  return new Promise(resolve => {
-    const options = url.parse(cdnImageUrl)
-
-    http.get(options, response => {
-      const chunks = []
-
-      const onChunk = chunk => {
-        chunks.push(chunk)
-
-        const buffer = Buffer.concat(chunks)
-        if (buffer.length > 10 * 1024) {
-          response.off("data", onChunk)
-          response.destroy()
-          resolve(sizeOf(buffer))
-        }
-      }
-
-      response.on("data", onChunk)
     })
   })
 }
