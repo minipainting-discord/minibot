@@ -58,13 +58,16 @@ block content
           padding: 0;
         }
 
-        .users {
-          justify-content: flex-start;
+        @media screen and (max-width: 720px) {
         }
 
         .pictures > li,
         .users > li {
           margin: 1rem;
+        }
+
+        .users > li {
+          flex: 1 1 20rem;
         }
 
         .users > li figure {
@@ -76,8 +79,12 @@ block content
         }
 
         .users > li figure > img {
-        border-radius: 50%;
-        margin-bottom: 1rem;
+          border-radius: 50%;
+          margin-bottom: 1rem;
+        }
+
+        .users > li figure > figcaption {
+          text-align: center;
         }
 
         .users > li a {
