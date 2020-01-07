@@ -56,7 +56,7 @@ function statsHandler(bot) {
       .then(stats => {
         for (const channelStat of stats) {
           const channel = bot.guild.channels.get(channelStat.channelId)
-          channelStat.channelStat = channel ? channel.name : "deleted-channel"
+          channelStat.channelName = channel ? channel.name : "deleted-channel"
         }
         res.render("stats", { stats })
       })
