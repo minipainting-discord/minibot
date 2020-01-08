@@ -143,6 +143,14 @@ const bot = {
       game: { name: "you", type: "WATCHING" },
     })
 
+    bot.channels = Object.keys(settings.channels).reduce(
+      (channels, key) => ({
+        ...channels,
+        [key]: bot.client.channels.get(settings.channels[key]),
+      }),
+      {},
+    )
+
     bot.roles = Object.keys(settings.roles).reduce(
       (roles, key) => ({
         ...roles,

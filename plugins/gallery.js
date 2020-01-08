@@ -9,6 +9,8 @@ const SQL = require("sql-template-strings")
 const { Canvas, Image } = require("canvas")
 const sortBy = require("lodash/sortBy")
 
+const { pluralize } = require("../utils")
+
 const WEB_ROUTE = "/gallery"
 const MAX_HEIGHT = 1000
 const WEB_THUMB_WIDTH = 250
@@ -68,7 +70,7 @@ function filter(bot, message) {
 
   message.channel
     .awaitMessages(m => m.attachments.size > 0 && m.author.id == authorId, {
-      time: 10e3,
+      time: 30e3,
     })
     .then(async collected => {
       const idx = waitingUsers.indexOf(authorId)
@@ -167,18 +169,37 @@ async function processPictures(bot, message, attachments) {
   try {
     const buffers = await Promise.all(images.map(async i => downloadImage(i)))
     const collage = await createCollage(buffers)
-    const genChan = bot.client.channels.get(settings.channels.general)
-    const botcomsChan = bot.client.channels.get(settings.channels.botcoms)
 
-    for (const channel of [genChan, botcomsChan]) {
-      if (channel == null) {
-        continue
-      }
+    const genOutgoing = [
+      message.author,
+      attachments.length > 1
+        ? `See ${attachments.length - 1} more ${pluralize(
+            "picture",
+            attachments.length - 1,
+          )} at ${message.url}`
+        : null,
+    ]
+      .filter(s => s)
+      .join("\n")
+    const genAttachment = new Discord.Attachment(images[0])
+    await bot.channels.general.send(genOutgoing, genAttachment)
 
-      const attachment = new Discord.Attachment(collage, "minigalleryimage.png")
-
-      await channel.send(`${message.author}\n${message.url}`, attachment)
-    }
+    const botcomsOutgoing = [
+      message.author,
+      attachments.length > 6
+        ? `See ${attachments.length - 6} more ${pluralize(
+            "picture",
+            attachments.length - 6,
+          )} at ${message.url}`
+        : null,
+    ]
+      .filter(s => s)
+      .join("\n")
+    const botcomsAttachment = new Discord.Attachment(
+      collage,
+      "minigalleryimage.png",
+    )
+    await bot.channels.botcoms.send(botcomsOutgoing, botcomsAttachment)
 
     bot.log(
       `[gallery] Processed upload from ${message.author.username} [${message.id}]`,
