@@ -203,7 +203,7 @@ async function createCollage(buffers) {
         image = buffer
       }
 
-      const size = await probeImageSize.sync(buffer)
+      const size = await probeImageSize.sync(image)
       const ratio = MAX_HEIGHT / size.height
       const width = Math.round(ratio * size.width)
       const height = MAX_HEIGHT
