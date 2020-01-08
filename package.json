@@ -9,7 +9,6 @@
     "discord.js": "^11.4.2",
     "express": "^4.17.1",
     "express-basic-auth": "^1.2.0",
-    "image-size": "^0.8.3",
     "jpeg-autorotate": "^5.0.2",
     "jstransformer-cdata-js": "^1.0.0",
     "probe-image-size": "^5.0.0",
