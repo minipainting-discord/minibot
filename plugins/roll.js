@@ -20,7 +20,7 @@ function roll(bot, message, ...args) {
 
     for (const dice of diceExpression.dice) {
       if (dice.diceCount > 50) {
-        message.reply("My claws are not so big!")
+        message.reply("My claws are not that big!")
         return
       }
     }
