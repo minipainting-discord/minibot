@@ -12,7 +12,7 @@ const sortBy = require("lodash/sortBy")
 const { pluralize } = require("../utils")
 
 const WEB_ROUTE = "/gallery"
-const MAX_HEIGHT = 1000
+const MAX_HEIGHT = 640
 const WEB_THUMB_WIDTH = 250
 const CDN_HOST = "cdn.discordapp.com"
 const RESIZER_HOST = "media.discordapp.net"
