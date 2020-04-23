@@ -8,6 +8,7 @@ module.exports = {
       help: "`!roll DICE_EXPRESSION`: Roll some dice!",
       availableInDM: true,
       execute: roll,
+      vc: true,
     },
   ],
 }

@@ -106,7 +106,11 @@ const bot = {
 
     // If the message wasn't filtered out, we detect and execute commands
     const [firstWord, ...args] = splitMessage(message)
-    const commandChannels = [settings.channels.botcoms, settings.channels.mod]
+    const commandChannels = [
+      settings.channels.botcoms,
+      settings.channels.mod,
+      settings.channels.vc,
+    ]
 
     for (const command of commands) {
       if (firstWord !== COMMAND_PREFIX + command.keyword) {
@@ -114,7 +118,8 @@ const bot = {
       }
       if (
         !commandChannels.includes(message.channel.id) ||
-        (command.mod && message.channel.id !== settings.channels.mod)
+        (command.mod && message.channel.id !== settings.channels.mod) ||
+        (!command.vc && message.channel.id === settings.channels.vc)
       ) {
         continue
       }
