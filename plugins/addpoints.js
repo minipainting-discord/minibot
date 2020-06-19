@@ -17,6 +17,7 @@ module.exports = {
   commands: [
     {
       keyword: "addpoints",
+      anywhere: true,
       help: `${USAGE}: Add or remove user points`,
       helpMod: true,
       execute: addpoints,

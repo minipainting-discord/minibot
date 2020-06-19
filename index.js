@@ -119,7 +119,8 @@ const bot = {
       if (
         !commandChannels.includes(message.channel.id) ||
         (command.mod && message.channel.id !== settings.channels.mod) ||
-        (!command.vc && message.channel.id === settings.channels.vc)
+        (!command.vc && message.channel.id === settings.channels.vc) ||
+        !command.anywhere
       ) {
         continue
       }
