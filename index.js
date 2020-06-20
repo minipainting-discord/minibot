@@ -116,11 +116,15 @@ const bot = {
       if (firstWord !== COMMAND_PREFIX + command.keyword) {
         continue
       }
+      console.log([
+        !(command.anywhere || commandChannels.includes(message.channel.id)),
+        command.mod && message.channel.id !== settings.channels.mod,
+        !command.vc && message.channel.id === settings.channels.vc,
+      ])
       if (
-        !commandChannels.includes(message.channel.id) ||
+        !(command.anywhere || commandChannels.includes(message.channel.id)) ||
         (command.mod && message.channel.id !== settings.channels.mod) ||
-        (!command.vc && message.channel.id === settings.channels.vc) ||
-        !command.anywhere
+        (!command.vc && message.channel.id === settings.channels.vc)
       ) {
         continue
       }
