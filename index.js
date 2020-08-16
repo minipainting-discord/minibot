@@ -20,7 +20,7 @@ const bot = {
   commands,
   utils,
 
-  start() {
+  async start() {
     const client = new Discord.Client()
     bot.client = client
 
@@ -36,25 +36,24 @@ const bot = {
     bot.log(`Loaded commands: ${commands.map(c => c.keyword).join(", ")}`)
     bot.log(`Loaded plugins: ${plugins.map(p => p.name).join(", ")}`)
 
-    sql
-      .open("./database.sqlite")
-      .then(database => {
-        bot.db = database
+    try {
+      bot.db = await sql.open("./database.sqlite")
 
-        return Promise.all(
-          plugins
-            .filter(p => p.setup)
-            .map(async plugin => {
-              bot.log(`Run setup for ${plugin.name}`)
-              await plugin.setup(bot)
-            }),
-        )
-      })
-      .then(() => client.login(settings.token))
-      .catch(err => {
-        console.error("Bot startup failed")
-        console.error(err)
-      })
+      await Promise.all(
+        plugins.map(async plugin => {
+          if (!plugin.setup) {
+            return
+          }
+          bot.log(`Run setup for ${plugin.name}`)
+          await plugin.setup(bot)
+        }),
+      )
+
+      client.login(settings.token)
+    } catch (error) {
+      console.error("Bot startup failed")
+      console.error(error)
+    }
   },
 
   onDM(message) {
