@@ -53,7 +53,10 @@ function colorComplement(bot, message, ...args) {
   ctx.fillStyle = toHex(complement)
   ctx.fillRect(32, 0, 28, 28)
 
-  const attachment = new Discord.Attachment(canvas.toBuffer(), "complement.png")
+  const attachment = new Discord.MessageAttachment(
+    canvas.toBuffer(),
+    "complement.png",
+  )
 
   message.reply(
     `Complement to \`${color}\` is \`${toHex(complement)}\``,
@@ -81,9 +84,12 @@ function colorWithCount(bot, message, arg) {
     ctx.fillRect(xOffset, 0, 28, 28)
   })
 
-  const attachment = new Discord.Attachment(canvas.toBuffer(), "colors.png")
+  const attachment = new Discord.MessageAttachment(
+    canvas.toBuffer(),
+    "colors.png",
+  )
 
-  message.reply(colors.map(c => `\`${toHex(c)}\``).join(", "), attachment)
+  message.reply(colors.map((c) => `\`${toHex(c)}\``).join(", "), attachment)
 }
 
 function randomHex() {

@@ -1,6 +1,6 @@
 module.exports = {
   name: "points",
-  setup: bot =>
+  setup: (bot) =>
     bot.db.run(
       "CREATE TABLE IF NOT EXISTS scores (userId TEXT, points INTEGER, level INTEGER)",
     ),
@@ -24,7 +24,7 @@ function points(bot, message) {
     .get(
       `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`,
     )
-    .then(row => {
+    .then((row) => {
       if (!row) {
         message.reply(`${toSelf ? "you have" : `${user} has`} 0 points`)
         return
@@ -36,7 +36,7 @@ function points(bot, message) {
         } and ${row.a_points} current point${row.a_points !== 1 ? "s" : ""}`,
       )
     })
-    .catch(err => {
+    .catch((err) => {
       bot.logError(err)
       message.reply("Oops, something went wrong!")
     })

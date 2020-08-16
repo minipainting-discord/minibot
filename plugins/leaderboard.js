@@ -20,7 +20,7 @@ module.exports = {
       const annualTable = selectedYear ? `annual_${selectedYear}` : "annual"
 
       retrieveScores(bot, "all", annualTable).then(([scores, annual]) => {
-        const colorToRGB = color =>
+        const colorToRGB = (color) =>
           [
             (color & 0xff0000) >> 16,
             (color & 0x00ff00) >> 8,
@@ -58,17 +58,18 @@ module.exports = {
 function leaderboard(bot, message) {
   retrieveScores(bot)
     .then(([scores, annual]) => {
-      const embed = new Discord.RichEmbed({
+      const embed = new Discord.MessageEmbed({
         color: 0x0088aa,
-        description: `[See full leaderboard](${bot.settings.serverUrl +
-          WEB_ROUTE})`,
+        description: `[See full leaderboard](${
+          bot.settings.serverUrl + WEB_ROUTE
+        })`,
         fields: [
           {
             name: "Lifetime Leaderboard",
             value: [
               "```",
               scores
-                .map(s => [s.points, s.user.displayName].join(" - "))
+                .map((s) => [s.points, s.user.displayName].join(" - "))
                 .join("\n"),
               "```",
             ].join("\n"),
@@ -78,7 +79,7 @@ function leaderboard(bot, message) {
             value: [
               "```",
               annual
-                .map(s => [s.points, s.user.displayName].join(" - "))
+                .map((s) => [s.points, s.user.displayName].join(" - "))
                 .join("\n"),
               "```",
             ].join("\n"),
@@ -87,7 +88,7 @@ function leaderboard(bot, message) {
       })
       message.reply(embed)
     })
-    .catch(err => {
+    .catch((err) => {
       bot.logError(err)
       message.reply("Oops, something went wrong!")
     })
@@ -96,34 +97,34 @@ function leaderboard(bot, message) {
 
 function retrieveScores(bot, all = false, annualTable = "annual") {
   const limit = all ? "" : "LIMIT 10"
-  return bot.guild.fetchMembers().then(() => {
+  return bot.guild.members.fetch().then(() => {
     return Promise.all([
-      new Promise(resolve => {
+      new Promise((resolve) => {
         bot.db
           .all(`SELECT * FROM scores ORDER BY points DESC ${limit}`)
-          .then(results =>
+          .then((results) =>
             Promise.all(
-              results.map(r => bot.findMember(r.userId)),
-            ).then(users =>
+              results.map((r) => bot.findMember(r.userId)),
+            ).then((users) =>
               resolve(
                 results
                   .map((r, i) => ({ ...r, user: users[i] }))
-                  .filter(r => r.user),
+                  .filter((r) => r.user),
               ),
             ),
           )
       }),
-      new Promise(resolve => {
+      new Promise((resolve) => {
         bot.db
           .all(`SELECT * FROM ${annualTable} ORDER BY points DESC ${limit}`)
-          .then(results =>
+          .then((results) =>
             Promise.all(
-              results.map(r => bot.findMember(r.userId)),
-            ).then(users =>
+              results.map((r) => bot.findMember(r.userId)),
+            ).then((users) =>
               resolve(
                 results
                   .map((r, i) => ({ ...r, user: users[i] }))
-                  .filter(r => r.user),
+                  .filter((r) => r.user),
               ),
             ),
           )

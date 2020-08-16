@@ -29,7 +29,7 @@ function roll(bot, message, ...args) {
     const roll = diceExpression.roll()
 
     const reply = [
-      roll.diceRaw.map(subRoll => `(${subRoll.join(", ")})`).join(", "),
+      roll.diceRaw.map((subRoll) => `(${subRoll.join(", ")})`).join(", "),
       "=>",
       roll.roll,
     ].join(" ")

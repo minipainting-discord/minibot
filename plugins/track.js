@@ -15,7 +15,7 @@ const EXAMPLE_CATEGORIES = [
 module.exports = {
   name: "track",
 
-  setup: async bot => {
+  setup: async (bot) => {
     await bot.db.run(
       `CREATE TABLE IF NOT EXISTS shame (
         userId   TEXT,
@@ -112,16 +112,16 @@ async function trackShow(bot, message, db = null) {
       "",
       showPainted &&
         `Painted models: **${totalPainted}** (${painted
-          .filter(c => c.amount > 0)
-          .map(c => `\`${c.category}\`: ${c.amount}`)
+          .filter((c) => c.amount > 0)
+          .map((c) => `\`${c.category}\`: ${c.amount}`)
           .join(", ")})`,
       showShame &&
         `Pile of shame: **${totalShame}** (${shame
-          .filter(c => c.amount > 0)
-          .map(c => `\`${c.category}\`: ${c.amount}`)
+          .filter((c) => c.amount > 0)
+          .map((c) => `\`${c.category}\`: ${c.amount}`)
           .join(", ")})`,
     ]
-      .filter(s => s !== false)
+      .filter((s) => s !== false)
       .join("\n"),
   )
 }

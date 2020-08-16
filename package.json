@@ -6,23 +6,25 @@
   "dependencies": {
     "canvas": "^2.6.1",
     "dice-expression-evaluator": "^0.1.2",
-    "discord.js": "^11.4.2",
+    "discord.js": "^12.3.1",
     "express": "^4.17.1",
     "express-basic-auth": "^1.2.0",
-    "jpeg-autorotate": "^5.0.2",
+    "jpeg-autorotate": "^6.0.0",
     "jstransformer-cdata-js": "^1.0.0",
     "probe-image-size": "^5.0.0",
-    "pug": "^2.0.4",
+    "pug": "^3.0.0",
     "resize-img": "^2.0.0",
     "shellwords": "^0.1.1",
     "sql-template-strings": "^2.2.2",
-    "sqlite": "^3.0.3"
+    "sqlite": "^4.0.14",
+    "sqlite3": "^5.0.0"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "husky": "^4.0.1",
-    "lint-staged": "^9.5.0",
-    "prettier": "^1.19.1"
+    "eslint": "^7.7.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5"
   },
   "repository": {
     "type": "git",
@@ -41,8 +43,7 @@
   },
   "lint-staged": {
     "**/*.{js,json,md}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "prettier": {

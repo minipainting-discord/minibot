@@ -1,6 +1,6 @@
 module.exports = {
   name: "annual",
-  setup: bot =>
+  setup: (bot) =>
     bot.db.run(
       "CREATE TABLE IF NOT EXISTS annual (userId TEXT, points INTEGER)",
     ),
@@ -19,7 +19,7 @@ module.exports = {
 }
 
 function annual(bot, message, ...args) {
-  if (!message.member.roles.has(bot.roles.admin.id)) {
+  if (!message.member.roles.cache.has(bot.roles.admin.id)) {
     return
   }
 
@@ -48,11 +48,11 @@ function annual(bot, message, ...args) {
         .all(
           `SELECT name FROM sqlite_master WHERE type ='table' AND name LIKE 'annual_%' ORDER BY name DESC LIMIT 10`,
         )
-        .then(results => {
+        .then((results) => {
           if (results) {
             const msg = [
               "```",
-              ...results.map(r => `  - ${r.name}`),
+              ...results.map((r) => `  - ${r.name}`),
               "```",
             ].join("\n")
             message.reply(msg)

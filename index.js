@@ -1,4 +1,5 @@
 const Discord = require("discord.js")
+const sqlite3 = require("sqlite3")
 const sql = require("sqlite")
 const shellwords = require("shellwords")
 const express = require("express")
@@ -8,7 +9,7 @@ const settings = require("./settings.json")
 
 const COMMAND_PREFIX = "!"
 
-const commands = plugins.flatMap(p => p.commands || [])
+const commands = plugins.flatMap((p) => p.commands || [])
 
 const bot = {
   app: null,
@@ -28,19 +29,22 @@ const bot = {
     client.on("message", bot.onMessage)
 
     const app = express()
-    plugins.forEach(p => p.web && p.web(app, bot))
+    plugins.forEach((p) => p.web && p.web(app, bot))
     app.set("view engine", "pug")
     app.use(express.static("public"))
     app.listen(4567, "0.0.0.0")
 
-    bot.log(`Loaded commands: ${commands.map(c => c.keyword).join(", ")}`)
-    bot.log(`Loaded plugins: ${plugins.map(p => p.name).join(", ")}`)
+    bot.log(`Loaded commands: ${commands.map((c) => c.keyword).join(", ")}`)
+    bot.log(`Loaded plugins: ${plugins.map((p) => p.name).join(", ")}`)
 
     try {
-      bot.db = await sql.open("./database.sqlite")
+      bot.db = await sql.open({
+        filename: "./database.sqlite",
+        driver: sqlite3.Database,
+      })
 
       await Promise.all(
-        plugins.map(async plugin => {
+        plugins.map(async (plugin) => {
           if (!plugin.setup) {
             return
           }
@@ -136,10 +140,10 @@ const bot = {
   },
 
   onReady() {
-    const guild = bot.client.guilds.first()
+    const guild = bot.client.guilds.cache.first()
 
     // Prefetch members
-    guild.fetchMembers()
+    guild.members.fetch()
 
     bot.guild = guild
 
@@ -150,7 +154,7 @@ const bot = {
     bot.channels = Object.keys(settings.channels).reduce(
       (channels, key) => ({
         ...channels,
-        [key]: bot.client.channels.get(settings.channels[key]),
+        [key]: bot.client.channels.cache.get(settings.channels[key]),
       }),
       {},
     )
@@ -158,7 +162,9 @@ const bot = {
     bot.roles = Object.keys(settings.roles).reduce(
       (roles, key) => ({
         ...roles,
-        [key]: guild.roles.find(role => role.id === settings.roles[key]),
+        [key]: guild.roles.cache.find(
+          (role) => role.id === settings.roles[key],
+        ),
       }),
       {},
     )
@@ -166,10 +172,10 @@ const bot = {
     bot.ranks = settings.ranks.map((rank, level) => ({
       ...rank,
       level: level + 1,
-      role: guild.roles.find(r => r.name === rank.name),
+      role: guild.roles.cache.find((r) => r.name === rank.name),
     }))
 
-    bot.emojis = guild.emojis.reduce(
+    bot.emojis = guild.emojis.cache.reduce(
       (emojis, emoji) => ({ ...emojis, [emoji.name]: emoji }),
       {},
     )
@@ -178,7 +184,7 @@ const bot = {
   },
 
   findMember(id) {
-    return bot.guild.members.find(u => u.id === id)
+    return bot.guild.members.cache.find((u) => u.id === id)
   },
 
   fromModerator(message) {
@@ -193,8 +199,8 @@ const bot = {
     }
 
     if (
-      !guildMember.roles.has(bot.roles.admin.id) &&
-      !guildMember.roles.has(bot.roles.mod.id)
+      !guildMember.roles.cache.has(bot.roles.admin.id) &&
+      !guildMember.roles.cache.has(bot.roles.mod.id)
     ) {
       message.reply(`Nope ${bot.emojis.LUL}`)
       return false
@@ -222,7 +228,7 @@ const bot = {
           JSON.stringify(args),
         ],
       )
-      .catch(err => bot.logError(err, "Error while logging command"))
+      .catch((err) => bot.logError(err, "Error while logging command"))
   },
 }
 

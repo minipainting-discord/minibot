@@ -28,34 +28,36 @@ function resetpoints(bot, message, ...args) {
 
   const zero = 0
 
-  message.guild.fetchMember(user).then(member => {
-    const roles = bot.settings.ranks.map(rank =>
-      message.guild.roles.find(role => role.name === rank.name),
+  message.guild.members.fetch(user).then((member) => {
+    const roles = bot.settings.ranks.map((rank) =>
+      message.guild.roles.cache.find((role) => role.name === rank.name),
     )
 
     for (const role of roles) {
-      if (role !== null && member.roles.has(role.id)) {
-        member.removeRole(role).catch(bot.logError)
+      if (role !== null && member.roles.cache.has(role.id)) {
+        member.roles.remove(role).catch(bot.logError)
       }
     }
 
-    bot.db.get(`SELECT * FROM scores WHERE userId ='${user.id}'`).then(row => {
-      if (!row) {
-        bot.db.run(
-          "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
-          [user.id, zero, 0],
-        )
-      } else {
-        bot.db
-          .run(
-            `UPDATE scores SET points = ${zero}, level = ${zero} WHERE userId = ${user.id}`,
+    bot.db
+      .get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
+      .then((row) => {
+        if (!row) {
+          bot.db.run(
+            "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
+            [user.id, zero, 0],
           )
-          .then(() => {
-            bot.db.run(`DELETE FROM annual WHERE userId = ${user.id}`)
-          })
-      }
-      message.reply(user + ` reset to 0 points`)
-      return
-    })
+        } else {
+          bot.db
+            .run(
+              `UPDATE scores SET points = ${zero}, level = ${zero} WHERE userId = ${user.id}`,
+            )
+            .then(() => {
+              bot.db.run(`DELETE FROM annual WHERE userId = ${user.id}`)
+            })
+        }
+        message.reply(`${user} reset to 0 points`)
+        return
+      })
   })
 }

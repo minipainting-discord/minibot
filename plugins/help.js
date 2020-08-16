@@ -13,7 +13,7 @@ module.exports = {
 function help(bot, message) {
   const onModChannel = message.channel.id === bot.settings.channels.mod
 
-  const visibleCommands = bot.commands.filter(command => {
+  const visibleCommands = bot.commands.filter((command) => {
     if (!command.help) {
       return false
     }
@@ -42,7 +42,7 @@ function help(bot, message) {
 
   function showCommandHelp(command) {
     return Array.isArray(command.help)
-      ? command.help.map(help => showCommandHelp({ help })).join("\n")
+      ? command.help.map((help) => showCommandHelp({ help })).join("\n")
       : `- ${command.help}`
   }
 
@@ -54,9 +54,9 @@ function help(bot, message) {
 
   const reply = [
     "**COMMAND LIST**",
-    ...visibleCommands.filter(c => !c.mod && !c.helpMod).map(showCommandHelp),
+    ...visibleCommands.filter((c) => !c.mod && !c.helpMod).map(showCommandHelp),
     modHeader,
-    ...visibleCommands.filter(c => c.mod || c.helpMod).map(showCommandHelp),
+    ...visibleCommands.filter((c) => c.mod || c.helpMod).map(showCommandHelp),
   ].join("\n")
 
   message.reply(`\n>>> ${reply}`)

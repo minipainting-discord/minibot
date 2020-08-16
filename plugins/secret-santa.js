@@ -19,7 +19,7 @@ const DEADLINE = "December 15th"
 module.exports = {
   name: "secret-santa",
 
-  setup: bot => {
+  setup: (bot) => {
     bot.data.set("secret-santa:pending", new Map())
     return bot.db.run(
       `CREATE TABLE IF NOT EXISTS secretSanta (
@@ -131,12 +131,12 @@ module.exports = {
             message.reply(
               "All good! If you made a mistake or want to edit your letter, just repeat the whole process.",
             )
-            bot.client.channels
+            bot.client.channels.cache
               .get(settings.channels.mod)
               .send(`:santa: New letter from ${guildMember.displayName}`)
             bot.log(`[santa] Saved letter for ${message.author.username}`)
           })
-          .catch(err =>
+          .catch((err) =>
             bot.logError(
               err,
               `Error while saving letter for user ${message.author.username}`,
@@ -217,27 +217,27 @@ function santaList(bot, message) {
     .all(
       `SELECT userId, region, tier, matchWith FROM secretSanta ORDER BY region, tier DESC`,
     )
-    .then(results =>
-      results.map(r => ({
+    .then((results) =>
+      results.map((r) => ({
         ...r,
         member: bot.findMember(r.userId),
         match: bot.findMember(r.matchWith),
       })),
     )
-    .then(results => {
+    .then((results) => {
       if (!results.length) {
         message.reply(":shrug:")
         return
       }
 
       const longestNameLength = results
-        .map(r => [...r.member.displayName].length)
+        .map((r) => [...r.member.displayName].length)
         .sort((a, b) => b - a)
         .shift()
 
       const volunteerList = results
         .map(
-          r =>
+          (r) =>
             `${r.tier.padEnd(7, " ")} | ${r.region.padEnd(
               4,
               " ",
@@ -260,7 +260,7 @@ function santaList(bot, message) {
 
 async function santaMatch(bot, message) {
   const letters = await bot.db.all(`SELECT * FROM secretSanta`)
-  letters.forEach(l => {
+  letters.forEach((l) => {
     l.user = bot.findMember(l.userId)
   })
 
@@ -275,8 +275,10 @@ async function santaMatch(bot, message) {
 
   // SPECIAL RULE: If some one is alone in nice/intl, rematch with the admin
   if (groups.nice.INTL.length === 1) {
-    const admin = bot.guild.members.find(m => m.roles.has(bot.roles.admin.id))
-    const adminLetter = letters.find(l => l.userId === admin.user.id)
+    const admin = bot.guild.members.cache.find((m) =>
+      m.roles.cache.has(bot.roles.admin.id),
+    )
+    const adminLetter = letters.find((l) => l.userId === admin.user.id)
     const group = groups[adminLetter.tier][adminLetter.region]
     group.splice(group.indexOf(adminLetter), 1)
     groups.nice.INTL.push(adminLetter)
@@ -321,7 +323,7 @@ async function santaSend(bot, message) {
     const match = bot.findMember(letter.matchWith)
     const { letter: content, address } = letter
 
-    match.user.createDM().then(dmChannel => {
+    match.user.createDM().then((dmChannel) => {
       dmChannel.send(
         [
           "Hello dear minipainter,",
@@ -357,13 +359,15 @@ async function santaStatus(bot, message) {
   }
 
   const users = await Promise.all(
-    Array.from(pendingLetters.keys()).map(async id => await bot.findMember(id)),
+    Array.from(pendingLetters.keys()).map(
+      async (id) => await bot.findMember(id),
+    ),
   )
 
   message.reply(
     `There are currently ${
       pendingLetters.size
-    } letters being written. (${users.map(u => u.displayName).join(", ")})`,
+    } letters being written. (${users.map((u) => u.displayName).join(", ")})`,
   )
 }
 
@@ -373,10 +377,10 @@ function santaHandler(bot) {
 
     bot.db
       .all(`SELECT * FROM secretSanta ORDER BY region, tier DESC`)
-      .then(async results => {
+      .then(async (results) => {
         const guildMembers = new Map(
           await Promise.all(
-            results.map(r => [r.userId, bot.findMember(r.userId)]),
+            results.map((r) => [r.userId, bot.findMember(r.userId)]),
           ),
         )
 

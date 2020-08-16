@@ -3,7 +3,7 @@ const WEB_ROUTE = "/stats"
 module.exports = {
   name: "stats",
 
-  setup: bot =>
+  setup: (bot) =>
     bot.db.run(
       `CREATE TABLE IF NOT EXISTS stats (
         userId    TEXT,
@@ -41,7 +41,7 @@ function filter(bot, message) {
         1,
       ],
     )
-    .catch(err => {
+    .catch((err) => {
       bot.logError(err, "Error updating stats")
     })
 }
@@ -53,9 +53,9 @@ function statsHandler(bot) {
       .all(
         `SELECT channelId, year, month, day, sum(count) as dailyCount FROM stats GROUP BY channelId, year, month, day`,
       )
-      .then(stats => {
+      .then((stats) => {
         for (const channelStat of stats) {
-          const channel = bot.guild.channels.get(channelStat.channelId)
+          const channel = bot.guild.channels.cache.get(channelStat.channelId)
           channelStat.channelName = channel ? channel.name : "deleted-channel"
         }
         res.render("stats", { stats })

@@ -17,7 +17,7 @@ function randomItem(collection) {
 function shuffle(collection) {
   const copy = [...collection]
 
-  return collection.reduce(shuffled => {
+  return collection.reduce((shuffled) => {
     const randomIndex = randomInt(0, copy.length - 1)
     return [...shuffled, copy.splice(randomIndex, 1).pop()]
   }, [])

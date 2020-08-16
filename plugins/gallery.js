@@ -20,7 +20,7 @@ const waitingUsers = []
 
 module.exports = {
   name: "gallery",
-  setup: bot =>
+  setup: (bot) =>
     bot.db.run(
       `CREATE TABLE IF NOT EXISTS pictures (
          id TEXT PRIMARY KEY,
@@ -43,7 +43,7 @@ function filter(bot, message) {
 
   if (message.attachments.size == 0) {
     if (
-      ["https://", "http://", "www"].some(prefix =>
+      ["https://", "http://", "www"].some((prefix) =>
         message.content.startsWith(prefix),
       )
     ) {
@@ -53,7 +53,7 @@ function filter(bot, message) {
       ]) {
         bot.client.channels
           .get(channel)
-          .sendMessage(message.author + " : " + message.content)
+          .send(`${message.author} : ${message.content}`)
       }
     } else {
       message.delete()
@@ -69,10 +69,10 @@ function filter(bot, message) {
   waitingUsers.push(authorId)
 
   message.channel
-    .awaitMessages(m => m.attachments.size > 0 && m.author.id == authorId, {
+    .awaitMessages((m) => m.attachments.size > 0 && m.author.id == authorId, {
       time: 30e3,
     })
-    .then(async collected => {
+    .then(async (collected) => {
       const idx = waitingUsers.indexOf(authorId)
       waitingUsers.splice(idx, 1)
 
@@ -97,7 +97,7 @@ function web(app, bot) {
   app.get(WEB_ROUTE, async (req, res) => {
     bot.log(`WEB ${WEB_ROUTE}`)
 
-    await bot.guild.fetchMembers()
+    await bot.guild.members.fetch()
 
     const userId = req.query.user
 
@@ -105,7 +105,7 @@ function web(app, bot) {
       const picturesQuery = await bot.db.all(
         SQL`SELECT * FROM pictures WHERE userId = ${userId}`,
       )
-      const pictures = picturesQuery.map(picture => {
+      const pictures = picturesQuery.map((picture) => {
         const thumbHeight = Math.round(
           (WEB_THUMB_WIDTH * picture.height) / picture.width,
         )
@@ -129,7 +129,7 @@ function web(app, bot) {
     )
 
     const users = sortBy(
-      postingUsers.map(user => bot.findMember(user.userId)),
+      postingUsers.map((user) => bot.findMember(user.userId)),
       ["displayName"],
     )
 
@@ -143,7 +143,7 @@ function web(app, bot) {
 async function savePictures(bot, message, attachments) {
   try {
     const values = await Promise.all(
-      attachments.map(async attachment => {
+      attachments.map(async (attachment) => {
         const imageSize = await probeImageSize(attachment.url)
         const { width, height } = imageSize
         return SQL`(${attachment.id}, ${message.author.id}, ${attachment.url}, ${message.content}, ${width}, ${height}, datetime('now'))`
@@ -164,10 +164,10 @@ async function savePictures(bot, message, attachments) {
 }
 
 async function processPictures(bot, message, attachments) {
-  const images = attachments.slice(0, 6).map(a => a.url)
+  const images = attachments.slice(0, 6).map((a) => a.url)
 
   try {
-    const buffers = await Promise.all(images.map(async i => downloadImage(i)))
+    const buffers = await Promise.all(images.map(async (i) => downloadImage(i)))
     const collage = await createCollage(buffers)
 
     const genOutgoing = [
@@ -179,9 +179,9 @@ async function processPictures(bot, message, attachments) {
           )} at ${message.url}`
         : null,
     ]
-      .filter(s => s)
+      .filter((s) => s)
       .join("\n")
-    const genAttachment = new Discord.Attachment(images[0])
+    const genAttachment = new Discord.MessageAttachment(images[0])
     await bot.channels.general.send(genOutgoing, genAttachment)
 
     const botcomsOutgoing = [
@@ -193,9 +193,9 @@ async function processPictures(bot, message, attachments) {
           )} at ${message.url}`
         : null,
     ]
-      .filter(s => s)
+      .filter((s) => s)
       .join("\n")
-    const botcomsAttachment = new Discord.Attachment(
+    const botcomsAttachment = new Discord.MessageAttachment(
       collage,
       "minigalleryimage.png",
     )
@@ -215,7 +215,7 @@ function sumWidths(items) {
 
 async function createCollage(buffers) {
   const thumbs = await Promise.all(
-    buffers.map(async buffer => {
+    buffers.map(async (buffer) => {
       let image
       try {
         const rotated = await ja.rotate(buffer, { quality: 85 })
@@ -257,12 +257,12 @@ async function createCollage(buffers) {
 }
 
 function downloadImage(imageUrl) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const options = url.parse(imageUrl)
-    http.get(options, response => {
+    http.get(options, (response) => {
       const chunks = []
       response
-        .on("data", chunk => chunks.push(chunk))
+        .on("data", (chunk) => chunks.push(chunk))
         .on("end", () => resolve(Buffer.concat(chunks)))
     })
   })
