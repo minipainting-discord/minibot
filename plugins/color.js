@@ -1,5 +1,8 @@
 const Discord = require("discord.js")
 const { Canvas } = require("canvas")
+const settings = require("../settings.json")
+
+const { channels } = settings
 
 const COLOR_USAGE = {
   COMPLEMENT: "`!color complement COLOR`",
@@ -16,7 +19,7 @@ module.exports = {
       ],
       availableInDM: true,
       execute: color,
-      vc: true,
+      allowIn: [channels.general, channels.vc],
     },
   ],
 }

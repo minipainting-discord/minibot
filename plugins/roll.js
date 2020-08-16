@@ -1,4 +1,7 @@
 const DiceExpression = require("dice-expression-evaluator")
+const settings = require("../settings.json")
+
+const { channels } = settings
 
 module.exports = {
   name: "roll",
@@ -8,7 +11,7 @@ module.exports = {
       help: "`!roll DICE_EXPRESSION`: Roll some dice!",
       availableInDM: true,
       execute: roll,
-      vc: true,
+      allowIn: [channels.vc],
     },
   ],
 }

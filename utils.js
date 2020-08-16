@@ -36,10 +36,33 @@ function pluralize(word, count, plural = null) {
   return count === 1 ? word : plural || word + "s"
 }
 
+function isCommandAllowed(bot, command, channelId) {
+  const { channels } = bot.settings
+
+  if (command.mod && channelId !== channels.mod) {
+    return false
+  }
+
+  if (command.allowAnywhere) {
+    return true
+  }
+
+  if (channelId === channels.botcoms) {
+    return true
+  }
+
+  if (command.allowIn && command.allowIn.includes(channelId)) {
+    return true
+  }
+
+  return false
+}
+
 module.exports = {
   randomInt,
   randomItem,
   shuffle,
   requireWebAuth,
   pluralize,
+  isCommandAllowed,
 }
