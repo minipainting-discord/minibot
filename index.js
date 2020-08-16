@@ -28,7 +28,7 @@ const bot = {
     client.on("message", bot.onMessage)
 
     const app = express()
-    plugins.filter(p => p.web).forEach(p => p.web(app, bot))
+    plugins.forEach(p => p.web && p.web(app, bot))
     app.set("view engine", "pug")
     app.use(express.static("public"))
     app.listen(4567, "0.0.0.0")
