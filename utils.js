@@ -25,7 +25,7 @@ function shuffle(collection) {
 
 function requireWebAuth() {
   return basicAuth({
-    users: { minipainting: settings.adminPassword },
+    users: { minipainting: settings.webPassword },
     challenge: true,
     realm: "minipainting",
     unauthorizedResponse: () => "SKREEEOOOONK!!!",
