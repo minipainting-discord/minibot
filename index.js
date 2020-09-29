@@ -173,6 +173,12 @@ const bot = {
     )
 
     bot.log("I'm online!")
+
+    for (const plugin of bot.plugins) {
+      if (plugin.onReady) {
+        plugin.onReady(bot)
+      }
+    }
   },
 
   findMember(id) {
