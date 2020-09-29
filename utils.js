@@ -39,8 +39,8 @@ function pluralize(word, count, plural = null) {
 function isCommandAllowed(bot, command, channelId) {
   const { channels } = bot.settings
 
-  if (command.mod && channelId !== channels.mod) {
-    return false
+  if (channelId === channels.mod) {
+    return true
   }
 
   if (command.allowAnywhere) {
