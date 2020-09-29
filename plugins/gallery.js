@@ -51,7 +51,7 @@ function filter(bot, message) {
         settings.channels.general,
         settings.channels.botcoms,
       ]) {
-        bot.client.channels
+        bot.client.channels.cache
           .get(channel)
           .send(`${message.author} : ${message.content}`)
       }
