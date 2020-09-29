@@ -25,7 +25,7 @@ block content
         const channelNames = Object.keys(statsByChannel).sort()
         const options = {
           title: {
-            text: "msg/day (last 7 days)"
+            text: "msg/day (last 14 days)"
           },
           tooltip: {},
           legend: {
@@ -73,11 +73,11 @@ block content
         const channelNames = Object.keys(statsByChannel).sort()
         const options = {
           title: {
-            text: "total/day (last 14 days)"
+            text: "total/day (last 90 days)"
           },
           tooltip: {},
           xAxis: {
-            data: Array.from({length: 14}, (_, i) => dayjs().subtract(13 - i, 'days').format("MM/DD"))
+            data: Array.from({length: 90}, (_, i) => dayjs().subtract(89 - i, 'days').format("MM/DD"))
           },
           yAxis: {},
           series: [{
