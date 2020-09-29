@@ -131,7 +131,7 @@ function web(app, bot) {
     const users = sortBy(
       postingUsers.map((user) => bot.findMember(user.userId)),
       ["displayName"],
-    )
+    ).filter(Boolean)
 
     res.render("gallery", {
       users,
