@@ -8,13 +8,13 @@ const SANTA_USAGE = {
   SHORT: "`!santa list | match | status`",
 }
 
-const TIER_THRESHOLD = 4000
+const TIER_THRESHOLD = 5000
 const MAX_LETTER_SIZE = 1996 // 2000 chars discord limit - length of ">>> "
 const NICE_TIER = "nice"
 const NAUGHTY_TIER = "naughty"
 const WEB_ROUTE = "/admin/santa"
 
-const DEADLINE = "December 15th"
+const DEADLINE = "November 20th"
 
 module.exports = {
   name: "secret-santa",
@@ -75,13 +75,13 @@ module.exports = {
       }
 
       if (!letter.region) {
-        if (message.content.match(/^na|eu|intl$/i)) {
+        if (message.content.match(/^na|eu|any$/i)) {
           message.reply(
             "Got it! Now please type your full name and address (in one discord message)",
           )
           letter.region = message.content.toUpperCase()
         } else {
-          message.reply("Wut? Please answer `NA`, `EU` or `INTL`")
+          message.reply("Wut? Please answer `NA`, `EU` or `ANY`")
         }
         return true
       }
@@ -161,7 +161,7 @@ module.exports = {
       message.reply(
         [
           "Ho ho ho! I got your letter little hooman!",
-          "Now where are you willing to ship stuff? (Answer `NA`, `EU` or `INTL`)",
+          "Now where are you willing to ship stuff? (Answer `NA`, `EU` or `ANY`)",
           "You can also `CANCEL` anytime.",
         ].join("\n"),
       )
@@ -265,24 +265,24 @@ async function santaMatch(bot, message) {
   })
 
   const groups = {
-    naughty: { NA: [], EU: [], INTL: [] },
-    nice: { NA: [], EU: [], INTL: [] },
+    naughty: { NA: [], EU: [], ANY: [] },
+    nice: { NA: [], EU: [], ANY: [] },
   }
 
   for (const letter of letters) {
     groups[letter.tier][letter.region].push(letter)
   }
 
-  // SPECIAL RULE: If some one is alone in nice/intl, rematch with the admin
-  if (groups.nice.INTL.length === 1) {
+  // SPECIAL RULE: If some one is alone in nice/any, rematch with the admin
+  if (groups.nice.ANY.length === 1) {
     const admin = bot.guild.members.cache.find((m) =>
       m.roles.cache.has(bot.roles.admin.id),
     )
     const adminLetter = letters.find((l) => l.userId === admin.user.id)
     const group = groups[adminLetter.tier][adminLetter.region]
     group.splice(group.indexOf(adminLetter), 1)
-    groups.nice.INTL.push(adminLetter)
-    bot.log("[santa] rematched admin to Nice/INTL")
+    groups.nice.ANY.push(adminLetter)
+    bot.log("[santa] rematched admin to Nice/ANY")
   }
 
   for (const tier of [NAUGHTY_TIER, NICE_TIER]) {
