@@ -273,7 +273,7 @@ async function santaMatch(bot, message) {
     groups[letter.tier][letter.region].push(letter)
   }
 
-  // SPECIAL RULE: If some one is alone in nice/any, rematch with the admin
+  // SPECIAL RULE: If someone is alone in nice/any, rematch with the admin
   if (groups.nice.ANY.length === 1) {
     const admin = bot.guild.members.cache.find((m) =>
       m.roles.cache.has(bot.roles.admin.id),
