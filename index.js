@@ -60,12 +60,12 @@ const bot = {
     }
   },
 
-  onDM(message) {
+  async onDM(message) {
     const [firstWord, ...args] = splitMessage(message)
 
     // First we apply each dmFilter and we stop if the filter returns true
     for (const plugin of bot.plugins) {
-      if (plugin.dmFilter && plugin.dmFilter(bot, message)) {
+      if (plugin.dmFilter && (await plugin.dmFilter(bot, message))) {
         break
       }
     }
