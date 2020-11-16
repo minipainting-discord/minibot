@@ -134,9 +134,6 @@ const bot = {
   onReady() {
     const guild = bot.client.guilds.cache.first()
 
-    // Prefetch members
-    guild.members.fetch()
-
     bot.guild = guild
 
     bot.client.user.setPresence({

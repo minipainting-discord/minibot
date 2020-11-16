@@ -55,82 +55,61 @@ module.exports = {
   ],
 }
 
-function leaderboard(bot, message) {
-  retrieveScores(bot)
-    .then(([scores, annual]) => {
-      const embed = new Discord.MessageEmbed({
-        color: 0x0088aa,
-        description: `[See full leaderboard](${
-          bot.settings.serverUrl + WEB_ROUTE
-        })`,
-        fields: [
-          {
-            name: "Lifetime Leaderboard",
-            value: [
-              "```",
-              scores
-                .map((s) => [s.points, s.user.displayName].join(" - "))
-                .join("\n"),
-              "```",
-            ].join("\n"),
-          },
-          {
-            name: "Annual Leaderboard",
-            value: [
-              "```",
-              annual
-                .map((s) => [s.points, s.user.displayName].join(" - "))
-                .join("\n"),
-              "```",
-            ].join("\n"),
-          },
-        ],
-      })
-      message.reply(embed)
+async function leaderboard(bot, message) {
+  try {
+    const [scores, annual] = await retrieveScores(bot)
+    const embed = new Discord.MessageEmbed({
+      color: 0x0088aa,
+      description: `[See full leaderboard](${
+        bot.settings.serverUrl + WEB_ROUTE
+      })`,
+      fields: [
+        {
+          name: "Lifetime Leaderboard",
+          value: [
+            "```",
+            scores
+              .map((s) => [s.points, s.user.displayName].join(" - "))
+              .join("\n"),
+            "```",
+          ].join("\n"),
+        },
+        {
+          name: "Annual Leaderboard",
+          value: [
+            "```",
+            annual
+              .map((s) => [s.points, s.user.displayName].join(" - "))
+              .join("\n"),
+            "```",
+          ].join("\n"),
+        },
+      ],
     })
-    .catch((err) => {
-      bot.logError(err)
-      message.reply("Oops, something went wrong!")
-    })
-  return
+    message.reply(embed)
+  } catch (err) {
+    bot.logError(err)
+    message.reply("Oops, something went wrong!")
+  }
 }
 
-function retrieveScores(bot, all = false, annualTable = "annual") {
+async function retrieveScores(bot, all = false, annualTable = "annual") {
   const limit = all ? "" : "LIMIT 10"
-  return bot.guild.members.fetch().then(() => {
-    return Promise.all([
-      new Promise((resolve) => {
-        bot.db
-          .all(`SELECT * FROM scores ORDER BY points DESC ${limit}`)
-          .then((results) =>
-            Promise.all(
-              results.map((r) => bot.findMember(r.userId)),
-            ).then((users) =>
-              resolve(
-                results
-                  .map((r, i) => ({ ...r, user: users[i] }))
-                  .filter((r) => r.user),
-              ),
-            ),
-          )
-      }),
-      new Promise((resolve) => {
-        bot.db
-          .all(`SELECT * FROM ${annualTable} ORDER BY points DESC ${limit}`)
-          .then((results) =>
-            Promise.all(
-              results.map((r) => bot.findMember(r.userId)),
-            ).then((users) =>
-              resolve(
-                results
-                  .map((r, i) => ({ ...r, user: users[i] }))
-                  .filter((r) => r.user),
-              ),
-            ),
-          )
-      }),
-    ])
+  const scores = await bot.db.all(
+    `SELECT * FROM scores ORDER BY points DESC ${limit}`,
+  )
+  const annual = await bot.db.all(
+    `SELECT * FROM ${annualTable} ORDER BY points DESC ${limit}`,
+  )
+
+  await bot.guild.members.fetch({
+    user: scores.map((u) => u.userId).concat(annual.map((u) => u.userId)),
   })
+
+  return [
+    scores.map((s) => ({ ...s, user: bot.findMember(s.userId) })),
+    annual.map((s) => ({ ...s, user: bot.findMember(s.userId) })),
+  ]
 }
 
 function ranks(bot, message) {
