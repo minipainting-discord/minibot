@@ -12,6 +12,8 @@ const RANK_DOWN_GIFS = Array.from(
   (_, i) => `images/addpoints/rank-down-${i + 1}.gif`,
 )
 
+const MIN_CNC_POINTS = 10
+
 module.exports = {
   name: "addpoints",
   commands: [
@@ -25,7 +27,7 @@ module.exports = {
   ],
 }
 
-function addpoints(bot, message, ...args) {
+async function addpoints(bot, message, ...args) {
   if (!bot.fromModerator(message)) {
     return
   }
@@ -45,153 +47,183 @@ function addpoints(bot, message, ...args) {
     return
   }
 
-  let new_points = amount
-  let annual_points = annual
-  let current_level = 0
+  let newPoints = amount
+  let annualPoints = annual
+  let currentLevel = 0
 
-  function doAnnual() {
-    bot.db
-      .get(`SELECT * FROM annual WHERE userId ='${user.id}'`)
-      .then((row) => {
-        if (!row) {
-          bot.db
-            .run("INSERT INTO annual (userId, points) VALUES (?, ?)", [
-              user.id,
-              0,
-            ])
-            .catch((err) => {
-              bot.logError(
-                err,
-                "Unknown error inserting new annual score record",
-              )
-            })
-        } else {
-          annual_points += row.points
-        }
-        setPoints(bot, message, user, new_points, current_level, annual_points)
-      })
-      .catch((err) => bot.logError(err, "Unknown error selecting annual score"))
-  }
-
-  function doLifetime() {
-    bot.db
-      .get(`SELECT * FROM scores WHERE userId ='${user.id}'`)
-      .then((row) => {
-        if (!row) {
-          bot.db
-            .run(
-              "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
-              [user.id, 0, 0],
-            )
-            .catch((err) => {
-              bot.logError(
-                err,
-                "Unknown error inserting new lifetime score record",
-              )
-            })
-        } else {
-          current_level = row.level
-          new_points += row.points
-        }
-        doAnnual()
-      })
-      .catch((err) =>
-        bot.logError(err, "Unknown error selecting lifetime score"),
+  async function doLifetime() {
+    try {
+      const row = await bot.db.get(
+        `SELECT * FROM scores WHERE userId = ?`,
+        user.id,
       )
+      if (row) {
+        currentLevel = row.level || 0
+        newPoints += row.points
+      } else {
+        try {
+          await bot.db.run(
+            "INSERT INTO scores (userId, points, level) VALUES (?, ?, ?)",
+            [user.id, 0, 0],
+          )
+        } catch (err) {
+          bot.logError(err, "Unknown error inserting new lifetime score record")
+        }
+      }
+      await doAnnual()
+    } catch (err) {
+      bot.logError(err, "Unknown error selecting lifetime score")
+    }
   }
 
-  doLifetime()
+  async function doAnnual() {
+    try {
+      const row = await bot.db.get(
+        `SELECT * FROM annual WHERE userId = ?`,
+        user.id,
+      )
+      if (row) {
+        annualPoints += row.points
+      } else {
+        try {
+          await bot.db.run(
+            "INSERT INTO annual (userId, points) VALUES (?, ?)",
+            [user.id, 0],
+          )
+        } catch (err) {
+          bot.logError(err, "Unknown error inserting new annual score record")
+        }
+      }
+      try {
+        await setPoints(
+          bot,
+          message,
+          user,
+          newPoints,
+          currentLevel,
+          annualPoints,
+        )
+      } catch (err) {
+        bot.logError(err, "Unable to update points")
+      }
+    } catch (err) {
+      bot.logError(err, "Unknown error selecting annual score")
+    }
+  }
+
+  await doLifetime()
 }
 
-function setPoints(bot, message, user, new_points, current_level, annual_add) {
-  message.guild.members
-    .fetch(user)
-    .then((member) => {
-      let old_rank = bot.ranks.find((r) => r.level === current_level)
-      let new_rank = null
+async function setPoints(
+  bot,
+  message,
+  user,
+  newPoints,
+  currentLevel,
+  annualAdd,
+) {
+  const [member, memberErr] = await maybe(message.guild.members.fetch(user))
+  if (memberErr) {
+    return bot.logError(memberErr, "Unknown error retrieving GuildMember")
+  }
 
-      for (let rank of bot.ranks) {
-        if (new_points >= rank.minPoints) {
-          new_rank = rank
+  const oldRank = bot.ranks.find((r) => r.level === currentLevel)
+  const newRank = bot.ranks
+    .slice()
+    .reverse()
+    .find((r) => newPoints >= r.minPoints)
+
+  let cmd
+
+  if (oldRank != newRank) {
+    if (oldRank) {
+      member.roles.remove(oldRank.role).catch(bot.logError)
+    }
+    if (newRank) {
+      member.roles.add(newRank.role).catch(bot.logError)
+    }
+
+    const { message, gif } = getRankingMessage(bot, newRank, currentLevel)
+    bot.channels.general.send(
+      `${user} ${message}`,
+      new Discord.MessageAttachment(gif),
+    )
+    cmd = [
+      "UPDATE scores SET points = ?, level = ? WHERE userId = ?",
+      newPoints,
+      newRank ? newRank.level : 0,
+      user.id,
+    ]
+  } else {
+    cmd = ["UPDATE scores SET points = ? WHERE userId = ?", newPoints, user.id]
+  }
+
+  if (
+    newPoints >= MIN_CNC_POINTS &&
+    !member.roles.cache.has(bot.roles.cnc.id)
+  ) {
+    member.roles.add(bot.roles.cnc).catch(bot.logError)
+  }
+
+  console.log(
+    `[info] addpoints ${
+      user.username
+    } lifetime=${newPoints} annual=${annualAdd}${
+      newRank ? ` new_rank="${newRank.name}"` : oldRank ? ` new_rank=""` : ""
+    }`,
+  )
+
+  const [, lifetimeErr] = await maybe(bot.db.run(...cmd))
+  if (lifetimeErr) {
+    return bot.logError(lifetimeErr, "Unknown error updating lifetime score")
+  }
+
+  const [, annualErr] = await maybe(
+    bot.db.run(
+      "UPDATE annual SET points = ? WHERE userId = ?",
+      annualAdd,
+      user.id,
+    ),
+  )
+  if (annualErr) {
+    return bot.logError(annualErr, "Unknown error updating annual score")
+  }
+
+  const [newScore, newScoreErr] = await maybe(
+    bot.db.get(
+      "SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId = ?",
+      user.id,
+    ),
+  )
+  if (newScoreErr) {
+    return bot.logError(newScoreErr, "Unknown error selecting updated score")
+  }
+  message.reply(
+    `${user} has ${newScore.s_points} lifetime points and ${newScore.a_points} current points`,
+  )
+}
+
+async function maybe(promise) {
+  try {
+    return [await promise, null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
+function getRankingMessage(bot, newRank, currentLevel) {
+  return newRank
+    ? newRank.level > currentLevel
+      ? {
+          message: `:confetti_ball: Congratulations you reached the **${newRank.role.name}** rank! :confetti_ball:`,
+          gif: bot.utils.randomItem(RANK_UP_GIFS),
         }
+      : {
+          message: `SSKREEEOONK!!! DEMOTED TO **${newRank.role.name}**`,
+          gif: bot.utils.randomItem(RANK_DOWN_GIFS),
+        }
+    : {
+        message: `SKREEEOONK!!! ANNIHILATED`,
+        gif: bot.utils.randomItem(RANK_DOWN_GIFS),
       }
-
-      var cmd
-
-      if (old_rank != new_rank) {
-        if (old_rank) {
-          member.roles.remove(old_rank.role).catch(bot.logError)
-        }
-        if (new_rank || old_rank) {
-          const { message, gif } = new_rank
-            ? new_rank.level > current_level
-              ? {
-                  message: `:confetti_ball: Congratulations you reached **${new_rank.role.name}** rank! :confetti_ball:`,
-                  gif: bot.utils.randomItem(RANK_UP_GIFS),
-                }
-              : {
-                  message: `SSKREEEOONK!!! DEMOTED TO **${new_rank.role.name}**`,
-                  gif: bot.utils.randomItem(RANK_DOWN_GIFS),
-                }
-            : {
-                message: `SKREEEOONK!!! ANNIHILATED`,
-                gif: bot.utils.randomItem(RANK_DOWN_GIFS),
-              }
-          bot.client.channels.cache
-            .get(bot.settings.channels.general)
-            .send(`${user} ${message}`, new Discord.MessageAttachment(gif))
-
-          if (new_rank) {
-            member.roles.add(new_rank.role).catch(bot.logError)
-          }
-        }
-        cmd = `UPDATE scores SET points = ${new_points}, level = ${
-          new_rank ? new_rank.level : 0
-        } WHERE userId = ${user.id}`
-      } else {
-        cmd = `UPDATE scores SET points = ${new_points} WHERE userId = ${user.id}`
-      }
-
-      console.log(
-        `[info] addpoints ${
-          user.username
-        } lifetime=${new_points} annual=${annual_add}${
-          new_rank
-            ? ` new_rank="${new_rank.name}"`
-            : old_rank
-            ? ` new_rank=""`
-            : ""
-        }`,
-      )
-
-      bot.db
-        .run(cmd)
-        .then(() => {
-          bot.db
-            .run(
-              `UPDATE annual SET points = ${annual_add} WHERE userId = ${user.id}`,
-            )
-            .then(() => {
-              bot.db
-                .get(
-                  `SELECT s.points AS s_points, ifnull(a.points, 0) AS a_points FROM scores s LEFT JOIN annual a ON s.userId = a.userId WHERE s.userId ='${user.id}'`,
-                )
-                .then((row) => {
-                  message.reply(
-                    `${user} has ${row.s_points} lifetime points and ${row.a_points} current points`,
-                  )
-                })
-                .catch((err) =>
-                  bot.logError(err, "Unknown error selecting updated score"),
-                )
-            })
-            .catch((err) =>
-              bot.logError(err, "Unknown error updating annual score"),
-            )
-        })
-        .catch((err) =>
-          bot.logError(err, "Unknown error updating lifetime score"),
-        )
-    })
-    .catch((err) => bot.logError(err, "Unknown error retrieving GuildMember"))
 }
