@@ -57,6 +57,7 @@ const bot = {
     } catch (error) {
       console.error("Bot startup failed")
       console.error(error)
+      process.exit(1)
     }
   },
 
@@ -131,7 +132,7 @@ const bot = {
     }
   },
 
-  onReady() {
+  async onReady() {
     const guild = bot.client.guilds.cache.first()
 
     bot.guild = guild
@@ -173,7 +174,7 @@ const bot = {
 
     for (const plugin of bot.plugins) {
       if (plugin.onReady) {
-        plugin.onReady(bot)
+        await plugin.onReady(bot)
       }
     }
   },
