@@ -33,11 +33,19 @@ async function onGuildMemberUpdate(bot, oldMember, newMember) {
 }
 
 async function onPresenceUpdate(bot, oldPresence, newPresence) {
+  if (!newPresence.member) {
+    return
+  }
+
   await updateMember(bot, newPresence.member)
 }
 
 async function onMessage(bot, message) {
-  await updateMember(bot, message.author)
+  if (!message.guild) {
+    return
+  }
+
+  await updateMember(bot, message.member)
 }
 
 async function updateMember(bot, member) {
