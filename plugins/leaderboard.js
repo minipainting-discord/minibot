@@ -69,7 +69,7 @@ async function leaderboard(bot, message) {
           value: [
             "```",
             scores
-              .map((s) => [s.points, s.user.displayName].join(" - "))
+              .map((s) => [s.points, s.userName || "Unknown User"].join(" - "))
               .join("\n"),
             "```",
           ].join("\n"),
@@ -79,7 +79,7 @@ async function leaderboard(bot, message) {
           value: [
             "```",
             annual
-              .map((s) => [s.points, s.user.displayName].join(" - "))
+              .map((s) => [s.points, s.userName || "Unknown User"].join(" - "))
               .join("\n"),
             "```",
           ].join("\n"),
@@ -96,20 +96,42 @@ async function leaderboard(bot, message) {
 async function retrieveScores(bot, all = false, annualTable = "annual") {
   const limit = all ? "" : "LIMIT 10"
   const scores = await bot.db.all(
-    `SELECT * FROM scores ORDER BY points DESC ${limit}`,
+    `SELECT s.*, u.displayName as userName
+     FROM scores s LEFT OUTER JOIN users u ON s.userId = u.userId
+     ORDER BY points DESC ${limit}`,
   )
   const annual = await bot.db.all(
-    `SELECT * FROM ${annualTable} ORDER BY points DESC ${limit}`,
+    `SELECT s.*, u.displayName as userName
+     FROM ${annualTable} s LEFT OUTER JOIN users u ON s.userId = u.userId
+     ORDER BY points DESC ${limit}`,
   )
 
-  await bot.guild.members.fetch({
-    user: scores.map((u) => u.userId).concat(annual.map((u) => u.userId)),
+  const missingUsers = new Set(
+    [...scores, ...annual].filter((e) => !e.userName).map((e) => e.userId),
+  )
+
+  const missing = await bot.guild.members.fetch({
+    user: [...missingUsers],
+    withPresences: false,
   })
 
-  return [
-    scores.map((s) => ({ ...s, user: bot.findMember(s.userId) })),
-    annual.map((s) => ({ ...s, user: bot.findMember(s.userId) })),
-  ]
+  console.log(missing)
+
+  return [scores, annual]
+
+  // const scores = dbScores.map((s) => ({
+  //   ...s,
+  //   user: users.find((u) => u.userId === s.userId),
+  // }))
+  //
+  // const annual = dbAnnual.map((s) => ({
+  //   ...s,
+  //   user: users.find((u) => u.userId === s.userId),
+  // }))
+  //
+  // const missingUsers = [...scores, ...annual].filter(s => !s.user).map(s => s.userId)
+
+  // return [scores, annual]
 }
 
 function ranks(bot, message) {

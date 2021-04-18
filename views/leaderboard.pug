@@ -13,9 +13,9 @@ block content
       table
         tbody
           each score, index in scores
-            tr(data-user-id=score.user.id)
+            tr(data-user-id=score.userId)
               td= score.points
-              td(class=`rank-${score.level}`)= score.user.displayName
+              td(class=`rank-${score.level}`)= score.userName || "Unknown User"
     .col
       h2 Annual Leaderboard
 
@@ -27,9 +27,9 @@ block content
       table
         tbody
           each score, index in annual
-            tr(data-user-id=score.user.id)
+            tr(data-user-id=score.userId)
               td= score.points
-              td(class=`rank-${scores.find(s => s.userId === score.userId).level}`)= score.user.displayName
+              td(class=`rank-${scores.find(s => s.userId === score.userId).level}`)= score.userName || "Unknown User"
 
   section.ranks
     h2 Ranks
