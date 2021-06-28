@@ -185,7 +185,9 @@ async function listRoles(bot, message, showDetails = true) {
     )
   } else {
     message.reply(
-      "No temporary roles. Add one with `!role add ROLE_NAME [DESCRIPTION]`",
+      showDetails
+        ? "No temporary roles. Add one with `!role add ROLE_NAME [DESCRIPTION]`"
+        : "There currently are no roles to join.",
     )
   }
 }
