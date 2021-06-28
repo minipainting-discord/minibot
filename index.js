@@ -184,6 +184,10 @@ const bot = {
   },
 
   fromModerator(message) {
+    if (message.author.id === settings.botMaster) {
+      return true
+    }
+
     const guildMember =
       message.channel.type === "dm"
         ? bot.findMember(message.author.id)
