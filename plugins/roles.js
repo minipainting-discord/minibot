@@ -142,7 +142,9 @@ async function listRoles(bot, message, showDetails = true) {
       ].join("\n"),
     )
   } else {
-    message.reply("No temporary roles. Add one with `!role add ROLE_NAME`")
+    message.reply(
+      "No temporary roles. Add one with `!role add ROLE_NAME [DESCRIPTION]`",
+    )
   }
 }
 
