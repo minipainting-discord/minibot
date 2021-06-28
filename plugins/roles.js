@@ -22,6 +22,7 @@ module.exports = {
         "`!role remove ROLE_NAME`: Remove a temporary role",
         "`!role list`: List temporary roles",
       ],
+      helpMod: true,
       execute: role,
     },
     {
@@ -33,6 +34,10 @@ module.exports = {
 }
 
 async function role(bot, message, ...args) {
+  if (!bot.fromModerator(message)) {
+    return
+  }
+
   const command = args.shift()
 
   switch (command) {
