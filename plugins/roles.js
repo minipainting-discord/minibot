@@ -1,5 +1,4 @@
 const ROLE_USAGE = "`!role add ROLE_NAME | !role remove ROLE_NAME | !role list`"
-const JOIN_USAGE = "`!join ROLE_NAME`"
 
 module.exports = {
   name: "roles",
@@ -9,6 +8,7 @@ module.exports = {
       `CREATE TABLE IF NOT EXISTS managedRoles (
         roleId TEXT PRIMARY KEY,
         name TEXT,
+        description TEXT,
         createdBy TEXT
       )`,
     )
@@ -42,10 +42,10 @@ async function role(bot, message, ...args) {
 
   switch (command) {
     case "add":
-      addRole(bot, message, args[0])
+      addRole(bot, message, ...args)
       break
     case "remove":
-      removeRole(bot, message, args[0])
+      removeRole(bot, message, ...args)
       break
     case "list":
       listRoles(bot, message)
@@ -57,7 +57,7 @@ async function role(bot, message, ...args) {
 
 async function join(bot, message, roleName) {
   if (!roleName) {
-    return message.reply(JOIN_USAGE)
+    return listRoles(bot, message, false)
   }
 
   const managedRole = await bot.db.get(
@@ -75,7 +75,7 @@ async function join(bot, message, roleName) {
   message.reply(`role added!`)
 }
 
-async function addRole(bot, message, roleName) {
+async function addRole(bot, message, roleName, description = "") {
   if (!roleName) {
     return message.reply(ROLE_USAGE)
   }
@@ -89,12 +89,12 @@ async function addRole(bot, message, roleName) {
       name: roleName,
       mentionable: true,
     },
-    reason: `Role created by @${message.author.username}`,
+    reason: `Role created by @${message.author.username}: ${description}`,
   })
 
   await bot.db.run(
-    "INSERT INTO managedRoles (roleId, name, createdBy) VALUES (?, ?, ?)",
-    [newRole.id, newRole.name, message.author.id],
+    "INSERT INTO managedRoles (roleId, name, description, createdBy) VALUES (?, ?, ?, ?)",
+    [newRole.id, newRole.name, description, message.author.id],
   )
 
   message.reply(`Created role <@&${newRole.id}>`)
@@ -126,20 +126,31 @@ async function removeRole(bot, message, roleName) {
   message.reply(`Deleted role ${roleName}`)
 }
 
-async function listRoles(bot, message) {
+async function listRoles(bot, message, showDetails = true) {
   const managedRoles = await bot.db.all("SELECT * FROM managedRoles")
 
   if (managedRoles.length > 0) {
     message.reply(
       [
-        "**TEMPORARY ROLES**",
-        ...managedRoles.map(
-          (role) =>
-            `- <@&${role.roleId}> - added by <@${role.createdBy}> - [${role.roleId}] `,
+        "here are the available roles:",
+        ...managedRoles.map((role) =>
+          showDetails
+            ? `- ${formatRole(role, showDetails)}`
+            : `- ${formatRole(role, showDetails)}`,
         ),
       ].join("\n"),
     )
   } else {
     message.reply("No temporary roles. Add one with `!role add ROLE_NAME`")
   }
+}
+
+function formatRole(role, showDetails = false) {
+  return [
+    `\`${role.name}\``,
+    role.description.length && `(${role.description})`,
+    showDetails && `- added by <@${role.createdBy}>`,
+  ]
+    .filter(Boolean)
+    .join(" ")
 }
