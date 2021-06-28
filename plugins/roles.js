@@ -1,4 +1,5 @@
-const ROLE_USAGE = "`!role add ROLE_NAME | !role remove ROLE_NAME | !role list`"
+const ROLE_USAGE =
+  "`!role add ROLE_NAME [DESCRIPTION] | !role remove ROLE_NAME | !role list`"
 
 module.exports = {
   name: "roles",
@@ -27,7 +28,7 @@ module.exports = {
     },
     {
       keyword: "join",
-      help: "`!join ROLE_NAME`: Give yourself a specific role",
+      help: "`!join [ROLE_NAME]`: Show available roles or give yourself a role",
       execute: join,
     },
   ],
