@@ -30,16 +30,19 @@ module.exports = {
       keyword: "join",
       help: "`!join [ROLE_NAME]`: Show available roles or give yourself a role",
       execute: join,
+      allowAnywhere: true,
     },
     {
       keyword: "leave",
       help: "`!leave [ROLE_NAME]`: Leave an assignable role",
       execute: leave,
+      allowAnywhere: true,
     },
     {
       keyword: "roles",
       help: "`!roles`: List your currently assigned roles",
       execute: roles,
+      allowAnywhere: true,
     },
   ],
 }
