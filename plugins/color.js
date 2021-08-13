@@ -19,7 +19,7 @@ module.exports = {
       ],
       availableInDM: true,
       execute: color,
-      allowIn: [channels.general, channels.vc],
+      allowAnywhere: true,
     },
   ],
 }
