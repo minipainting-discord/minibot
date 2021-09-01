@@ -89,7 +89,7 @@ async function track(bot, message, db, category, count) {
       await reply.delete()
     }, 10 * 1000)
   } catch (err) {
-    console.error(err)
+    bot.logError(err)
   }
 }
 
