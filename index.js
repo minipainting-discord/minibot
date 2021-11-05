@@ -85,7 +85,7 @@ const bot = {
     }
   },
 
-  onMessage(message) {
+  async onMessage(message) {
     // Ignore the bot's own messages
     if (message.author === bot.client.user) {
       return
@@ -126,8 +126,12 @@ const bot = {
         }> ${firstWord} ${args.join(" ")}`,
       )
 
-      command.execute(bot, message, ...args)
-      bot.logCommand(message, command, args)
+      try {
+        await Promise.resolve(command.execute(bot, message, ...args))
+        bot.logCommand(message, command, args)
+      } catch (err) {
+        bot.logError(err, `Error while executing ${command.keyword}`)
+      }
       break
     }
   },
@@ -214,7 +218,11 @@ const bot = {
   },
 
   logError(error, message = "An error occured", ...args) {
-    console.error(`[ERROR] [${new Date().toISOString()}] ${message}`, ...args)
+    console.error(
+      `[ERROR] [${new Date().toISOString()}] ${message}\n`,
+      error,
+      ...args,
+    )
   },
 
   logCommand(message, command, args) {
