@@ -91,7 +91,7 @@ module.exports = {
         message.reply(
           [
             "Great, now please tell me how many total messages have you posted around here?",
-            "You can find this info by searching for your own messages like so http://drop.yapok.org/2019-11-03T11:42:14.png",
+            "You can find this info by searching for your own messages like so https://cdn.discordapp.com/attachments/560362358174646273/906095376921137162/unknown.png",
           ].join("\n"),
         )
         return true
