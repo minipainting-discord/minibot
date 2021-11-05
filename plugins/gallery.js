@@ -90,7 +90,10 @@ function web(app, bot) {
         }
       })
       return res.render("gallery", {
-        user: await bot.findMember(userId),
+        user: {
+          avatarURL: () => "",
+          ...(await bot.findMember(userId)),
+        },
         pictures,
         WEB_ROUTE,
       })

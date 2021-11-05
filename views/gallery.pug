@@ -25,7 +25,7 @@ block content
       ul.users: each user in users
         li: a(href=`${WEB_ROUTE}?user=${user.id}`)
           figure
-            img(src=user.user?.avatarURL(), width=64, height=64)
+            img(src=user.user.avatarURL(), width=64, height=64)
             figcaption= user.displayName
 
     style
