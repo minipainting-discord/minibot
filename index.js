@@ -213,8 +213,8 @@ const bot = {
     console.log(`[${new Date().toISOString()}] ${message}`, ...args)
   },
 
-  logError(error, message = "An error occured") {
-    bot.log(`[ERROR] ${message}`, error)
+  logError(error, message = "An error occured", ...args) {
+    console.error(`[ERROR] [${new Date().toISOString()}] ${message}`, ...args)
   },
 
   logCommand(message, command, args) {

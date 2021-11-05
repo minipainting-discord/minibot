@@ -189,12 +189,12 @@ async function setPoints(
       const dmChannel = await member.createDM()
       await dmChannel.send(CNC_RULES)
     } catch (err) {
-      console.log(err)
+      bot.logError(err)
     }
   }
 
-  console.log(
-    `[info] addpoints ${
+  bot.log(
+    `Updated points for ${
       user.username
     } lifetime=${newPoints} annual=${annualAdd}${
       newRank ? ` new_rank="${newRank.name}"` : oldRank ? ` new_rank=""` : ""

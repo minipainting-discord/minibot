@@ -115,8 +115,6 @@ async function retrieveScores(bot, all = false, annualTable = "annual") {
     withPresences: false,
   })
 
-  console.log(missing)
-
   return [scores, annual]
 
   // const scores = dbScores.map((s) => ({
