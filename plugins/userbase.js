@@ -11,41 +11,61 @@ module.exports = {
   },
 
   async onReady(bot) {
-    bot.client.on("guildMemberAdd", (member) => onGuildMemberAdd(bot, member))
-    bot.client.on("guildMemberUpdate", (oldMember, newMember) =>
-      onGuildMemberUpdate(bot, oldMember, newMember),
-    )
-    bot.client.on("presenceUpdate", (oldPresence, newPresence) =>
-      onPresenceUpdate(bot, oldPresence, newPresence),
-    )
-    bot.client.on("message", (member) => onMessage(bot, member))
+    async function onGuildMemberAdd(member) {
+      try {
+        await updateMember(bot, member)
+      } catch (err) {
+        bot.logError(
+          err,
+          "Unable to update member from guild member add",
+          member,
+        )
+      }
+    }
+
+    async function onGuildMemberUpdate(oldMember, newMember) {
+      try {
+        await updateMember(bot, newMember)
+      } catch (err) {
+        bot.logError(
+          err,
+          "Unable to update member from guild member update",
+          newMember,
+        )
+      }
+    }
+
+    async function onPresenceUpdate(oldPresence, newPresence) {
+      if (!newPresence.member) {
+        return
+      }
+
+      try {
+        await updateMember(bot, newPresence.member)
+      } catch (err) {
+        bot.logError(err, "Unable to update member from presence", newPresence)
+      }
+    }
+
+    async function onMessage(message) {
+      if (!message.guild) {
+        return
+      }
+
+      try {
+        await updateMember(bot, message.member)
+      } catch (err) {
+        bot.logError(err, "Unable to update member from message", message)
+      }
+    }
+
+    bot.client.on("guildMemberAdd", onGuildMemberAdd)
+    bot.client.on("guildMemberUpdate", onGuildMemberUpdate)
+    bot.client.on("presenceUpdate", onPresenceUpdate)
+    bot.client.on("message", onMessage)
 
     await updateMembers(bot, bot.guild.members.cache.array())
   },
-}
-
-async function onGuildMemberAdd(bot, member) {
-  await updateMember(bot, member)
-}
-
-async function onGuildMemberUpdate(bot, oldMember, newMember) {
-  await updateMember(bot, newMember)
-}
-
-async function onPresenceUpdate(bot, oldPresence, newPresence) {
-  if (!newPresence.member) {
-    return
-  }
-
-  await updateMember(bot, newPresence.member)
-}
-
-async function onMessage(bot, message) {
-  if (!message.guild) {
-    return
-  }
-
-  await updateMember(bot, message.member)
 }
 
 async function updateMember(bot, member) {
