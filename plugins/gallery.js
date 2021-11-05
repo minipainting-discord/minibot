@@ -105,7 +105,12 @@ function web(app, bot) {
 
     const users = sortBy(
       await Promise.all(
-        postingUsers.map(async (user) => await bot.findMember(user.userId)),
+        postingUsers.map(async (user) => ({
+          user: {
+            avatarURL: () => "",
+          },
+          ...(await bot.findMember(user.userId)),
+        })),
       ),
       ["displayName"],
     ).filter(Boolean)
