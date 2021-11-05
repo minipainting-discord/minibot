@@ -231,7 +231,7 @@ function santaList(bot, message) {
       }
 
       const longestNameLength = results
-        .map((r) => [...r.member.displayName].length)
+        .map((r) => r.member?.displayName?.length || 0)
         .sort((a, b) => b - a)
         .shift()
 
@@ -365,9 +365,9 @@ async function santaStatus(bot, message) {
   )
 
   message.reply(
-    `There are currently ${
-      pendingLetters.size
-    } letters being written. (${users.map((u) => u.displayName).join(", ")})`,
+    `There are currently ${pendingLetters.size} letters being written. (${users
+      .map((u) => u.displayName)
+      .join(", ")})`,
   )
 }
 
