@@ -212,50 +212,48 @@ function santa(bot, message, command) {
   }
 }
 
-function santaList(bot, message) {
-  bot.db
-    .all(
-      `SELECT userId, region, tier, matchWith FROM secretSanta ORDER BY region, tier DESC`,
+async function santaList(bot, message) {
+  const results = await bot.db.all(
+    `SELECT userId, region, tier, matchWith FROM secretSanta ORDER BY region, tier DESC`,
+  )
+  const list = await Promise.all(
+    results.map(async (r) => ({
+      ...r,
+      member: await bot.findMember(r.userId),
+      match: await bot.findMember(r.matchWith),
+    })),
+  )
+
+  if (!list.length) {
+    message.reply(":shrug:")
+    return
+  }
+
+  const longestNameLength = list
+    .map((r) => r.member?.displayName?.length || 0)
+    .sort((a, b) => b - a)
+    .shift()
+
+  const volunteerList = list
+    .map(
+      (r) =>
+        `${r.tier.padEnd(7, " ")} | ${r.region.padEnd(
+          4,
+          " ",
+        )} | ${r.member?.displayName?.padEnd(longestNameLength, " ")}${
+          r.match ? ` 🎁 by ${r.match.displayName}` : ""
+        }`,
     )
-    .then((results) =>
-      results.map((r) => ({
-        ...r,
-        member: bot.findMember(r.userId),
-        match: bot.findMember(r.matchWith),
-      })),
-    )
-    .then((results) => {
-      if (!results.length) {
-        message.reply(":shrug:")
-        return
-      }
+    .join("\n")
 
-      const longestNameLength = results
-        .map((r) => r.member?.displayName?.length || 0)
-        .sort((a, b) => b - a)
-        .shift()
-
-      const volunteerList = results
-        .map(
-          (r) =>
-            `${r.tier.padEnd(7, " ")} | ${r.region.padEnd(
-              4,
-              " ",
-            )} | ${r.member.displayName.padEnd(longestNameLength, " ")}${
-              r.match ? ` 🎁 by ${r.match.displayName}` : ""
-            }`,
-        )
-        .join("\n")
-
-      message.reply(
-        [
-          "\n>>> ```",
-          volunteerList,
-          "```",
-          `See full Secret Santa info at ${bot.settings.serverUrl + WEB_ROUTE}`,
-        ].join("\n"),
-      )
-    })
+  await message.reply(
+    [
+      "\n>>> ```",
+      volunteerList,
+      "```",
+      `See full Secret Santa info at ${bot.settings.serverUrl + WEB_ROUTE}`,
+    ].join("\n"),
+  )
 }
 
 async function santaMatch(bot, message) {
@@ -319,8 +317,8 @@ async function santaSend(bot, message) {
   }
 
   for (const letter of letters) {
-    const user = bot.findMember(letter.userId)
-    const match = bot.findMember(letter.matchWith)
+    const user = await bot.findMember(letter.userId)
+    const match = await bot.findMember(letter.matchWith)
     const { letter: content, address } = letter
 
     match.user.createDM().then((dmChannel) => {
@@ -380,7 +378,10 @@ function santaHandler(bot) {
       .then(async (results) => {
         const guildMembers = new Map(
           await Promise.all(
-            results.map((r) => [r.userId, bot.findMember(r.userId)]),
+            results.map(async (r) => [
+              r.userId,
+              await bot.findMember(r.userId),
+            ]),
           ),
         )
 

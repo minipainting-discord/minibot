@@ -183,18 +183,26 @@ const bot = {
     }
   },
 
-  findMember(id) {
-    return bot.guild.members.cache.find((u) => u.id === id)
+  async findMember(id) {
+    const fromGuildCache = bot.guild.members.cache.find((u) => u.id === id)
+
+    return (
+      fromGuildCache ??
+      (await bot.db.get(
+        "SELECT userId as id, displayName FROM users WHERE userId = ?",
+        id,
+      ))
+    )
   },
 
-  fromModerator(message) {
+  async fromModerator(message) {
     if (message.author.id === settings.botMaster) {
       return true
     }
 
     const guildMember =
       message.channel.type === "dm"
-        ? bot.findMember(message.author.id)
+        ? await bot.findMember(message.author.id)
         : message.member
 
     if (!guildMember) {

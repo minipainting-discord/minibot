@@ -90,7 +90,7 @@ function web(app, bot) {
         }
       })
       return res.render("gallery", {
-        user: bot.findMember(userId),
+        user: await bot.findMember(userId),
         pictures,
         WEB_ROUTE,
       })
@@ -101,7 +101,9 @@ function web(app, bot) {
     )
 
     const users = sortBy(
-      postingUsers.map((user) => bot.findMember(user.userId)),
+      await Promise.all(
+        postingUsers.map(async (user) => await bot.findMember(user.userId)),
+      ),
       ["displayName"],
     ).filter(Boolean)
 

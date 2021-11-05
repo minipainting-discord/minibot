@@ -90,39 +90,37 @@ function reset(bot, message) {
 }
 
 function auditHandler(bot) {
-  return (req, res) => {
+  return async (req, res) => {
     bot.log(`WEB ${WEB_ROUTE}`)
 
-    bot.db
-      .all("SELECT * FROM log ORDER BY date DESC")
-      .then((results) =>
-        Promise.all(
-          results.map((r) => ({
-            ...r,
-            user: (() => {
-              const member = bot.findMember(r.userId)
-              return member ? member.displayName : `deleted user (${r.userId})`
-            })(),
-            message: [
-              r.command,
-              ...JSON.parse(r.arguments).map((arg) =>
-                arg
-                  .replace(/^<@(\d+)>/, (_, id) => {
-                    const member = bot.findMember(id)
-                    return `<mark>@${member ? member.displayName : id}</mark>`
-                  })
-                  .replace(/^<#(\d+)>/, (_, id) => {
-                    const channel = bot.guild.channels.cache.find(
-                      (c) => c.id === id,
-                    )
-                    return `<mark>#${channel ? channel.name : id}</mark>`
-                  }),
-              ),
-            ].join(" "),
-            channel: bot.client.channels.cache.find((c) => c.id === r.location),
-          })),
-        ),
-      )
-      .then((log) => res.render("audit", { log }))
+    const results = await bot.db.all("SELECT * FROM log ORDER BY date DESC")
+    const log = await Promise.all(
+      results.map(async (r) => ({
+        ...r,
+        user: await (async () => {
+          const member = await bot.findMember(r.userId)
+          return member ? member.displayName : `deleted user (${r.userId})`
+        })(),
+        message: [
+          r.command,
+          ...JSON.parse(r.arguments).map((arg) =>
+            arg
+              .replace(/^<@(\d+)>/, (_, id) => {
+                const member = bot.findMember(id)
+                return `<mark>@${member ? member.displayName : id}</mark>`
+              })
+              .replace(/^<#(\d+)>/, (_, id) => {
+                const channel = bot.guild.channels.cache.find(
+                  (c) => c.id === id,
+                )
+                return `<mark>#${channel ? channel.name : id}</mark>`
+              }),
+          ),
+        ].join(" "),
+        channel: bot.client.channels.cache.find((c) => c.id === r.location),
+      })),
+    )
+
+    res.render("audit", { log })
   }
 }
