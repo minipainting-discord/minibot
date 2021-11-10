@@ -4,33 +4,17 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "bufferutil": "^4.0.3",
-    "canvas": "^2.8.0",
-    "dice-expression-evaluator": "^0.1.2",
-    "discord.js": "^12.5.3",
-    "express": "^4.17.1",
-    "express-basic-auth": "^1.2.0",
-    "friendly-node-cron": "^1.4.1",
-    "jpeg-autorotate": "^7.1.1",
-    "jstransformer-cdata-js": "^1.0.0",
-    "lodash": "^4.17.21",
-    "node-cron": "^3.0.0",
-    "probe-image-size": "^7.2.1",
-    "pug": "^3.0.2",
-    "resize-img": "^2.0.0",
-    "shellwords": "^0.1.1",
-    "sql-template-strings": "^2.2.2",
-    "sqlite": "^4.0.23",
-    "sqlite3": "^5.0.2",
-    "utf-8-validate": "^5.0.5",
+    "bufferutil": "^4.0.5",
+    "discord.js": "^13.3.1",
+    "utf-8-validate": "^5.0.7",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "eslint": "^7.29.0",
+    "eslint": "^8.2.0",
     "husky": "^4.3.8",
-    "lint-staged": "^11.0.0",
-    "nodemon": "^2.0.9",
-    "prettier": "^2.3.2"
+    "lint-staged": "^11.2.6",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.4.1"
   },
   "repository": {
     "type": "git",
@@ -53,9 +37,7 @@
     ]
   },
   "prettier": {
-    "semi": false,
-    "trailingComma": "all",
-    "bracketSpacing": true
+    "semi": false
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
