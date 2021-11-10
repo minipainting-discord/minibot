@@ -1,11 +1,19 @@
 {
   "name": "minibot",
-  "version": "1.0.0",
+  "type": "module",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
+  "scripts": {
+    "start": "dotenv -- node index.js",
+    "dev": "dotenv -- nodemon index.js"
+  },
   "dependencies": {
     "bufferutil": "^4.0.5",
+    "chalk": "^4.1.2",
+    "dicebag": "^0.1.2",
     "discord.js": "^13.3.1",
+    "dotenv-cli": "^4.1.0",
     "utf-8-validate": "^5.0.7",
     "zlib-sync": "^0.1.7"
   },
@@ -42,11 +50,13 @@
   "eslintConfig": {
     "extends": "eslint:recommended",
     "env": {
+      "browser": true,
       "node": true,
-      "es6": true
+      "es2021": true
     },
     "parserOptions": {
-      "ecmaVersion": "2018"
+      "ecmaVersion": 13,
+      "sourceType": "module"
     }
   }
 }
