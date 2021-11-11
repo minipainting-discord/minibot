@@ -258,9 +258,9 @@ async function santaList(bot, message) {
 
 async function santaMatch(bot, message) {
   const letters = await bot.db.all(`SELECT * FROM secretSanta`)
-  letters.forEach((l) => {
-    l.user = bot.findMember(l.userId)
-  })
+  for (const letter of letters) {
+    letter.user = await bot.findMember(letter.userId)
+  }
 
   const groups = {
     naughty: { NA: [], EU: [], ANY: [] },
