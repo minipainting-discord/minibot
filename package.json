@@ -9,6 +9,7 @@
     "dev": "dotenv -- nodemon index.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^1.27.0",
     "bufferutil": "^4.0.5",
     "chalk": "^4.1.2",
     "dicebag": "^0.1.2",
