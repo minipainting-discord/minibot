@@ -188,10 +188,7 @@ const bot = {
 
     return (
       fromGuildCache ??
-      (await bot.db.get(
-        "SELECT userId as id, displayName FROM users WHERE userId = ?",
-        id,
-      ))
+      await bot.guild.members.fetch(id)
     )
   },
 
