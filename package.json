@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "start": "dotenv -- node index.js",
-    "dev": "dotenv -- nodemon index.js"
+    "dev": "dotenv -- nodemon index.js",
+    "console": "dotenv -- node console.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.27.0",
