@@ -29,5 +29,8 @@ async function sayDailyWord(bot) {
     dayOfMonth,
   )
 
-  await bot.channels.advent.send(`${bot.roles.advent} today's word is ${word}`)
+  await bot.channels.advent.send(
+    `:calendar_spiral: Howdy ${bot.roles.advent}! Today's word is: **${word}**`,
+  )
+  bot.log("[advent] Sent daily word")
 }
