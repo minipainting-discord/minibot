@@ -12,7 +12,9 @@ module.exports = {
         PRIMARY KEY (day)
       )`,
     )
+  },
 
+  onReady: async (bot) => {
     cron.schedule(
       parseSchedule("every day at 00:00 from 1 through 24 of december"),
       () => sayDailyWord(bot),
