@@ -16,7 +16,7 @@ module.exports = {
 
   onReady: async (bot) => {
     cron.schedule(
-      parseSchedule("every day at 00:00 from 1 through 24 of december"),
+      parseSchedule("every day at 01:00 from 1 through 24 of december"),
       () => sayDailyWord(bot),
     )
   },
