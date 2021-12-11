@@ -24,7 +24,8 @@
     "husky": "^4.3.8",
     "lint-staged": "^11.2.6",
     "nodemon": "^2.0.15",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "uvu": "^0.5.2"
   },
   "repository": {
     "type": "git",
