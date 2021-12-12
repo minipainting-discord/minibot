@@ -1,21 +1,27 @@
+import { Collection } from "discord.js"
 import EventEmitter from "events"
-import { Client, Collection, Intents } from "discord.js"
 
-import { createSupabase } from "./supabase.js"
-import { registerCommands } from "./commands/index.js"
-import { registerEvents } from "./events/index.js"
-import logger from "./logger.js"
+import { importDirectory } from "./utils.js"
 
-const { DISCORD_API_TOKEN } = process.env
-const BOT_INTENTS = [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+const AVAILABILITY = {
+  PUBLIC: "public",
+  MOD: "mod",
+  ADMIN: "admin",
+}
 
-export function createBot() {
+const EVENT = {
+  PLAYER_SCORE_UPDATE: "player-score-update",
+}
+
+export default function createBot({ discord, db, logger }) {
   const bot = {
+    EVENT,
+    AVAILABILITY,
+    discord,
+    db,
     logger,
     channels: {},
     commands: new Collection(),
-    db: createSupabase(),
-    discord: new Client({ intents: BOT_INTENTS }),
     events: new EventEmitter(),
     guild: null,
     ranks: [],
@@ -24,7 +30,6 @@ export function createBot() {
     isBotMaster,
     isAdmin,
     isModerator,
-    PermissionError: class PermissionError extends Error {},
   }
 
   async function onReady() {
@@ -42,7 +47,7 @@ export function createBot() {
       await registerNamedChannels(bot)
       await registerNamedRoles(bot)
       await registerCommands(bot)
-      await registerEvents(bot)
+      await registerWorkflows(bot)
     } catch (error) {
       bot.logger.fatal(error)
     }
@@ -62,43 +67,16 @@ export function createBot() {
   }
 
   function isModerator(guildMember) {
-    return (
-      isBotMaster(guildMember) ||
-      [bot.roles.admin, bot.roles.mod].some((role) =>
-        guildMember.roles.cache.has(role.id)
-      )
-    )
+    return isAdmin(guildMember) || guildMember.roles.cache.has(bot.roles.mod.id)
   }
 
   return {
-    async start() {
-      const { data: settings } = await bot.db.from("settings").select().single()
+    async setup() {
+      const { data: settings } = await db.from("settings").select().single()
       bot.settings = settings
 
-      bot.discord.once("ready", onReady)
-
-      bot.discord.login(DISCORD_API_TOKEN)
+      discord.once("ready", onReady)
     },
-  }
-}
-
-async function registerNamedChannels(bot) {
-  bot.logger.info("Registering named channels...")
-  const { data: namedChannels } = await bot.db.from("namedChannels").select()
-
-  for (const namedChannel of namedChannels) {
-    const channel = await bot.guild.channels.fetch(namedChannel.channelId)
-    bot.channels[namedChannel.shortName] = channel
-  }
-}
-
-async function registerNamedRoles(bot) {
-  bot.logger.info("Registering named roles...")
-  const { data: namedRoles } = await bot.db.from("namedRoles").select()
-
-  for (const namedRole of namedRoles) {
-    const role = await bot.guild.roles.fetch(namedRole.roleId)
-    bot.roles[namedRole.shortName] = role
   }
 }
 
@@ -140,4 +118,57 @@ async function syncRanks(bot) {
   }
 
   bot.ranks = ranks
+}
+
+async function registerNamedChannels(bot) {
+  bot.logger.info("Registering named channels...")
+  const { data: namedChannels } = await bot.db.from("namedChannels").select()
+
+  for (const namedChannel of namedChannels) {
+    const channel = await bot.guild.channels.fetch(namedChannel.channelId)
+    bot.channels[namedChannel.shortName] = channel
+  }
+}
+
+async function registerNamedRoles(bot) {
+  bot.logger.info("Registering named roles...")
+  const { data: namedRoles } = await bot.db.from("namedRoles").select()
+
+  for (const namedRole of namedRoles) {
+    const role = await bot.guild.roles.fetch(namedRole.roleId)
+    bot.roles[namedRole.shortName] = role
+  }
+}
+
+async function registerCommands(bot) {
+  bot.logger.info("Registering commands...")
+
+  const commandList = await importDirectory("commands", bot.logger)
+
+  for (const registerCommand of commandList) {
+    try {
+      const command = await registerCommand(bot)
+      bot.commands.set(command.name, command)
+    } catch (error) {
+      bot.logger.fatal(registerCommand.name, error)
+    }
+  }
+
+  bot.logger.info(
+    `Enabled commands: ${commandList.map((c) => c.name).join(", ")}`
+  )
+}
+
+async function registerWorkflows(bot) {
+  bot.logger.info("Registering workflows...")
+
+  const workflowList = await importDirectory("workflows", bot.logger)
+
+  for (const registerWorkflow of workflowList) {
+    try {
+      await registerWorkflow(bot)
+    } catch (error) {
+      bot.logger.fatal(registerWorkflow.name, error)
+    }
+  }
 }

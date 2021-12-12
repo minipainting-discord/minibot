@@ -1,58 +1,58 @@
 import { getManagedRoleFromOptions } from "../helpers/roles.js"
 import { createEmbed } from "../utils.js"
 
-import { Permission } from "./index.js"
+export default function role(bot) {
+  return {
+    name: "role",
+    description: "Manage your assignable roles",
+    availability: bot.AVAILABILITY.PUBLIC,
+    options: [
+      {
+        name: "list",
+        description: "List your current roles and assignable ones",
+        type: "SUB_COMMAND",
+      },
+      {
+        name: "join",
+        description: "List your current roles and assignable ones",
+        type: "SUB_COMMAND",
+        options: [
+          {
+            name: "role",
+            description: "The role to join",
+            type: "ROLE",
+            required: true,
+          },
+        ],
+      },
+      {
+        name: "leave",
+        description: "List your current roles and assignable ones",
+        type: "SUB_COMMAND",
+        options: [
+          {
+            name: "role",
+            description: "The role to leave",
+            type: "ROLE",
+            required: true,
+          },
+        ],
+      },
+    ],
 
-export default {
-  name: "role",
-  description: "Manage your assignable roles",
-  permissions: [Permission.PUBLIC],
-  options: [
-    {
-      name: "list",
-      description: "List your current roles and assignable ones",
-      type: "SUB_COMMAND",
-    },
-    {
-      name: "join",
-      description: "List your current roles and assignable ones",
-      type: "SUB_COMMAND",
-      options: [
-        {
-          name: "role",
-          description: "The role to join",
-          type: "ROLE",
-          required: true,
-        },
-      ],
-    },
-    {
-      name: "leave",
-      description: "List your current roles and assignable ones",
-      type: "SUB_COMMAND",
-      options: [
-        {
-          name: "role",
-          description: "The role to leave",
-          type: "ROLE",
-          required: true,
-        },
-      ],
-    },
-  ],
+    async execute(interaction) {
+      const command = interaction.options.getSubcommand()
 
-  async execute(interaction, bot) {
-    const command = interaction.options.getSubcommand()
-
-    switch (command) {
-      case "list":
-        return listRoles(interaction, bot)
-      case "join":
-        return joinRole(interaction, bot)
-      case "leave":
-        return leaveRole(interaction, bot)
-    }
-  },
+      switch (command) {
+        case "list":
+          return listRoles(interaction, bot)
+        case "join":
+          return joinRole(interaction, bot)
+        case "leave":
+          return leaveRole(interaction, bot)
+      }
+    },
+  }
 }
 
 /**
