@@ -46,7 +46,7 @@ export default function addpoints(bot) {
       }
 
       interaction.reply(
-        `${user} now has ${newScore.current} current points and ${newScore.lifetime} lifetime points`
+        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`
       )
 
       bot.events.emit(bot.EVENT.PLAYER_SCORE_UPDATE, { ...newScore, user })
