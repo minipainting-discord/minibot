@@ -1,7 +1,7 @@
 export default function say(bot) {
   return {
     name: "say",
-    description: "Make the bot say something",
+    description: "🔓 Make the bot say something",
     availability: bot.AVAILABILITY.MOD,
     options: [
       {

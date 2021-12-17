@@ -8,7 +8,7 @@ export default function roleAdmin(bot) {
     options: [
       {
         name: "create",
-        description: "Create a new assignable role [MOD ONLY]",
+        description: "🔓 Create a new assignable role",
         type: "SUB_COMMAND",
         options: [
           {
@@ -27,7 +27,7 @@ export default function roleAdmin(bot) {
       },
       {
         name: "remove",
-        description: "Remove an assignable role [MOD ONLY]",
+        description: "🔓 Remove an assignable role",
         type: "SUB_COMMAND",
         options: [
           {

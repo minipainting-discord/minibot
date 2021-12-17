@@ -4,7 +4,7 @@ import { getCurrentYear } from "../utils.js"
 export default function addpoints(bot) {
   return {
     name: "addpoints",
-    description: "Add points to an user",
+    description: "🔓 Add points to an user",
     availability: bot.AVAILABILITY.MOD,
     options: [
       {

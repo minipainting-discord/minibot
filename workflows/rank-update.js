@@ -11,38 +11,40 @@ export default async function rankUpdate(bot) {
     .from("images")
     .list("rank-down")
 
-  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, async ({ user, lifetime }) => {
-    const member = await bot.guild.members.fetch(user)
-    const currentRank = bot.ranks.find((rank) =>
-      member.roles.cache.has(rank.roleId)
-    )
-    const nextRank = [...bot.ranks]
-      .reverse()
-      .find((rank) => lifetime >= rank.minPoints)
+  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, ({ user, lifetime }) => {
+    setImmediate(async () => {
+      const member = await bot.guild.members.fetch(user)
+      const currentRank = bot.ranks.find((rank) =>
+        member.roles.cache.has(rank.roleId)
+      )
+      const nextRank = [...bot.ranks]
+        .reverse()
+        .find((rank) => lifetime >= rank.minPoints)
 
-    if (currentRank === nextRank) {
-      return
-    }
+      if (currentRank === nextRank) {
+        return
+      }
 
-    if (currentRank) {
-      await member.roles.remove(currentRank.role)
-    }
+      if (currentRank) {
+        await member.roles.remove(currentRank.role)
+      }
 
-    if (nextRank) {
-      await member.roles.add(nextRank.role)
-    }
+      if (nextRank) {
+        await member.roles.add(nextRank.role)
+      }
 
-    const { message, gifUrl } = await getRankingMessage(currentRank, nextRank)
+      const { message, gifUrl } = await getRankingMessage(currentRank, nextRank)
 
-    bot.logger.info(
-      `[rank-update] ${member.displayName} ${member} ${
-        currentRank?.name || "No rank"
-      } -> ${nextRank?.name || "No rank"}`
-    )
+      bot.logger.info(
+        `[rank-update] ${member.displayName} ${member} ${
+          currentRank?.name || "No rank"
+        } -> ${nextRank?.name || "No rank"}`
+      )
 
-    await bot.channels.general.send({
-      content: `${member} ${message}`,
-      files: [gifUrl],
+      await bot.channels.general.send({
+        content: `${member} ${message}`,
+        files: [gifUrl],
+      })
     })
   })
 
