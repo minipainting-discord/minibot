@@ -45,5 +45,5 @@ export default function createLogger() {
 }
 
 function timestamp() {
-  return `[${new Date().toISOString()}]`
+  return `[${new Date().toISOString().slice(0, -1)}]`
 }
