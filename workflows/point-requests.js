@@ -110,7 +110,7 @@ async function startPointRequestWatcher(
   const messageCollector = requestMessage.thread.createMessageCollector({
     filter: async (message) => {
       const guildMember = await bot.guild.members.fetch(message.author)
-      return bot.isModerator(guildMember) && message.content.match(/^\d+$/)
+      return bot.isModerator(guildMember) && message.content.match(/^-?\d+$/)
     },
   })
   const buttonCollector = actionMessage.createMessageComponentCollector({
@@ -121,7 +121,7 @@ async function startPointRequestWatcher(
   await requestMessage.react("👀")
 
   async function resolveRequest(points) {
-    if (points > 0) {
+    if (points !== 0) {
       const newScore = await addPoints(bot, user, points)
 
       await requestMessage.thread.send(
