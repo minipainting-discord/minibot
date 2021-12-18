@@ -1,5 +1,4 @@
-import { getCurrentScore, getLifetimeScore } from "../helpers/points.js"
-import { getCurrentYear } from "../utils.js"
+import { addPoints } from "../helpers/points.js"
 
 export default function addpoints(bot) {
   return {
@@ -25,30 +24,17 @@ export default function addpoints(bot) {
       const user = interaction.options.getUser("user")
       const points = interaction.options.getInteger("points")
 
-      const userId = user.id
-      const year = getCurrentYear()
+      const newScore = await addPoints(bot, user, points)
 
-      const currentScore = await getCurrentScore(bot, user)
-      const lifetimeScore = await getLifetimeScore(bot, user)
-
-      const newScore = {
-        current: (currentScore?.points || 0) + points,
-        lifetime: (lifetimeScore?.points || 0) + points,
-      }
-
-      if (currentScore) {
-        await bot.db
-          .from("leaderboard")
-          .update({ points: newScore.current })
-          .match({ userId, year })
-      } else {
-        await bot.db.from("leaderboard").insert({ userId, year, points })
+      if (!newScore) {
+        return interaction.reply(
+          `💥 Error while adding points (I'm warning <@${bot.settings.botMasterId}>)`
+        )
       }
 
       interaction.reply(
         `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`
       )
-
       bot.events.emit(bot.EVENT.PLAYER_SCORE_UPDATE, { ...newScore, user })
     },
   }
