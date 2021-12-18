@@ -68,7 +68,8 @@ async function handleThreadUpdate(bot, oldThread, newThread) {
 
   if (oldThread.archived && !newThread.archived) {
     bot.logger.info(
-      `[workflows/point-requests] Reopening point request ${pointRequest.id}`
+      "workflow/point-requests",
+      `Reopening point request ${pointRequest.id}`
     )
     await newThread.send("Point request reopened!")
     await updatePointRequest(bot, pointRequest, { cleared: false })
@@ -82,7 +83,8 @@ async function resumePendingRequests(bot) {
 
   if (pendingCount) {
     bot.logger.info(
-      `[workflows/point-requests] Resuming tracking for ${pendingCount} point ${pluralize(
+      "workflow/point-requests",
+      `Resuming tracking for ${pendingCount} point ${pluralize(
         "request",
         pendingCount
       )}`
@@ -138,7 +140,8 @@ async function startPointRequestWatcher(
     messageCollector.stop()
     buttonCollector.stop()
     bot.logger.info(
-      `[workflows/point-requests] Closed point request ${pointRequest.id}`
+      "workflow/point-requests",
+      `Closed point request ${pointRequest.id}`
     )
   }
 

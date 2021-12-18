@@ -33,7 +33,7 @@ export default function createBot({ discord, db, logger }) {
   }
 
   async function onReady() {
-    bot.logger.info("🤖 Logged in to Discord")
+    bot.logger.info("core", "🤖 Logged in to Discord")
     const { application } = bot.discord
 
     if (!application?.owner) {
@@ -50,10 +50,10 @@ export default function createBot({ discord, db, logger }) {
       await registerCommands(bot)
       await registerWorkflows(bot)
     } catch (error) {
-      bot.logger.fatal(error)
+      bot.logger.fatal("core", error)
     }
 
-    bot.logger.info("🔥 I'm ready!")
+    bot.logger.info("core", "🔥 I'm ready!")
   }
 
   function isBotMaster(guildMember) {
@@ -82,7 +82,7 @@ export default function createBot({ discord, db, logger }) {
 }
 
 async function syncRanks(bot) {
-  bot.logger.info("Syncing ranks...")
+  bot.logger.info("core", "Syncing ranks...")
   // TODO: The synchronization logic is very basic, it should be a bit smarter
   // and ran at frequent intervals
   const { data: ranks } = await bot.db
@@ -103,7 +103,7 @@ async function syncRanks(bot) {
       const existingRole = allRoles.find((role) => role.name === rank.name)
 
       if (!existingRole) {
-        bot.logger.warn(`Missing role for rank ${rank.name}`)
+        bot.logger.warn("core", `Missing role for rank ${rank.name}`)
         continue
       }
 
@@ -114,7 +114,10 @@ async function syncRanks(bot) {
 
       rank.role = existingRole
 
-      bot.logger.info(`Matched rank ${rank.name} to role ${existingRole.id}`)
+      bot.logger.info(
+        "core",
+        `Matched rank ${rank.name} to role ${existingRole.id}`
+      )
     }
   }
 
@@ -129,7 +132,7 @@ async function syncEmojis(bot) {
 }
 
 async function registerNamedChannels(bot) {
-  bot.logger.info("Registering named channels...")
+  bot.logger.info("core", "Registering named channels...")
   const { data: namedChannels } = await bot.db.from("namedChannels").select()
 
   for (const namedChannel of namedChannels) {
@@ -139,7 +142,7 @@ async function registerNamedChannels(bot) {
 }
 
 async function registerNamedRoles(bot) {
-  bot.logger.info("Registering named roles...")
+  bot.logger.info("core", "Registering named roles...")
   const { data: namedRoles } = await bot.db.from("namedRoles").select()
 
   for (const namedRole of namedRoles) {
@@ -149,7 +152,7 @@ async function registerNamedRoles(bot) {
 }
 
 async function registerCommands(bot) {
-  bot.logger.info("Registering commands...")
+  bot.logger.info("core", "Registering commands...")
 
   const commandList = await importDirectory("commands", bot.logger)
 
@@ -158,17 +161,18 @@ async function registerCommands(bot) {
       const command = await registerCommand(bot)
       bot.commands.set(command.name, command)
     } catch (error) {
-      bot.logger.fatal(registerCommand.name, error)
+      bot.logger.fatal("core", registerCommand.name, error)
     }
   }
 
   bot.logger.info(
+    "core",
     `Enabled commands: ${commandList.map((c) => c.name).join(", ")}`
   )
 }
 
 async function registerWorkflows(bot) {
-  bot.logger.info("Registering workflows...")
+  bot.logger.info("core", "Registering workflows...")
 
   const workflowList = await importDirectory("workflows", bot.logger)
 
@@ -176,7 +180,7 @@ async function registerWorkflows(bot) {
     try {
       await registerWorkflow(bot)
     } catch (error) {
-      bot.logger.fatal(registerWorkflow.name, error)
+      bot.logger.fatal("core", registerWorkflow.name, error)
     }
   }
 }

@@ -22,6 +22,7 @@ export async function importDirectory(directory, logger) {
 
         if (!module.default) {
           logger.warn(
+            "utils",
             `Ignoring module without default export at ${moduleToLoad}`
           )
           return null
@@ -33,7 +34,7 @@ export async function importDirectory(directory, logger) {
 
     return modules.filter((m) => m !== null)
   } catch (error) {
-    logger.fatal(error)
+    logger.fatal("utils", `Unable to import directory ${directory}`, error)
     throw error
   }
 }

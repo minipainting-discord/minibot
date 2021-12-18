@@ -2,39 +2,34 @@ import chalk from "chalk"
 
 export default function createLogger() {
   const logger = {
-    info(message, ...args) {
-      console.log(chalk`{gray ${timestamp()}} {blue info} ${message}`, ...args)
-    },
-
-    debug(message, ...args) {
-      console.log(chalk`{gray ${timestamp()}} {gray debug} ${message}`, ...args)
-    },
-
-    error(message, ...args) {
-      console.error(
-        chalk`{gray ${timestamp()}} {red error} ${message}`,
+    info(scope, message, ...args) {
+      console.log(
+        chalk`{gray ${timestamp()}} {blue info} [${scope}] ${message}`,
         ...args
       )
     },
 
-    fatal(message, ...args) {
+    warn(scope, message, ...args) {
+      console.log(
+        chalk`{gray ${timestamp()}} {yellow warn} [${scope}] ${message}`,
+        ...args
+      )
+    },
+
+    error(scope, message, ...args) {
       console.error(
-        chalk`{gray ${timestamp()}} {magenta fatal} ${message}`,
+        chalk`{gray ${timestamp()}} {red error} [${scope}] ${message}`,
+        ...args
+      )
+    },
+
+    fatal(scope, message, ...args) {
+      console.error(
+        chalk`{gray ${timestamp()}} {magenta fatal} [${scope}] ${message}`,
         ...args
       )
       console.trace()
       process.exit(1)
-    },
-
-    warn(message, ...args) {
-      console.log(
-        chalk`{gray ${timestamp()}} {yellow warn} ${message}`,
-        ...args
-      )
-    },
-
-    trace(message, ...args) {
-      console.trace(message, ...args)
     },
   }
 

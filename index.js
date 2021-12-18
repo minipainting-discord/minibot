@@ -11,7 +11,10 @@ const missing = requiredVariables.filter((variable) => !process.env[variable])
 
 if (missing.length) {
   const s = missing.length > 1 ? "s" : ""
-  logger.fatal(`Missing environment variable${s}: ${missing.join(", ")}`)
+  logger.fatal(
+    "env-check",
+    `Missing environment variable${s}: ${missing.join(", ")}`
+  )
 }
 
 const { DISCORD_API_TOKEN, SUPABASE_KEY, SUPABASE_URL } = process.env

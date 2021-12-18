@@ -17,7 +17,7 @@ export async function addPoints(bot, user, points) {
     .upsert({ userId, year, points: newScore.current })
 
   if (error) {
-    bot.logger.error(`[helpers/addPoints] Error while adding points`, error)
+    bot.logger.error("helper/addPoints", "Error while adding points", error)
     return null
   }
 

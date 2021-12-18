@@ -36,9 +36,10 @@ export default async function rankUpdate(bot) {
       const { message, gifUrl } = await getRankingMessage(currentRank, nextRank)
 
       bot.logger.info(
-        `[rank-update] ${member.displayName} ${member} ${
-          currentRank?.name || "No rank"
-        } -> ${nextRank?.name || "No rank"}`
+        "rank-update",
+        `${member.displayName} ${member} ${currentRank?.name || "No rank"} -> ${
+          nextRank?.name || "No rank"
+        }`
       )
 
       await bot.channels.general.send({
