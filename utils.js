@@ -57,3 +57,15 @@ export function randomItem(collection) {
 export function getCurrentYear() {
   return new Date().getFullYear()
 }
+
+export function pluralize(word, count, plural = word + "s") {
+  return count === 1 ? word : plural
+}
+
+export async function removeReaction(message, reaction) {
+  const existingReaction = message.reactions.cache.get(reaction)
+
+  if (existingReaction) {
+    await existingReaction.remove()
+  }
+}
