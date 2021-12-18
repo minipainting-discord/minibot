@@ -44,6 +44,7 @@ export default function createBot({ discord, db, logger }) {
 
     try {
       await syncRanks(bot)
+      await syncEmojis(bot)
       await registerNamedChannels(bot)
       await registerNamedRoles(bot)
       await registerCommands(bot)
@@ -118,6 +119,13 @@ async function syncRanks(bot) {
   }
 
   bot.ranks = ranks
+}
+
+async function syncEmojis(bot) {
+  bot.emojis = bot.guild.emojis.cache.reduce(
+    (emojis, emoji) => ({ ...emojis, [emoji.name]: emoji }),
+    {}
+  )
 }
 
 async function registerNamedChannels(bot) {
