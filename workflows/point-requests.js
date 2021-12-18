@@ -7,7 +7,7 @@ import {
   getPointRequestFromThread,
   createPointRequest,
   updatePointRequest,
-} from "../helpers/pointRequests.js"
+} from "../helpers/point-requests.js"
 
 const BUTTONS = [
   { customId: "plus-one", label: "Add 1", style: "PRIMARY" },
