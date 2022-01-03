@@ -24,7 +24,8 @@ export default function addpoints(bot) {
       const user = interaction.options.getUser("user")
       const points = interaction.options.getInteger("points")
 
-      const newScore = await addPoints(bot, user, points)
+      const guildMember = await bot.guild.members.fetch(user)
+      const newScore = await addPoints(bot, guildMember, points)
 
       if (!newScore) {
         return interaction.reply(
@@ -35,7 +36,10 @@ export default function addpoints(bot) {
       interaction.reply(
         `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`
       )
-      bot.events.emit(bot.EVENT.PLAYER_SCORE_UPDATE, { ...newScore, user })
+      bot.events.emit(bot.EVENT.PLAYER_SCORE_UPDATE, {
+        ...newScore,
+        guildMember,
+      })
     },
   }
 }

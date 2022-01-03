@@ -101,6 +101,7 @@ async function startPointRequestWatcher(
   knownActionMessage = null
 ) {
   const user = await bot.discord.users.fetch(pointRequest.userId)
+  const guildMember = await bot.guild.members.fetch(user)
   const requestMessage = await bot.channels.points.messages.fetch(
     pointRequest.requestMessageId
   )
@@ -122,7 +123,7 @@ async function startPointRequestWatcher(
 
   async function resolveRequest(points) {
     if (points !== 0) {
-      const newScore = await addPoints(bot, user, points)
+      const newScore = await addPoints(bot, guildMember, points)
 
       await requestMessage.thread.send(
         `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`

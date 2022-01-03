@@ -11,11 +11,10 @@ export default async function rankUpdate(bot) {
     .from("images")
     .list("rank-down")
 
-  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, ({ user, lifetime }) => {
+  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, ({ guildMember, lifetime }) => {
     setImmediate(async () => {
-      const member = await bot.guild.members.fetch(user)
       const currentRank = bot.ranks.find((rank) =>
-        member.roles.cache.has(rank.roleId)
+        guildMember.roles.cache.has(rank.roleId)
       )
       const nextRank = [...bot.ranks]
         .reverse()
@@ -26,24 +25,30 @@ export default async function rankUpdate(bot) {
       }
 
       if (currentRank) {
-        await member.roles.remove(currentRank.role)
+        await guildMember.roles.remove(currentRank.role)
       }
 
       if (nextRank) {
-        await member.roles.add(nextRank.role)
+        await guildMember.roles.add(nextRank.role)
       }
+
+      await bot.db.from("users").upsert({
+        userId: guildMember.user.id,
+        displayName: guildMember.displayName,
+        rankId: nextRank.id,
+      })
 
       const { message, gifUrl } = await getRankingMessage(currentRank, nextRank)
 
       bot.logger.info(
         "rank-update",
-        `${member.displayName} ${member} ${currentRank?.name || "No rank"} -> ${
-          nextRank?.name || "No rank"
-        }`
+        `${guildMember.displayName} ${guildMember} ${
+          currentRank?.name || "No rank"
+        } -> ${nextRank?.name || "No rank"}`
       )
 
       await bot.channels.general.send({
-        content: `${member} ${message}`,
+        content: `${guildMember} ${message}`,
         files: [gifUrl],
       })
     })

@@ -1,11 +1,11 @@
 import { getCurrentYear } from "../utils.js"
 
-export async function addPoints(bot, user, points) {
-  const userId = user.id
+export async function addPoints(bot, guildMember, points) {
+  const userId = guildMember.id
   const year = getCurrentYear()
 
-  const currentScore = await getCurrentScore(bot, user)
-  const lifetimeScore = await getLifetimeScore(bot, user)
+  const currentScore = await getCurrentScore(bot, guildMember)
+  const lifetimeScore = await getLifetimeScore(bot, guildMember)
 
   const newScore = {
     current: (currentScore?.points || 0) + points,
@@ -19,6 +19,18 @@ export async function addPoints(bot, user, points) {
   if (error) {
     bot.logger.error("helper/addPoints", "Error while adding points", error)
     return null
+  }
+
+  const { error: userUpdateError } = await bot.db
+    .from("users")
+    .upsert({ userId, displayName: guildMember.displayName })
+
+  if (userUpdateError) {
+    bot.logger.error(
+      "helper/addPoints",
+      "Error while updating user",
+      userUpdateError
+    )
   }
 
   return newScore
