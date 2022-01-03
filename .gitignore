@@ -3,3 +3,8 @@ node_modules
 settings.json
 *.sqlite
 .vimproject
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp
+**/supabase/.env
