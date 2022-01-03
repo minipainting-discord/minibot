@@ -172,8 +172,6 @@ async function registerCommands(bot) {
 }
 
 async function registerWorkflows(bot) {
-  bot.logger.info("core", "Registering workflows...")
-
   const workflowList = await importDirectory("workflows", bot.logger)
 
   for (const registerWorkflow of workflowList) {
@@ -183,4 +181,10 @@ async function registerWorkflows(bot) {
       bot.logger.fatal("core", registerWorkflow.name, error)
     }
   }
+  bot.logger.info(
+    "core",
+    `Registered workflows: ${workflowList
+      .map((workflow) => workflow.name)
+      .join(", ")}`
+  )
 }
