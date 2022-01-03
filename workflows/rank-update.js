@@ -33,7 +33,7 @@ export default async function rankUpdate(bot) {
       }
 
       await bot.db.from("users").upsert({
-        userId: guildMember.user.id,
+        userId: guildMember.id,
         displayName: guildMember.displayName,
         rankId: nextRank.id,
       })
