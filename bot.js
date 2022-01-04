@@ -94,32 +94,37 @@ async function syncRanks(bot) {
 
   for (const rank of ranks) {
     if (rank.roleId) {
-      rank.role = await bot.guild.roles.fetch(rank.roleId)
+      rank.role = allRoles.get(rank.roleId)
       continue
     }
 
     // roleId is missing, try to fetch the rank by name or warn about it being missing
-    if (!rank.roleId) {
-      const existingRole = allRoles.find((role) => role.name === rank.name)
+    const existingRole = allRoles.find((role) => role.name === rank.name)
 
-      if (!existingRole) {
-        bot.logger.warn("core", `Missing role for rank ${rank.name}`)
-        continue
-      }
-
-      await bot.db
-        .from("ranks")
-        .update({ roleId: existingRole.id })
-        .eq("id", rank.id)
-
-      rank.role = existingRole
-
-      bot.logger.info(
-        "core",
-        `Matched rank ${rank.name} to role ${existingRole.id}`
-      )
+    if (!existingRole) {
+      bot.logger.warn("core", `Missing role for rank ${rank.name}`)
+      continue
     }
+
+    await bot.db
+      .from("ranks")
+      .update({ roleId: existingRole.id })
+      .eq("id", rank.id)
+
+    rank.role = existingRole
+
+    bot.logger.info(
+      "core",
+      `Matched rank ${rank.name} to role ${existingRole.id}`
+    )
   }
+
+  await bot.db.from("ranks").upsert(
+    ranks.map((rank) => ({
+      id: rank.id,
+      color: "#" + rank.role.color.toString(16).padStart(6, "0"),
+    }))
+  )
 
   bot.ranks = ranks
 }
