@@ -3,23 +3,21 @@ export default async function cncGatekeeper(bot) {
     bot.settings.cncRulesMessageId
   )
 
-  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, ({ user, lifetime }) => {
+  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, ({ guildMember, lifetime }) => {
     setImmediate(async () => {
-      const member = await bot.guild.members.fetch(user)
-
       if (lifetime < bot.settings.minCncPoints) {
         return
       }
 
-      if (member.roles.cache.has(bot.roles.cnc.id)) {
+      if (guildMember.roles.cache.has(bot.roles.cnc.id)) {
         return
       }
 
       // Add the CNC role to the member
-      await member.roles.add(bot.roles.cnc)
+      await guildMember.roles.add(bot.roles.cnc)
 
       // Send instructions via DM
-      const dmChannel = await member.createDM()
+      const dmChannel = await guildMember.createDM()
       const messages = [
         `Hello, you just unlocked access to the ${bot.channels.critique} channel on the minipainting server. Below is a copy of the rules for that channel.`,
         ">>> " + cncRulesMessage.content,
