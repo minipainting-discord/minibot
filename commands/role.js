@@ -87,19 +87,27 @@ async function listRoles(interaction, bot) {
       .map((role) => `${guildRoles.get(role.roleId)} ${role.description}`)
       .join("\n")
 
-  const embed = createEmbed({
-    title: "Self-assignable roles",
-  })
+  const embeds = []
 
   if (joinedRoles.length) {
-    embed.addField("**Joined**", listRoles(joinedRoles))
+    embeds.push(
+      createEmbed({
+        title: "Joined roles",
+        description: listRoles(joinedRoles),
+      })
+    )
   }
 
   if (availableRoles.length) {
-    embed.addField("**Available**", listRoles(availableRoles))
+    embeds.push(
+      createEmbed({
+        title: "Available roles",
+        description: listRoles(availableRoles),
+      })
+    )
   }
 
-  interaction.reply({ embeds: [embed], ephemeral: true })
+  interaction.reply({ embeds, ephemeral: true })
 }
 
 /**
