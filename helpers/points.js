@@ -33,7 +33,7 @@ export async function addPoints(bot, guildMember, points) {
     )
   }
 
-  bot.events.emit(bot.EVENT.PLAYER_SCORE_UPDATE, {
+  bot.events.emit(bot.EVENT.USER_POINTS_UPDATE, {
     ...newScore,
     guildMember,
   })

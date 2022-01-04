@@ -3,7 +3,7 @@ export default async function cncGatekeeper(bot) {
     bot.settings.cncRulesMessageId
   )
 
-  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, ({ guildMember, lifetime }) => {
+  bot.events.on(bot.EVENT.USER_POINTS_UPDATE, ({ guildMember, lifetime }) => {
     setImmediate(async () => {
       if (lifetime < bot.settings.minCncPoints) {
         return

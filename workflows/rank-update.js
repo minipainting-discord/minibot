@@ -11,7 +11,7 @@ export default async function rankUpdate(bot) {
     .from("images")
     .list("rank-down")
 
-  bot.events.on(bot.EVENT.PLAYER_SCORE_UPDATE, ({ guildMember, lifetime }) => {
+  bot.events.on(bot.EVENT.USER_POINTS_UPDATE, ({ guildMember, lifetime }) => {
     setImmediate(async () => {
       const currentRank = bot.ranks.find((rank) =>
         guildMember.roles.cache.has(rank.roleId)

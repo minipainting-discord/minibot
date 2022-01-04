@@ -10,7 +10,7 @@ const AVAILABILITY = {
 }
 
 const EVENT = {
-  PLAYER_SCORE_UPDATE: "player-score-update",
+  USER_POINTS_UPDATE: "player-score-update",
 }
 
 export default function createBot({ discord, db, logger }) {
