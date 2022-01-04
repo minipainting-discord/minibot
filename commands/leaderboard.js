@@ -34,6 +34,8 @@ export default function leaderboard(bot) {
         )
       )
 
+      const maxDigits = Math.max(currentDigits, lifetimeDigits)
+
       // TODO: Add the web leaderboard
       const embed = createEmbed({
         fields: [
@@ -42,7 +44,7 @@ export default function leaderboard(bot) {
             value: lifetimeLeaderboard
               .map(
                 (line) =>
-                  `\`${String(line.points).padStart(lifetimeDigits)}\` <@${
+                  `\`${String(line.points).padStart(maxDigits)}\` <@${
                     line.userId
                   }>`
               )
@@ -53,7 +55,7 @@ export default function leaderboard(bot) {
             value: currentLeaderboard
               .map(
                 (line) =>
-                  `\`${String(line.points).padStart(currentDigits)}\` <@${
+                  `\`${String(line.points).padStart(maxDigits)}\` <@${
                     line.userId
                   }>`
               )
