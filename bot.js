@@ -109,7 +109,7 @@ async function syncRanks(bot) {
       .from("ranks")
       .update({
         roleId: role.id,
-        color: role.color.toString(16).padStart(6, "0"),
+        color: "#" + role.color.toString(16).padStart(6, "0"),
       })
       .eq("id", rank.id)
 
