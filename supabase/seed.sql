@@ -10,6 +10,14 @@ VALUES
   ('576672844851707905', 'points')
 ;
 
+/* Named Roles */
+INSERT INTO public."namedRoles" ("roleId", "shortName")
+VALUES
+  ('576672043165155338', 'admin'),
+  ('909740487177535488', 'mod'),
+  ('793236788150927360', 'cnc')
+;
+
 INSERT INTO public."ranks" ("minPoints", "name")
 VALUES
   (5, 'Dip ''N Forget'),
