@@ -74,6 +74,11 @@ export default async function rankUpdate(bot) {
   }
 
   async function getRandomGifUrl(prefix, gifs) {
+    // FIXME: Only used in dev when storage isn't available, to be fixed once it is
+    if (!gifs.length) {
+      return "https://thumbs.gfycat.com/DistinctThunderousCatfish-size_restricted.gif"
+    }
+
     const { publicURL } = await bot.db.storage
       .from("images")
       .getPublicUrl(path.join(prefix, randomItem(gifs).name))
