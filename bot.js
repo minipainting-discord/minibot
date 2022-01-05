@@ -99,32 +99,24 @@ async function syncRanks(bot) {
     }
 
     // roleId is missing, try to fetch the rank by name or warn about it being missing
-    const existingRole = allRoles.find((role) => role.name === rank.name)
+    const role = allRoles.find((role) => role.name === rank.name)
 
-    if (!existingRole) {
-      bot.logger.warn("core", `Missing role for rank ${rank.name}`)
-      continue
+    if (!role) {
+      bot.logger.fatal("core", `Missing role for rank ${rank.name}`)
     }
 
     await bot.db
       .from("ranks")
-      .update({ roleId: existingRole.id })
+      .update({
+        roleId: role.id,
+        color: role.color.toString(16).padStart(6, "0"),
+      })
       .eq("id", rank.id)
 
-    rank.role = existingRole
+    rank.role = role
 
-    bot.logger.info(
-      "core",
-      `Matched rank ${rank.name} to role ${existingRole.id}`
-    )
+    bot.logger.info("core", `Matched rank ${rank.name} to role ${role.id}`)
   }
-
-  await bot.db.from("ranks").upsert(
-    ranks.map((rank) => ({
-      id: rank.id,
-      color: "#" + rank.role.color.toString(16).padStart(6, "0"),
-    }))
-  )
 
   bot.ranks = ranks
 }
@@ -139,6 +131,10 @@ async function syncEmojis(bot) {
 async function registerNamedChannels(bot) {
   bot.logger.info("core", "Registering named channels...")
   const { data: namedChannels } = await bot.db.from("namedChannels").select()
+
+  if (!namedChannels.length) {
+    bot.logger.fatal("core", "No named channels found, aborting")
+  }
 
   for (const namedChannel of namedChannels) {
     const channel = await bot.guild.channels.fetch(namedChannel.channelId)
