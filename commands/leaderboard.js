@@ -64,7 +64,11 @@ export default function leaderboard(bot) {
         ],
       })
 
-      interaction.reply({ embeds: [embed] })
+      interaction.reply({
+        content:
+          "See the full leaderboard at https://minipainting.art/leaderboard",
+        embeds: [embed],
+      })
     },
   }
 }
