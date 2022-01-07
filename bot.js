@@ -7,6 +7,7 @@ const AVAILABILITY = {
   PUBLIC: "public",
   MOD: "mod",
   ADMIN: "admin",
+  BOT_MASTER: "bot-master",
 }
 
 const EVENT = {

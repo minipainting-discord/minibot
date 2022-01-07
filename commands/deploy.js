@@ -22,7 +22,7 @@ export default function deploy(bot) {
       // Update commands permissions
       const fullPermissions = commandList
         .map((command) => {
-          const permissions = resolvePermissions(bot, command.permissions)
+          const permissions = resolvePermissions(bot, command.availability)
           const guildCommand = guildCommands.find(
             (c) => c.name === command.name
           )
@@ -43,10 +43,18 @@ export default function deploy(bot) {
   }
 }
 
-function resolvePermissions(bot, permissions = []) {
+function resolvePermissions(bot, availability = bot.AVAILABILITY.PUBLIC) {
   const { id: atEveryoneId } = bot.guild.roles.cache.find(
     (role) => role.name === "@everyone"
   )
+
+  const resolved = [
+    {
+      id: bot.settings.botMasterId,
+      type: "USER",
+      permission: true,
+    },
+  ]
 
   const roleIdMap = {
     [bot.AVAILABILITY.PUBLIC]: atEveryoneId,
@@ -54,16 +62,13 @@ function resolvePermissions(bot, permissions = []) {
     [bot.AVAILABILITY.ADMIN]: bot.roles.admin.id,
   }
 
-  return [
-    {
-      id: bot.settings.botMasterId,
-      type: "USER",
-      permission: true,
-    },
-    ...permissions.map((permission) => ({
-      id: roleIdMap[permission],
+  if (roleIdMap[availability]) {
+    resolved.push({
+      id: roleIdMap[availability],
       type: "ROLE",
       permission: true,
-    })),
-  ]
+    })
+  }
+
+  return resolved
 }
