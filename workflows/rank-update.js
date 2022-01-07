@@ -20,7 +20,7 @@ export default async function rankUpdate(bot) {
         .reverse()
         .find((rank) => lifetime >= rank.minPoints)
 
-      if (currentRank.id === nextRank.id) {
+      if (currentRank?.id === nextRank?.id) {
         return
       }
 
