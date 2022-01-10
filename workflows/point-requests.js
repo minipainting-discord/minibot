@@ -163,7 +163,9 @@ async function handleModeratorInput(bot, message, resolveRequest) {
 
 async function handleButtonInteraction(bot, interaction, resolveRequest) {
   if (!bot.isModerator(interaction.member)) {
-    return interaction.reply(`${bot.emojis.LUL} well tried!`)
+    return interaction.reply(
+      `${bot.emojis.LUL} well tried ${interaction.member}!`
+    )
   }
 
   switch (interaction.customId) {
