@@ -12,7 +12,7 @@ import {
 const BUTTONS = [
   { customId: "plus-one", label: "Add 1", style: "PRIMARY" },
   { customId: "plus-two", label: "Add 2", style: "PRIMARY" },
-  { customId: "reject", label: "Close", style: "DANGER" },
+  { customId: "close", label: "Close", style: "DANGER" },
 ]
 
 export default async function pointRequests(bot) {
@@ -177,7 +177,7 @@ async function handleButtonInteraction(bot, interaction, resolveRequest) {
       await interaction.reply("Added 2 points")
       await resolveRequest(2)
       break
-    case "reject":
+    case "close":
       await interaction.reply("Request rejected")
       await resolveRequest(0)
       break
