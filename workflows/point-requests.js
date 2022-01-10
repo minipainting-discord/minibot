@@ -110,8 +110,7 @@ async function startPointRequestWatcher(
     (await requestMessage.thread.messages.fetch(pointRequest.actionMessageId))
   const messageCollector = requestMessage.thread.createMessageCollector({
     filter: async (message) => {
-      const guildMember = await bot.guild.members.fetch(message.author)
-      return bot.isModerator(guildMember) && message.content.match(/^-?\d+$/)
+      return bot.isModerator(message.member) && message.content.match(/^-?\d+$/)
     },
   })
   const buttonCollector = actionMessage.createMessageComponentCollector({
@@ -121,7 +120,7 @@ async function startPointRequestWatcher(
   await removeReaction(requestMessage, "✅")
   await requestMessage.react("👀")
 
-  async function resolveRequest(points) {
+  async function resolveRequest(points, resolver) {
     if (points !== 0) {
       const newScore = await addPoints(bot, guildMember, points)
 
@@ -142,7 +141,7 @@ async function startPointRequestWatcher(
     buttonCollector.stop()
     bot.logger.info(
       "workflow/point-requests",
-      `Closed point request ${pointRequest.id}`
+      `Point request ${pointRequest.id} closed by ${resolver.displayName} ${resolver}`
     )
   }
 
@@ -158,7 +157,7 @@ async function startPointRequestWatcher(
 async function handleModeratorInput(bot, message, resolveRequest) {
   const points = parseInt(message.content, 10)
 
-  await resolveRequest(points)
+  await resolveRequest(points, message.member)
 }
 
 async function handleButtonInteraction(bot, interaction, resolveRequest) {
@@ -171,15 +170,15 @@ async function handleButtonInteraction(bot, interaction, resolveRequest) {
   switch (interaction.customId) {
     case "plus-one":
       await interaction.reply(`Added 1 point by ${interaction.member}`)
-      await resolveRequest(1)
+      await resolveRequest(1, interaction.member)
       break
     case "plus-two":
       await interaction.reply(`Added 2 points by ${interaction.member}`)
-      await resolveRequest(2)
+      await resolveRequest(2, interaction.member)
       break
     case "close":
       await interaction.reply(`Request closed by ${interaction.member}`)
-      await resolveRequest(0)
+      await resolveRequest(0, interaction.member)
       break
   }
 }
