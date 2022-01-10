@@ -170,15 +170,15 @@ async function handleButtonInteraction(bot, interaction, resolveRequest) {
 
   switch (interaction.customId) {
     case "plus-one":
-      await interaction.reply("Added 1 point")
+      await interaction.reply(`Added 1 point by ${interaction.member}`)
       await resolveRequest(1)
       break
     case "plus-two":
-      await interaction.reply("Added 2 points")
+      await interaction.reply(`Added 2 points by ${interaction.member}`)
       await resolveRequest(2)
       break
     case "close":
-      await interaction.reply("Request rejected")
+      await interaction.reply(`Request closed by ${interaction.member}`)
       await resolveRequest(0)
       break
   }
