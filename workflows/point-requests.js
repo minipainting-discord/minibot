@@ -12,7 +12,7 @@ import {
 const BUTTONS = [
   { customId: "plus-one", label: "Add 1", style: "PRIMARY" },
   { customId: "plus-two", label: "Add 2", style: "PRIMARY" },
-  { customId: "reject", label: "Reject", style: "DANGER" },
+  { customId: "reject", label: "Close", style: "DANGER" },
 ]
 
 export default async function pointRequests(bot) {
