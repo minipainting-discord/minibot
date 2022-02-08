@@ -26,6 +26,25 @@ export default function roleAdmin(bot) {
         ],
       },
       {
+        name: "edit",
+        description: "🔓 Edit an assignable role's description",
+        type: "SUB_COMMAND",
+        options: [
+          {
+            name: "role",
+            description: "The role to remove",
+            type: "ROLE",
+            required: true,
+          },
+          {
+            name: "description",
+            description: "New description for the role",
+            type: "STRING",
+            required: true,
+          },
+        ],
+      },
+      {
         name: "remove",
         description: "🔓 Remove an assignable role",
         type: "SUB_COMMAND",
@@ -46,6 +65,8 @@ export default function roleAdmin(bot) {
       switch (command) {
         case "create":
           return createRole(interaction, bot)
+        case "edit":
+          return editRole(interaction, bot)
         case "remove":
           return removeRole(interaction, bot)
       }
@@ -95,4 +116,25 @@ async function removeRole(interaction, bot) {
   await role.delete()
 
   interaction.reply(`Role \`${role.name}\` removed`)
+}
+
+/**
+ * editRole
+ */
+async function editRole(interaction, bot) {
+  const role = await getManagedRoleFromOptions(bot, interaction)
+  const description = interaction.options.getString("description")
+
+  if (!role) {
+    return
+  }
+
+  await bot.db
+    .from("managedRoles")
+    .update({ description })
+    .eq("roleId", role.id)
+
+  interaction.reply(
+    `Description for \`${role.name}\` changed to: ${description}`
+  )
 }
