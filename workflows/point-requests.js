@@ -93,7 +93,14 @@ async function resumePendingRequests(bot) {
       )}`
     )
     for (const pointRequest of pendingPointRequests) {
-      await startPointRequestWatcher(bot, pointRequest)
+      try {
+        await startPointRequestWatcher(bot, pointRequest)
+      } catch (error) {
+        bot.logger.error(
+          "workflow/point-requests",
+          `Unable to resume tracking for ${pointRequest.requestMessageId}`
+        )
+      }
     }
   }
 }
