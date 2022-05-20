@@ -9,6 +9,8 @@ import {
   updatePointRequest,
 } from "../helpers/point-requests.js"
 
+const URL_PATTERN = /https?:\/\//
+
 const BUTTONS = [
   { customId: "plus-one", label: "Add 1", style: "PRIMARY" },
   { customId: "plus-two", label: "Add 2", style: "PRIMARY" },
@@ -18,7 +20,8 @@ const BUTTONS = [
 export default async function pointRequests(bot) {
   const requestCollector = bot.channels.points.createMessageCollector({
     filter: (message) =>
-      message.attachments.size > 0 && message.mentions.has(bot.roles.mod),
+      (message.attachments.size > 0 || URL_PATTERN.test(message.content)) &&
+      message.mentions.has(bot.roles.mod),
   })
 
   requestCollector.on("collect", (message) => openPointRequest(bot, message))
