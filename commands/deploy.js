@@ -12,31 +12,38 @@ export default function deploy(bot) {
       const commandList = [...commands.values()]
 
       // Create commands, private by default
-      const guildCommands = await guild.commands.set(
+      await guild.commands.set(
         commandList.map((command) => ({
           ...pick(command, ["name", "description", "options"]),
           defaultPermission: false,
         }))
       )
 
-      // Update commands permissions
-      const fullPermissions = commandList
-        .map((command) => {
-          const permissions = resolvePermissions(bot, command.availability)
-          const guildCommand = guildCommands.find(
-            (c) => c.name === command.name
-          )
-
-          return {
-            id: guildCommand.id,
-            permissions,
-          }
-        })
-        .filter(({ permissions }) => Boolean(permissions))
-
-      if (fullPermissions.length > 0) {
-        await guild.commands.permissions.set({ fullPermissions })
-      }
+      // TODO: Discord has discontinued setting command permissions for bots
+      // We'll be able to only specify if normal members can use them or not
+      // but we need to wait for a new discord.js (>13.7.0) version to support
+      // it
+      //
+      // Earlier:
+      // const guildCommands = await guild.commands.set(...)
+      //
+      // const fullPermissions = commandList
+      //   .map((command) => {
+      //     const permissions = resolvePermissions(bot, command.availability)
+      //     const guildCommand = guildCommands.find(
+      //       (c) => c.name === command.name
+      //     )
+      //
+      //     return {
+      //       id: guildCommand.id,
+      //       permissions,
+      //     }
+      //   })
+      //   .filter(({ permissions }) => Boolean(permissions))
+      //
+      // if (fullPermissions.length > 0) {
+      //   await guild.commands.permissions.set({ fullPermissions })
+      // }
 
       await interaction.reply("🤖 Commands deployed!")
     },
