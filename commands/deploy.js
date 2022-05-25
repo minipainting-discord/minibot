@@ -15,7 +15,7 @@ export default function deploy(bot) {
       await guild.commands.set(
         commandList.map((command) => ({
           ...pick(command, ["name", "description", "options"]),
-          defaultPermission: false,
+          defaultPermission: command.availability === bot.AVAILABILITY.PUBLIC,
         }))
       )
 
