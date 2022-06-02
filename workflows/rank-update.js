@@ -36,7 +36,7 @@ export default async function rankUpdate(bot) {
         await bot.db.from("users").upsert({
           userId: guildMember.id,
           displayName: guildMember.displayName,
-          rankId: nextRank.id,
+          rankId: nextRank?.id,
         })
 
         const { message, gifUrl } = await getRankingMessage(
