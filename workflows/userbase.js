@@ -12,14 +12,15 @@ export default async function userbase(bot) {
 
   async function onGuildMemberUpdate(oldGuildMember, newGuildMember) {
     await complete(oldGuildMember, newGuildMember)
-    bot.logger.info(
-      "userbase",
-      `Rename ${oldGuildMember.displayName} to ${newGuildMember.displayName}`
-    )
 
     if (oldGuildMember.displayName === newGuildMember.displayName) {
       return
     }
+
+    bot.logger.info(
+      "userbase",
+      `Rename ${oldGuildMember.displayName} to ${newGuildMember.displayName}`
+    )
 
     await updateDisplayNames(newGuildMember)
   }
