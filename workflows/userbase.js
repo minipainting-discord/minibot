@@ -1,4 +1,5 @@
 import { complete } from "../helpers/partials.js"
+import { updateDisplayName } from "../helpers/userbase.js"
 
 export default async function userbase(bot) {
   bot.discord.on("guildMemberAdd", onGuildMemberAdd)
@@ -7,7 +8,7 @@ export default async function userbase(bot) {
   async function onGuildMemberAdd(guildMember) {
     await complete(guildMember)
     bot.logger.info("userbase", `New member: ${guildMember.displayName}`)
-    await updateDisplayNames(guildMember)
+    await updateDisplayName(guildMember)
   }
 
   async function onGuildMemberUpdate(oldGuildMember, newGuildMember) {
@@ -22,13 +23,6 @@ export default async function userbase(bot) {
       `Rename ${oldGuildMember.displayName} to ${newGuildMember.displayName}`
     )
 
-    await updateDisplayNames(newGuildMember)
-  }
-
-  async function updateDisplayNames(guildMember) {
-    await bot.db.from("users").upsert({
-      userId: guildMember.id,
-      displayName: guildMember.displayName,
-    })
+    await updateDisplayName(newGuildMember)
   }
 }

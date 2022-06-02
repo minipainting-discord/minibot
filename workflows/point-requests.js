@@ -8,6 +8,7 @@ import {
   createPointRequest,
   updatePointRequest,
 } from "../helpers/point-requests.js"
+import { updateDisplayName } from "../helpers/userbase.js"
 
 const URL_PATTERN = /https?:\/\//
 
@@ -35,6 +36,9 @@ export default async function pointRequests(bot) {
 
 async function openPointRequest(bot, message) {
   const guildMember = await bot.guild.members.fetch(message.author)
+  // Make sure the member is in userbase
+  await updateDisplayName(bot, guildMember)
+
   const pointRequest = await createPointRequest(bot, message)
   const thread = await message.startThread({
     name: `Request by ${guildMember.displayName}`,
