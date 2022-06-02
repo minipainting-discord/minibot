@@ -8,7 +8,7 @@ export default async function userbase(bot) {
   async function onGuildMemberAdd(guildMember) {
     await complete(guildMember)
     bot.logger.info("userbase", `New member: ${guildMember.displayName}`)
-    await updateDisplayName(guildMember)
+    await updateDisplayName(bot, guildMember)
   }
 
   async function onGuildMemberUpdate(oldGuildMember, newGuildMember) {
@@ -23,6 +23,6 @@ export default async function userbase(bot) {
       `Rename ${oldGuildMember.displayName} to ${newGuildMember.displayName}`
     )
 
-    await updateDisplayName(newGuildMember)
+    await updateDisplayName(bot, newGuildMember)
   }
 }
