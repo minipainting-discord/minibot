@@ -1,33 +1,69 @@
+import { MessageEmbed } from "discord.js"
 import chalk from "chalk"
 
+const COLORS = {
+  info: "blue",
+  warn: "yellow",
+  error: "red",
+  fatal: "magenta",
+}
+
+const DISCORD_COLORS = {
+  info: "#0098d9",
+  warn: "#f6c42f",
+  error: "#f52565",
+  fatal: "#a05bb4",
+}
+
 export default function createLogger() {
+  let bot = null
+
+  async function botLog(level, scope, message, error) {
+    if (!bot?.channels?.bot) {
+      return
+    }
+
+    const description = `**[${scope}]** ${message}`
+    const embed = new MessageEmbed()
+      .setColor(DISCORD_COLORS[level])
+      .setDescription(
+        error ? `${description}\n\`\`\`\n${error.stack}\`\`\`` : description
+      )
+    bot.channels.bot.send({ embeds: [embed] })
+
+    if (["error", "fatal"].includes(level)) {
+      bot.channels.bot.send(`<@${bot.settings.botMasterId}> :arrow_up:`)
+    }
+  }
+
+  function format(level, scope, message) {
+    return [
+      chalk.gray(`[${new Date().toISOString().slice(0, -1)}]`),
+      chalk[COLORS[level]](level),
+      `[${scope}]`,
+      message,
+    ].join(" ")
+  }
+
   const logger = {
-    info(scope, message, ...args) {
-      console.log(
-        chalk`{gray ${timestamp()}} {blue info} [${scope}] ${message}`,
-        ...args
-      )
+    info(scope, message) {
+      console.log(format("info", scope, message))
+      botLog("info", scope, message)
     },
 
-    warn(scope, message, ...args) {
-      console.log(
-        chalk`{gray ${timestamp()}} {yellow warn} [${scope}] ${message}`,
-        ...args
-      )
+    warn(scope, message) {
+      console.log(format("warn", scope, message))
+      botLog("warn", scope, message)
     },
 
-    error(scope, message, ...args) {
-      console.error(
-        chalk`{gray ${timestamp()}} {red error} [${scope}] ${message}`,
-        ...args
-      )
+    error(scope, message, error) {
+      console.error(format("error", scope, message), error)
+      botLog("error", scope, message, error)
     },
 
-    fatal(scope, message, ...args) {
-      console.error(
-        chalk`{gray ${timestamp()}} {magenta fatal} [${scope}] ${message}`,
-        ...args
-      )
+    fatal(scope, message, error) {
+      console.error(format("fatal", scope, message), error)
+      botLog("fatal", scope, message, error)
       console.trace()
       process.exit(1)
     },
@@ -36,9 +72,9 @@ export default function createLogger() {
   return {
     ...logger,
     child: () => logger,
+    setBot(_bot) {
+      logger.info("core", "Online logging enabled")
+      bot = _bot
+    },
   }
-}
-
-function timestamp() {
-  return `[${new Date().toISOString().slice(0, -1)}]`
 }

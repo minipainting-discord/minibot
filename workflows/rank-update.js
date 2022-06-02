@@ -13,44 +13,55 @@ export default async function rankUpdate(bot) {
 
   bot.events.on(bot.EVENT.USER_POINTS_UPDATE, ({ guildMember, lifetime }) => {
     setImmediate(async () => {
-      const currentRank = bot.ranks.find((rank) =>
-        guildMember.roles.cache.has(rank.roleId)
-      )
-      const nextRank = [...bot.ranks]
-        .reverse()
-        .find((rank) => lifetime >= rank.minPoints)
+      try {
+        const currentRank = bot.ranks.find((rank) =>
+          guildMember.roles.cache.has(rank.roleId)
+        )
+        const nextRank = [...bot.ranks]
+          .reverse()
+          .find((rank) => lifetime >= rank.minPoints)
 
-      if (currentRank?.id === nextRank?.id) {
-        return
+        if (currentRank?.id === nextRank?.id) {
+          return
+        }
+
+        if (currentRank) {
+          await guildMember.roles.remove(currentRank.role)
+        }
+
+        if (nextRank) {
+          await guildMember.roles.add(nextRank.role)
+        }
+
+        await bot.db.from("users").upsert({
+          userId: guildMember.id,
+          displayName: guildMember.displayName,
+          rankId: nextRank.id,
+        })
+
+        const { message, gifUrl } = await getRankingMessage(
+          currentRank,
+          nextRank
+        )
+
+        bot.logger.info(
+          "workflows/rank-update",
+          `${guildMember.displayName} ${guildMember} ${
+            currentRank?.name || "No rank"
+          } -> ${nextRank?.name || "No rank"}`
+        )
+
+        await bot.channels.general.send({
+          content: `${guildMember} ${message}`,
+          files: [gifUrl],
+        })
+      } catch (error) {
+        bot.logger.error(
+          "workflows/rank-update",
+          "Error while updating rank",
+          error
+        )
       }
-
-      if (currentRank) {
-        await guildMember.roles.remove(currentRank.role)
-      }
-
-      if (nextRank) {
-        await guildMember.roles.add(nextRank.role)
-      }
-
-      await bot.db.from("users").upsert({
-        userId: guildMember.id,
-        displayName: guildMember.displayName,
-        rankId: nextRank.id,
-      })
-
-      const { message, gifUrl } = await getRankingMessage(currentRank, nextRank)
-
-      bot.logger.info(
-        "rank-update",
-        `${guildMember.displayName} ${guildMember} ${
-          currentRank?.name || "No rank"
-        } -> ${nextRank?.name || "No rank"}`
-      )
-
-      await bot.channels.general.send({
-        content: `${guildMember} ${message}`,
-        files: [gifUrl],
-      })
     })
   })
 

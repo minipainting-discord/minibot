@@ -50,6 +50,7 @@ export default function createBot({ discord, db, logger }) {
       await registerNamedRoles(bot)
       await registerCommands(bot)
       await registerWorkflows(bot)
+      bot.logger.setBot(bot)
     } catch (error) {
       bot.logger.fatal("core", error)
     }

@@ -55,6 +55,11 @@ async function openPointRequest(bot, message) {
     actionMessageId: actionMessage.id,
   })
 
+  bot.logger.info(
+    "workflow/point-requests",
+    `Opened point request ${pointRequest.id} by ${guildMember.displayName}`
+  )
+
   await startPointRequestWatcher(bot, pointRequest, actionMessage)
 }
 
