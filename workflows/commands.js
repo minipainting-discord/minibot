@@ -7,7 +7,7 @@ export default async function commands(bot) {
         await commands.get(interaction.commandName).execute(interaction)
         bot.logger.info(
           "commands",
-          `${interaction.member.displayName} ${interaction.member} used ${interaction}`
+          `${interaction.member} used **${interaction}** in ${interaction.channel}`
         )
       } catch (error) {
         bot.logger.error(
