@@ -10,22 +10,22 @@
     "console": "dotenv -- node console.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^1.27.0",
-    "bufferutil": "^4.0.5",
-    "chalk": "^4.1.2",
+    "@supabase/supabase-js": "^1.35.3",
+    "bufferutil": "^4.0.6",
+    "chalk": "^5.0.1",
     "dicebag": "^0.1.2",
-    "discord.js": "^13.3.1",
-    "dotenv-cli": "^4.1.0",
-    "utf-8-validate": "^5.0.7",
+    "discord.js": "^13.7.0",
+    "dotenv-cli": "^5.1.0",
+    "utf-8-validate": "^5.0.9",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "eslint": "^8.2.0",
+    "eslint": "^8.16.0",
     "husky": "^4.3.8",
-    "lint-staged": "^11.2.6",
-    "nodemon": "^2.0.15",
-    "prettier": "^2.4.1",
-    "uvu": "^0.5.2"
+    "lint-staged": "^13.0.0",
+    "nodemon": "^2.0.16",
+    "prettier": "^2.6.2",
+    "uvu": "^0.5.3"
   },
   "repository": {
     "type": "git",
