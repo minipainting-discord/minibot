@@ -7,6 +7,8 @@ export default function leaderboard(bot) {
     availability: bot.AVAILABILITY.PUBLIC,
 
     async execute(interaction) {
+      await interaction.deferReply()
+
       const { data: currentLeaderboard } = await bot.db
         .from("leaderboard")
         .select()
@@ -64,7 +66,7 @@ export default function leaderboard(bot) {
         ],
       })
 
-      await interaction.reply({
+      await interaction.editReply({
         content:
           "See the full leaderboard at https://minipainting.art/leaderboard",
         embeds: [embed],

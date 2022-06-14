@@ -3,8 +3,9 @@ export default async function commands(bot) {
     const { commands } = bot
 
     if (interaction.isCommand() && commands.has(interaction.commandName)) {
+      const command = commands.get(interaction.commandName)
       try {
-        await commands.get(interaction.commandName).execute(interaction)
+        await command.execute(interaction)
         bot.logger.info(
           "commands",
           `${interaction.member} used **${interaction}** in ${interaction.channel}`
@@ -12,7 +13,7 @@ export default async function commands(bot) {
       } catch (error) {
         bot.logger.error(
           "commands",
-          `Error while executing ${error.commandName}`,
+          `Error while executing ${command.name}`,
           error
         )
       }
