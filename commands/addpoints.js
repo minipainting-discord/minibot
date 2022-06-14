@@ -28,12 +28,12 @@ export default function addpoints(bot) {
       const newScore = await addPoints(bot, guildMember, points)
 
       if (!newScore) {
-        return interaction.reply(
+        return await interaction.reply(
           `💥 Error while adding points (I'm warning <@${bot.settings.botMasterId}>)`
         )
       }
 
-      interaction.reply(
+      await interaction.reply(
         `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`
       )
     },

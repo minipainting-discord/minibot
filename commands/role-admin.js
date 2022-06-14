@@ -64,11 +64,11 @@ export default function roleAdmin(bot) {
 
       switch (command) {
         case "create":
-          return createRole(interaction, bot)
+          return await createRole(interaction, bot)
         case "edit":
-          return editRole(interaction, bot)
+          return await editRole(interaction, bot)
         case "remove":
-          return removeRole(interaction, bot)
+          return await removeRole(interaction, bot)
       }
     },
   }
@@ -99,7 +99,7 @@ async function createRole(interaction, bot) {
     .from("managedRoles")
     .insert({ roleId: newRole.id, name, description, createdBy })
 
-  interaction.reply(`Created role ${newRole}.`)
+  await interaction.reply(`Created role ${newRole}.`)
 }
 
 /**
@@ -115,7 +115,7 @@ async function removeRole(interaction, bot) {
   await bot.db.from("managedRoles").delete().eq("roleId", role.id)
   await role.delete()
 
-  interaction.reply(`Role \`${role.name}\` removed`)
+  await interaction.reply(`Role \`${role.name}\` removed`)
 }
 
 /**
@@ -134,7 +134,7 @@ async function editRole(interaction, bot) {
     .update({ description })
     .eq("roleId", role.id)
 
-  interaction.reply(
+  await interaction.reply(
     `Description for \`${role.name}\` changed to: ${description}`
   )
 }

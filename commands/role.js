@@ -45,11 +45,11 @@ export default function role(bot) {
 
       switch (command) {
         case "list":
-          return listRoles(interaction, bot)
+          return await listRoles(interaction, bot)
         case "join":
-          return joinRole(interaction, bot)
+          return await joinRole(interaction, bot)
         case "leave":
-          return leaveRole(interaction, bot)
+          return await leaveRole(interaction, bot)
       }
     },
   }
@@ -107,7 +107,7 @@ async function listRoles(interaction, bot) {
     )
   }
 
-  interaction.reply({ embeds, ephemeral: true })
+  await interaction.reply({ embeds, ephemeral: true })
 }
 
 /**
@@ -128,7 +128,7 @@ async function joinRole(interaction, bot) {
   }
 
   await interaction.member.roles.add(role)
-  interaction.reply({ content: `${interaction.member} added to ${role}` })
+  await interaction.reply({ content: `${interaction.member} added to ${role}` })
 }
 
 /**
@@ -149,5 +149,7 @@ async function leaveRole(interaction, bot) {
   }
 
   await interaction.member.roles.remove(role)
-  interaction.reply({ content: `${role} removed from ${interaction.member}` })
+  await interaction.reply({
+    content: `${role} removed from ${interaction.member}`,
+  })
 }

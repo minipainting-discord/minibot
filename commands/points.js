@@ -25,7 +25,7 @@ export default function points(bot) {
         lifetime: lifetimeScore?.points || 0,
       }
 
-      interaction.reply(
+      await interaction.reply(
         userArg
           ? `${user} has ${score.lifetime} lifetime points and ${score.current} current points`
           : `${user}, you have ${score.lifetime} lifetime points and ${score.current} current points`

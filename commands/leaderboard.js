@@ -64,7 +64,7 @@ export default function leaderboard(bot) {
         ],
       })
 
-      interaction.reply({
+      await interaction.reply({
         content:
           "See the full leaderboard at https://minipainting.art/leaderboard",
         embeds: [embed],
