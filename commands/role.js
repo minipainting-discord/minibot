@@ -61,13 +61,10 @@ export default function role(bot) {
 async function listRoles(interaction, bot) {
   const { data: managedRoles } = await bot.db.from("managedRoles").select()
 
-  await interaction.deferReply()
+  await interaction.deferReply({ ephemeral: true })
 
   if (!managedRoles.length) {
-    return await interaction.editReply({
-      content: "There currently are no roles to join",
-      ephemeral: true,
-    })
+    return await interaction.editReply("There currently are no roles to join")
   }
 
   const managedRolesIds = managedRoles.map((managedRole) => managedRole.roleId)
@@ -109,7 +106,7 @@ async function listRoles(interaction, bot) {
     )
   }
 
-  await interaction.editReply({ embeds, ephemeral: true })
+  await interaction.editReply({ embeds })
 }
 
 /**
