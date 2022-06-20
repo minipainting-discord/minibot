@@ -113,6 +113,7 @@ async function listRoles(interaction, bot) {
  * joinRole
  */
 async function joinRole(interaction, bot) {
+  await interaction.deferReply()
   const role = await getManagedRoleFromOptions(bot, interaction)
 
   if (!role) {
@@ -120,20 +121,23 @@ async function joinRole(interaction, bot) {
   }
 
   if (interaction.member.roles.cache.has(role.id)) {
-    return interaction.reply({
+    return interaction.editReply({
       content: `You already have the ${role} role`,
       ephemeral: true,
     })
   }
 
   await interaction.member.roles.add(role)
-  await interaction.reply({ content: `${interaction.member} added to ${role}` })
+  await interaction.editReply({
+    content: `${interaction.member} added to ${role}`,
+  })
 }
 
 /**
  * leaveRole
  */
 async function leaveRole(interaction, bot) {
+  await interaction.deferReply()
   const role = await getManagedRoleFromOptions(bot, interaction)
 
   if (!role) {
@@ -141,14 +145,14 @@ async function leaveRole(interaction, bot) {
   }
 
   if (!interaction.member.roles.cache.has(role.id)) {
-    return interaction.reply({
+    return interaction.editReply({
       content: `You don't have the ${role} role`,
       ephemeral: true,
     })
   }
 
   await interaction.member.roles.remove(role)
-  await interaction.reply({
+  await interaction.editReply({
     content: `${role} removed from ${interaction.member}`,
   })
 }
