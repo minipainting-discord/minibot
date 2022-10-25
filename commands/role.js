@@ -92,7 +92,7 @@ async function listRoles(interaction, bot) {
     embeds.push(
       createEmbed({
         title: "Joined roles",
-        description: listRoles(joinedRoles),
+        description: listRoles(joinedRoles).slice(0, 4096),
       })
     )
   }
@@ -101,7 +101,7 @@ async function listRoles(interaction, bot) {
     embeds.push(
       createEmbed({
         title: "Available roles",
-        description: listRoles(availableRoles),
+        description: listRoles(availableRoles).slice(0, 4096),
       })
     )
   }
