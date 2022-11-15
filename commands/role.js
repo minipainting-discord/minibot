@@ -1,3 +1,4 @@
+import { ApplicationCommandOptionType } from "discord.js"
 import { getManagedRoleFromOptions } from "../helpers/roles.js"
 import { createEmbed } from "../utils.js"
 
@@ -10,17 +11,17 @@ export default function role(bot) {
       {
         name: "list",
         description: "List your current roles and assignable ones",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
       },
       {
         name: "join",
         description: "List your current roles and assignable ones",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "role",
             description: "The role to join",
-            type: "ROLE",
+            type: ApplicationCommandOptionType.Role,
             required: true,
           },
         ],
@@ -28,12 +29,12 @@ export default function role(bot) {
       {
         name: "leave",
         description: "List your current roles and assignable ones",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "role",
             description: "The role to leave",
-            type: "ROLE",
+            type: ApplicationCommandOptionType.Role,
             required: true,
           },
         ],

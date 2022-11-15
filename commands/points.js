@@ -1,3 +1,4 @@
+import { ApplicationCommandOptionType } from "discord.js"
 import { getCurrentScore, getLifetimeScore } from "../helpers/points.js"
 
 export default function points(bot) {
@@ -9,7 +10,7 @@ export default function points(bot) {
       {
         name: "user",
         description: "An optional user to show points for",
-        type: "USER",
+        type: ApplicationCommandOptionType.User,
       },
     ],
 

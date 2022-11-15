@@ -1,3 +1,4 @@
+import { ApplicationCommandOptionType } from "discord.js"
 import { addPoints } from "../helpers/points.js"
 import { updateDisplayName } from "../helpers/userbase.js"
 
@@ -10,13 +11,13 @@ export default function addpoints(bot) {
       {
         name: "user",
         description: "The user to add points to",
-        type: "USER",
+        type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "points",
         description: "The amount of points to add",
-        type: "INTEGER",
+        type: ApplicationCommandOptionType.Integer,
         required: true,
       },
     ],

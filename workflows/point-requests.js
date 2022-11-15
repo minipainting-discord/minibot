@@ -1,4 +1,9 @@
-import { ActionRowBuilder, ButtonBuilder } from "discord.js"
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+} from "discord.js"
 
 import { pluralize, removeReaction } from "../utils.js"
 import { addPoints } from "../helpers/points.js"
@@ -13,9 +18,9 @@ import { updateDisplayName } from "../helpers/userbase.js"
 const URL_PATTERN = /https?:\/\//
 
 const BUTTONS = [
-  { customId: "plus-one", label: "Add 1", style: "PRIMARY" },
-  { customId: "plus-two", label: "Add 2", style: "PRIMARY" },
-  { customId: "close", label: "Close", style: "DANGER" },
+  { customId: "plus-one", label: "Add 1", style: ButtonStyle.Primary },
+  { customId: "plus-two", label: "Add 2", style: ButtonStyle.Primary },
+  { customId: "close", label: "Close", style: ButtonStyle.Danger },
 ]
 
 export default async function pointRequests(bot) {
@@ -133,7 +138,7 @@ async function startPointRequestWatcher(
     },
   })
   const buttonCollector = actionMessage.createMessageComponentCollector({
-    componentType: "BUTTON",
+    componentType: ComponentType.Button,
   })
 
   await removeReaction(requestMessage, "✅")

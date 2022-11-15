@@ -1,3 +1,5 @@
+import { ApplicationCommandOptionType } from "discord.js"
+
 export default function say(bot) {
   return {
     name: "say",
@@ -7,13 +9,13 @@ export default function say(bot) {
       {
         name: "channel",
         description: "Where to send the message",
-        type: "CHANNEL",
+        type: ApplicationCommandOptionType.Channel,
         required: true,
       },
       {
         name: "message",
         description: "What to say",
-        type: "STRING",
+        type: ApplicationCommandOptionType.String,
         required: true,
       },
     ],

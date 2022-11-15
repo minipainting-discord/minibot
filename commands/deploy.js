@@ -50,32 +50,32 @@ export default function deploy(bot) {
   }
 }
 
-function resolvePermissions(bot, availability = bot.AVAILABILITY.PUBLIC) {
-  const { id: atEveryoneId } = bot.guild.roles.cache.find(
-    (role) => role.name === "@everyone"
-  )
-
-  const resolved = [
-    {
-      id: bot.settings.botMasterId,
-      type: "USER",
-      permission: true,
-    },
-  ]
-
-  const roleIdMap = {
-    [bot.AVAILABILITY.PUBLIC]: atEveryoneId,
-    [bot.AVAILABILITY.MOD]: bot.roles.mod.id,
-    [bot.AVAILABILITY.ADMIN]: bot.roles.admin.id,
-  }
-
-  if (roleIdMap[availability]) {
-    resolved.push({
-      id: roleIdMap[availability],
-      type: "ROLE",
-      permission: true,
-    })
-  }
-
-  return resolved
-}
+// function resolvePermissions(bot, availability = bot.AVAILABILITY.PUBLIC) {
+//   const { id: atEveryoneId } = bot.guild.roles.cache.find(
+//     (role) => role.name === "@everyone"
+//   )
+//
+//   const resolved = [
+//     {
+//       id: bot.settings.botMasterId,
+//       type: "USER",
+//       permission: true,
+//     },
+//   ]
+//
+//   const roleIdMap = {
+//     [bot.AVAILABILITY.PUBLIC]: atEveryoneId,
+//     [bot.AVAILABILITY.MOD]: bot.roles.mod.id,
+//     [bot.AVAILABILITY.ADMIN]: bot.roles.admin.id,
+//   }
+//
+//   if (roleIdMap[availability]) {
+//     resolved.push({
+//       id: roleIdMap[availability],
+//       type: "ROLE",
+//       permission: true,
+//     })
+//   }
+//
+//   return resolved
+// }

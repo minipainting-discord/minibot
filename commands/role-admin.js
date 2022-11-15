@@ -1,3 +1,4 @@
+import { ApplicationCommandOptionType } from "discord.js"
 import { getManagedRoleFromOptions } from "../helpers/roles.js"
 
 export default function roleAdmin(bot) {
@@ -9,18 +10,18 @@ export default function roleAdmin(bot) {
       {
         name: "create",
         description: "🔓 Create a new assignable role",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "name",
             description: "Name of the role to add",
-            type: "STRING",
+            type: ApplicationCommandOptionType.String,
             required: true,
           },
           {
             name: "description",
             description: "Description of the role to add",
-            type: "STRING",
+            type: ApplicationCommandOptionType.String,
             required: true,
           },
         ],
@@ -28,18 +29,18 @@ export default function roleAdmin(bot) {
       {
         name: "edit",
         description: "🔓 Edit an assignable role's description",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "role",
             description: "The role to remove",
-            type: "ROLE",
+            type: ApplicationCommandOptionType.Role,
             required: true,
           },
           {
             name: "description",
             description: "New description for the role",
-            type: "STRING",
+            type: ApplicationCommandOptionType.String,
             required: true,
           },
         ],
@@ -47,12 +48,12 @@ export default function roleAdmin(bot) {
       {
         name: "remove",
         description: "🔓 Remove an assignable role",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "role",
             description: "The role to remove",
-            type: "ROLE",
+            type: ApplicationCommandOptionType.Role,
             required: true,
           },
         ],

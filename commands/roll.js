@@ -1,4 +1,5 @@
 import { parse, pool } from "dicebag"
+import { ApplicationCommandOptionType } from "discord.js"
 
 export default function roll(bot) {
   return {
@@ -9,7 +10,7 @@ export default function roll(bot) {
       {
         name: "expression",
         description: "A dice expression to roll",
-        type: "STRING",
+        type: ApplicationCommandOptionType.String,
         required: true,
       },
     ],
