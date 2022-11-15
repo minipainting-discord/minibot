@@ -24,6 +24,7 @@ const discord = new Discord.Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.MessageContent,
   ],
   partials: [Partials.GuildMember],
 })
