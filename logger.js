@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js"
+import { EmbedBuilder } from "discord.js"
 import chalk from "chalk"
 
 const COLORS = {
@@ -24,7 +24,7 @@ export default function createLogger() {
     }
 
     const description = `**[${scope}]** ${message}`
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(DISCORD_COLORS[level])
       .setDescription(
         error ? `${description}\n\`\`\`\n${error.stack}\`\`\`` : description

@@ -38,30 +38,36 @@ export default function leaderboard(bot) {
 
       const maxDigits = Math.max(currentDigits, lifetimeDigits)
 
+      console.log(lifetimeLeaderboard, currentLeaderboard)
+
       // TODO: Add the web leaderboard
       const embed = createEmbed({
         fields: [
           {
             name: "Lifetime Leaderboard",
-            value: lifetimeLeaderboard
-              .map(
-                (line) =>
-                  `\`${String(line.points).padStart(maxDigits)}\` <@${
-                    line.userId
-                  }>`
-              )
-              .join("\n"),
+            value: defaultMessage(
+              lifetimeLeaderboard
+                .map(
+                  (line) =>
+                    `\`${String(line.points).padStart(maxDigits)}\` <@${
+                      line.userId
+                    }>`
+                )
+                .join("\n")
+            ),
           },
           {
             name: "Current Leaderboard",
-            value: currentLeaderboard
-              .map(
-                (line) =>
-                  `\`${String(line.points).padStart(maxDigits)}\` <@${
-                    line.userId
-                  }>`
-              )
-              .join("\n"),
+            value: defaultMessage(
+              currentLeaderboard
+                .map(
+                  (line) =>
+                    `\`${String(line.points).padStart(maxDigits)}\` <@${
+                      line.userId
+                    }>`
+                )
+                .join("\n")
+            ),
           },
         ],
       })
@@ -73,6 +79,10 @@ export default function leaderboard(bot) {
       })
     },
   }
+}
+
+function defaultMessage(leaderboardMessage) {
+  return leaderboardMessage.length > 0 ? leaderboardMessage : "Empty"
 }
 
 function digits(n) {

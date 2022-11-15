@@ -1,4 +1,4 @@
-import Discord from "discord.js"
+import Discord, { GatewayIntentBits, Partials } from "discord.js"
 
 import createLogger from "./logger.js"
 import createBot from "./bot.js"
@@ -21,11 +21,11 @@ const { DISCORD_API_TOKEN, SUPABASE_KEY, SUPABASE_URL } = process.env
 
 const discord = new Discord.Client({
   intents: [
-    Discord.Intents.FLAGS.GUILDS,
-    Discord.Intents.FLAGS.GUILD_MESSAGES,
-    Discord.Intents.FLAGS.GUILD_MEMBERS,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
   ],
-  partials: ["GUILD_MEMBER"],
+  partials: [Partials.GuildMember],
 })
 
 const db = createSupabase({

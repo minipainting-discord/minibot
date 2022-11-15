@@ -1,4 +1,4 @@
-import { MessageActionRow, MessageButton } from "discord.js"
+import { ActionRowBuilder, ButtonBuilder } from "discord.js"
 
 import { pluralize, removeReaction } from "../utils.js"
 import { addPoints } from "../helpers/points.js"
@@ -49,8 +49,8 @@ async function openPointRequest(bot, message) {
       "Moderators, enter the amount of points to give  (0 to reject the request) or use one of the quick actions below:",
     ].join("\n"),
     components: [
-      new MessageActionRow({
-        components: BUTTONS.map((button) => new MessageButton(button)),
+      new ActionRowBuilder({
+        components: BUTTONS.map((button) => new ButtonBuilder(button)),
       }),
     ],
   })

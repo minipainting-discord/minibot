@@ -87,10 +87,15 @@ async function syncRanks(bot) {
   bot.logger.info("core", "Syncing ranks...")
   // TODO: The synchronization logic is very basic, it should be a bit smarter
   // and ran at frequent intervals
-  const { data: ranks } = await bot.db
+  const { data: ranks, error } = await bot.db
     .from("ranks")
     .select()
     .order("minPoints", { ascending: true })
+
+  if (error) {
+    bot.logger.fatal("core", error.message, error)
+    process.exit(1)
+  }
 
   const allRoles = await bot.guild.roles.fetch()
 
@@ -132,7 +137,9 @@ async function syncEmojis(bot) {
 
 async function registerNamedChannels(bot) {
   bot.logger.info("core", "Registering named channels...")
-  const { data: namedChannels } = await bot.db.from("namedChannels").select()
+  const { data: namedChannels, error } = await bot.db
+    .from("namedChannels")
+    .select()
 
   if (!namedChannels.length) {
     bot.logger.fatal("core", "No named channels found, aborting")

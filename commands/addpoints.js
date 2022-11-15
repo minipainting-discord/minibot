@@ -1,4 +1,5 @@
 import { addPoints } from "../helpers/points.js"
+import { updateDisplayName } from "../helpers/userbase.js"
 
 export default function addpoints(bot) {
   return {
@@ -25,6 +26,9 @@ export default function addpoints(bot) {
       const points = interaction.options.getInteger("points")
 
       const guildMember = await bot.guild.members.fetch(user)
+
+      // Make sure the member is in userbase
+      await updateDisplayName(bot, guildMember)
       const newScore = await addPoints(bot, guildMember, points)
 
       if (!newScore) {

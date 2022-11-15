@@ -1,6 +1,6 @@
 import path from "path"
 import { readdir } from "fs/promises"
-import { MessageEmbed } from "discord.js"
+import { EmbedBuilder } from "discord.js"
 
 export function pick(source, includedKeys) {
   return Object.fromEntries(
@@ -40,7 +40,7 @@ export async function importDirectory(directory, logger) {
 }
 
 export function createEmbed(data) {
-  return new MessageEmbed(data).setColor("#BD62F0")
+  return new EmbedBuilder(data).setColor("#BD62F0")
 }
 
 // Returns a random integer between min and max, both inclusive
