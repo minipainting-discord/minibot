@@ -22,13 +22,18 @@ export async function getPointRequestFromThread(bot, message) {
 }
 
 export async function createPointRequest(bot, message) {
-  const { data } = await bot.db
+  const { data, error } = await bot.db
     .from("pointRequests")
     .insert({
       userId: message.author.id,
       requestMessageId: message.id,
     })
+    .select()
     .single()
+
+  if (error) {
+    throw new Error(`Unable to open point request: ${error}`)
+  }
 
   return data
 }

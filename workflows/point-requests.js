@@ -69,7 +69,15 @@ async function openPointRequest(bot, message) {
     `Opened point request ${pointRequest.id} by ${guildMember.displayName}`
   )
 
-  await startPointRequestWatcher(bot, pointRequest, actionMessage)
+  try {
+    await startPointRequestWatcher(bot, pointRequest, actionMessage)
+  } catch (error) {
+    bot.logger.error(
+      "workflow/point-requests",
+      `Unable to start watching point request ${pointRequest.id}`,
+      error
+    )
+  }
 }
 
 async function handleThreadUpdate(bot, oldThread, newThread) {
@@ -90,7 +98,15 @@ async function handleThreadUpdate(bot, oldThread, newThread) {
     )
     await newThread.send("Point request reopened!")
     await updatePointRequest(bot, pointRequest, { cleared: false })
-    await startPointRequestWatcher(bot, pointRequest)
+    try {
+      await startPointRequestWatcher(bot, pointRequest)
+    } catch (error) {
+      bot.logger.error(
+        "workflow/point-requests",
+        `Unable to start watching point request ${pointRequest.id}`,
+        error
+      )
+    }
   }
 }
 
@@ -112,7 +128,8 @@ async function resumePendingRequests(bot) {
       } catch (error) {
         bot.logger.error(
           "workflow/point-requests",
-          `Unable to resume tracking for ${pointRequest.requestMessageId}`
+          `Unable to resume tracking for ${pointRequest.requestMessageId}`,
+          error
         )
       }
     }
@@ -165,7 +182,7 @@ async function startPointRequestWatcher(
     buttonCollector.stop()
     bot.logger.info(
       "workflow/point-requests",
-      `Point request ${pointRequest.id} closed by ${resolver.displayName} ${resolver}`
+      `Point request ${pointRequest.id} closed by ${resolver.displayName} ${resolver} with ${points} points`
     )
   }
 
