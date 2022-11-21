@@ -78,3 +78,5 @@ export default function createLogger() {
     },
   }
 }
+
+export { DISCORD_COLORS }
