@@ -15,7 +15,7 @@ export async function submitLetter(bot, user, letter) {
   })
 
   if (error) {
-    throw new Error(`Unable to submit letter: ${error}`)
+    throw new Error("Unable to submit letter", { cause: error })
   }
 }
 
@@ -28,6 +28,6 @@ export async function updateLetter(bot, user, letter) {
     .eq("userId", user.id)
 
   if (error) {
-    throw new Error(`Unable to update letter: ${error}`)
+    throw new Error("Unable to update letter", { cause: error })
   }
 }
