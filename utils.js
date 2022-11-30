@@ -55,6 +55,16 @@ export function randomItem(collection) {
   return collection[randomInt(0, collection.length - 1)]
 }
 
+// Returns a new array with shuffled elements
+export function shuffle(collection) {
+  const copy = [...collection]
+
+  return collection.reduce((shuffled) => {
+    const randomIndex = randomInt(0, copy.length - 1)
+    return [...shuffled, copy.splice(randomIndex, 1).pop()]
+  }, [])
+}
+
 export function getCurrentYear() {
   return new Date().getFullYear()
 }
