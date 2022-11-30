@@ -36,6 +36,13 @@ export default function roleAdmin(bot) {
     ],
 
     async execute(interaction) {
+      if (interaction.member.id !== bot.settings.botMasterId) {
+        return interaction.reply({
+          content: "Only 🎅 can use this command!",
+          ephemeral: true,
+        })
+      }
+
       const command = interaction.options.getSubcommand()
 
       switch (command) {
@@ -64,7 +71,7 @@ async function listParticipants(interaction, bot) {
           (letter) =>
             `${FLAGS[letter.region]} ${TIERS[getTier(letter)]} <@${
               letter.userId
-            }>`
+            }> ${letter.matcheeId ? `(🎁 <@${letter.matcheeId}>)` : ""}`
         )
         .join("\n"),
     ].join("\n"),
