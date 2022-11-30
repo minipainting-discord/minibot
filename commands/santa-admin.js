@@ -9,6 +9,11 @@ const FLAGS = {
   any: "🌏",
 }
 
+const TIERS = {
+  nice: "🎅",
+  naughty: "🦌",
+}
+
 const NICE_THRESHOLD = 3500
 
 export default function roleAdmin(bot) {
@@ -57,7 +62,9 @@ async function listParticipants(interaction, bot) {
       letters
         .map(
           (letter) =>
-            `${FLAGS[letter.region]} ${letter.postCount} <@${letter.userId}>`
+            `${FLAGS[letter.region]} ${TIERS[getTier(letter)]} <@${
+              letter.userId
+            }>`
         )
         .join("\n"),
     ].join("\n"),
