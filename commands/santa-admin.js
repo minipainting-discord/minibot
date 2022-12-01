@@ -177,7 +177,10 @@ async function sendMatcheesToParticipants(interaction, bot) {
         `For any additional question, please ask <@${bot.settings.botMasterId}>!`,
       ].join("\n")
     )
-    bot.logger.info(`Sent letter to ${santa.displayName}`)
+    bot.logger.info(
+      "commands/santa-admin",
+      `Sent letter to ${santa.displayName}`
+    )
   }
 
   await interaction.followUp({ content: "Letters sent! :snowflake: :rocket:" })
