@@ -16,6 +16,8 @@
     "dicebag": "^0.1.2",
     "discord.js": "^14.6.0",
     "dotenv-cli": "^6.0.0",
+    "friendly-node-cron": "^1.4.1",
+    "node-cron": "^3.0.2",
     "utf-8-validate": "^5.0.10",
     "zlib-sync": "^0.1.7"
   },
