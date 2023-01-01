@@ -1,8 +1,7 @@
 import { getCurrentYear } from "../utils.js"
 
-export async function addPoints(bot, guildMember, points) {
+export async function addPoints(bot, guildMember, points, year) {
   const userId = guildMember.id
-  const year = getCurrentYear()
 
   const currentScore = await getCurrentScore(bot, guildMember)
   const lifetimeScore = await getLifetimeScore(bot, guildMember)

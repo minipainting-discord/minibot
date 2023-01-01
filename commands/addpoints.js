@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType } from "discord.js"
 import { addPoints } from "../helpers/points.js"
 import { updateDisplayName } from "../helpers/userbase.js"
+import { getCurrentYear } from "../utils.js"
 
 export default function addpoints(bot) {
   return {
@@ -20,17 +21,23 @@ export default function addpoints(bot) {
         type: ApplicationCommandOptionType.Integer,
         required: true,
       },
+      {
+        name: "year",
+        description: "The year of points to add (defaults to current year)",
+        type: ApplicationCommandOptionType.Integer,
+      },
     ],
 
     async execute(interaction) {
       const user = interaction.options.getUser("user")
       const points = interaction.options.getInteger("points")
+      const year = interaction.options.getInteger("year") ?? getCurrentYear()
 
       const guildMember = await bot.guild.members.fetch(user)
 
       // Make sure the member is in userbase
       await updateDisplayName(bot, guildMember)
-      const newScore = await addPoints(bot, guildMember, points)
+      const newScore = await addPoints(bot, guildMember, points, year)
 
       if (!newScore) {
         return await interaction.reply(

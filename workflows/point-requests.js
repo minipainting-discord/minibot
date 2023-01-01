@@ -5,7 +5,7 @@ import {
   ComponentType,
 } from "discord.js"
 
-import { pluralize, removeReaction } from "../utils.js"
+import { getCurrentYear, pluralize, removeReaction } from "../utils.js"
 import { addPoints } from "../helpers/points.js"
 import {
   listPendingPointRequests,
@@ -163,7 +163,12 @@ async function startPointRequestWatcher(
 
   async function resolveRequest(points, resolver) {
     if (points !== 0) {
-      const newScore = await addPoints(bot, guildMember, points)
+      const newScore = await addPoints(
+        bot,
+        guildMember,
+        points,
+        getCurrentYear()
+      )
 
       await requestMessage.thread.send(
         `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`
@@ -195,7 +200,7 @@ async function startPointRequestWatcher(
   )
 }
 
-async function handleModeratorInput(bot, message, resolveRequest) {
+async function handleModeratorInput(_bot, message, resolveRequest) {
   const points = parseInt(message.content, 10)
 
   await resolveRequest(points, message.member)
