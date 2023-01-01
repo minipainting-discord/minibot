@@ -1,19 +1,17 @@
-import { getCurrentYear } from "../utils.js"
-
 export async function addPoints(bot, guildMember, points, year) {
   const userId = guildMember.id
 
-  const currentScore = await getCurrentScore(bot, guildMember)
+  const yearScore = await getYearScore(bot, guildMember, year)
   const lifetimeScore = await getLifetimeScore(bot, guildMember)
 
   const newScore = {
-    current: (currentScore?.points || 0) + points,
+    year: (yearScore?.points || 0) + points,
     lifetime: (lifetimeScore?.points || 0) + points,
   }
 
   const { error } = await bot.db
     .from("leaderboard")
-    .upsert({ userId, year, points: newScore.current })
+    .upsert({ userId, year, points: newScore.year })
 
   if (error) {
     bot.logger.error("helper/addPoints", "Error while adding points", error)
@@ -40,14 +38,14 @@ export async function addPoints(bot, guildMember, points, year) {
   return newScore
 }
 
-export async function getCurrentScore(bot, user) {
-  const { data: currentScore } = await bot.db
+export async function getYearScore(bot, user, year) {
+  const { data: yearScore } = await bot.db
     .from("leaderboard")
     .select()
     .single()
-    .match({ userId: user.id, year: getCurrentYear() })
+    .match({ userId: user.id, year })
 
-  return currentScore
+  return yearScore
 }
 
 export async function getLifetimeScore(bot, user) {

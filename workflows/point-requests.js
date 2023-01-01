@@ -163,15 +163,11 @@ async function startPointRequestWatcher(
 
   async function resolveRequest(points, resolver) {
     if (points !== 0) {
-      const newScore = await addPoints(
-        bot,
-        guildMember,
-        points,
-        getCurrentYear()
-      )
+      const year = getCurrentYear()
+      const newScore = await addPoints(bot, guildMember, points, year)
 
       await requestMessage.thread.send(
-        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`
+        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.year} points for ${year}`
       )
     }
     await requestMessage.thread.send(

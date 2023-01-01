@@ -46,7 +46,7 @@ export default function addpoints(bot) {
       }
 
       await interaction.reply(
-        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.current} current points`
+        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.year} points for ${year}`
       )
     },
   }

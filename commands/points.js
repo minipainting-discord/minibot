@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType } from "discord.js"
-import { getCurrentScore, getLifetimeScore } from "../helpers/points.js"
+import { getYearScore, getLifetimeScore } from "../helpers/points.js"
+import { getCurrentYear } from "../utils.js"
 
 export default function points(bot) {
   return {
@@ -17,19 +18,20 @@ export default function points(bot) {
     async execute(interaction) {
       const userArg = interaction.options.getUser("user")
       const user = userArg || interaction.user
+      const year = getCurrentYear()
 
-      const currentScore = await getCurrentScore(bot, user)
+      const currentScore = await getYearScore(bot, user, year)
       const lifetimeScore = await getLifetimeScore(bot, user)
 
       const score = {
-        current: currentScore?.points || 0,
+        year: currentScore?.points || 0,
         lifetime: lifetimeScore?.points || 0,
       }
 
       await interaction.reply(
         userArg
-          ? `${user} has ${score.lifetime} lifetime points and ${score.current} current points`
-          : `${user}, you have ${score.lifetime} lifetime points and ${score.current} current points`
+          ? `${user} has ${score.lifetime} lifetime points and ${score.year} points for ${year}`
+          : `${user}, you have ${score.lifetime} lifetime points and ${score.year} points for ${year}`
       )
     },
   }
