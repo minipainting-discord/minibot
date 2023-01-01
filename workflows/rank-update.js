@@ -90,10 +90,12 @@ export default async function rankUpdate(bot) {
       return "https://thumbs.gfycat.com/DistinctThunderousCatfish-size_restricted.gif"
     }
 
-    const { data: { publicURL } } = await bot.db.storage
+    const {
+      data: { publicUrl },
+    } = await bot.db.storage
       .from("images")
       .getPublicUrl(path.join(prefix, randomItem(gifs).name))
 
-    return publicURL
+    return publicUrl
   }
 }
