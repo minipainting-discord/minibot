@@ -1,0 +1,12 @@
+# fly.toml file generated for minibot on 2022-11-16T12:33:08+01:00
+
+app = "minibot"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
