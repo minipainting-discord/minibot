@@ -39,7 +39,6 @@ async function processModalSubmit(bot, interaction, previousLetter) {
     .getTextInputValue("region")
     .toLowerCase()
     .trim()
-  const postCount = interaction.fields.getTextInputValue("post-count").trim()
   const address = interaction.fields.getTextInputValue("address").trim()
   const content = interaction.fields.getTextInputValue("content").trim()
 
@@ -47,14 +46,6 @@ async function processModalSubmit(bot, interaction, previousLetter) {
 
   if (!REGIONS.some((availableRegion) => availableRegion === region)) {
     errors.push({ name: "Region", value: "Should be one of NA, EU or ANY" })
-  }
-
-  if (postCount.length === 0) {
-    errors.push({ name: "Post Count", value: "Should not be empty" })
-  }
-
-  if (isNaN(Number(postCount))) {
-    errors.push({ name: "Post Count", value: "Should be a number" })
   }
 
   if (address.length === 0) {
@@ -81,7 +72,6 @@ async function processModalSubmit(bot, interaction, previousLetter) {
   if (previousLetter) {
     await updateLetter(bot, interaction.user, {
       region,
-      postCount: Number(postCount),
       address,
       content,
     })
@@ -92,7 +82,6 @@ async function processModalSubmit(bot, interaction, previousLetter) {
   } else {
     await submitLetter(bot, interaction.user, {
       region,
-      postCount: Number(postCount),
       address,
       content,
     })
@@ -117,12 +106,6 @@ async function processButtonClick(interaction, previousLetter) {
     .setStyle(TextInputStyle.Short)
     .setValue(previousLetter?.region ?? "")
 
-  const postCountComponent = new TextInputBuilder()
-    .setCustomId("post-count")
-    .setLabel("Your post count")
-    .setStyle(TextInputStyle.Short)
-    .setValue(previousLetter?.postCount ? String(previousLetter.postCount) : "")
-
   const addressComponent = new TextInputBuilder()
     .setCustomId("address")
     .setLabel("Your address")
@@ -137,7 +120,6 @@ async function processButtonClick(interaction, previousLetter) {
 
   modal.addComponents(
     new ActionRowBuilder().addComponents(regionComponent),
-    new ActionRowBuilder().addComponents(postCountComponent),
     new ActionRowBuilder().addComponents(addressComponent),
     new ActionRowBuilder().addComponents(contentComponent)
   )

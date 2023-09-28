@@ -11,13 +11,6 @@ const FLAGS = {
   any: "🌏",
 }
 
-const TIERS = {
-  nice: "🧝",
-  naughty: "🦌",
-}
-
-const NICE_THRESHOLD = 3500
-
 export default function roleAdmin(bot) {
   return {
     name: "santa-admin",
@@ -71,25 +64,22 @@ async function listParticipants(interaction, bot) {
     return interaction.reply({ content: ":shrug:", ephemeral: true })
   }
 
-  const groups = groupLetters(letters)
+  const lettersByRegion = groupLetters(letters)
 
-  const groupedLetters = [
-    ...groups.naughty.eu,
-    ...groups.naughty.na,
-    ...groups.naughty.any,
-    ...groups.nice.eu,
-    ...groups.nice.na,
-    ...groups.nice.any,
+  const sortedLetters = [
+    ...lettersByRegion.eu,
+    ...lettersByRegion.na,
+    ...lettersByRegion.any,
   ]
 
   return interaction.reply({
     content: [
-      groupedLetters
+      sortedLetters
         .map(
           (letter) =>
-            `${FLAGS[letter.region]} ${TIERS[getTier(letter)]} <@${
-              letter.userId
-            }> ${letter.matcheeId ? `(🎅 <@${letter.matcheeId}>)` : ""}`
+            `${FLAGS[letter.region]} <@${letter.userId}> ${
+              letter.matcheeId ? `(🎅 <@${letter.matcheeId}>)` : ""
+            }`
         )
         .join("\n"),
     ].join("\n"),
@@ -100,33 +90,19 @@ async function listParticipants(interaction, bot) {
 async function matchParticipants(interaction, bot) {
   await interaction.deferReply({ ephemeral: true })
   const { data: letters } = await bot.db.from("santaLetters").select()
-  const groups = groupLetters(letters)
-
-  // If someone is alone in naughty/region, move it to nice
-  for (const region of REGIONS) {
-    if (groups.naughty[region].length === 1) {
-      const letter = groups.naughty[region].pop()
-      groups.nice[region].push(letter)
-      bot.logger.info(
-        "commands/santa-admin",
-        `Upgraded user <@${letter.userId}> to the nice tier`
-      )
-    }
-  }
+  const lettersByRegion = groupLetters(letters)
 
   // Matching dance!
-  for (const tier of ["naughty", "nice"]) {
-    for (const region of REGIONS) {
-      const group = groups[tier][region]
-      const shuffledGroup = shuffle(group)
+  for (const region of REGIONS) {
+    const group = lettersByRegion[region]
+    const shuffledGroup = shuffle(group)
 
-      for (const [i, letter] of shuffledGroup.entries()) {
-        const matchee = shuffledGroup[(i + 1) % shuffledGroup.length]
-        await bot.db
-          .from("santaLetters")
-          .update({ matcheeId: matchee.userId })
-          .eq("userId", letter.userId)
-      }
+    for (const [i, letter] of shuffledGroup.entries()) {
+      const matchee = shuffledGroup[(i + 1) % shuffledGroup.length]
+      await bot.db
+        .from("santaLetters")
+        .update({ matcheeId: matchee.userId })
+        .eq("userId", letter.userId)
     }
   }
 
@@ -186,19 +162,12 @@ async function sendMatcheesToParticipants(interaction, bot) {
   await interaction.followUp({ content: "Letters sent! :snowflake: :rocket:" })
 }
 
-function getTier(letter) {
-  return letter.postCount >= NICE_THRESHOLD ? "nice" : "naughty"
-}
-
 function groupLetters(letters) {
-  const groups = {
-    naughty: { na: [], eu: [], any: [] },
-    nice: { na: [], eu: [], any: [] },
-  }
+  const regions = { na: [], eu: [], any: [] }
 
   for (const letter of letters) {
-    groups[getTier(letter)][letter.region].push(letter)
+    regions[letter.region].push(letter)
   }
 
-  return groups
+  return regions
 }
