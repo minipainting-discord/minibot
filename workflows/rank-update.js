@@ -36,7 +36,7 @@ export default async function rankUpdate(bot) {
         await bot.db.from("users").upsert({
           userId: guildMember.id,
           displayName: guildMember.displayName,
-          rankId: nextRank?.id,
+          rankId: nextRank?.id ?? null,
         })
 
         const { message, gifUrl } = await getRankingMessage(
@@ -87,7 +87,7 @@ export default async function rankUpdate(bot) {
   async function getRandomGifUrl(prefix, gifs) {
     // FIXME: Only used in dev when storage isn't available, to be fixed once it is
     if (!gifs.length) {
-      return "https://thumbs.gfycat.com/DistinctThunderousCatfish-size_restricted.gif"
+      return "https://placehold.co/600x400"
     }
 
     const {
