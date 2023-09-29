@@ -1,4 +1,6 @@
 .env
+.env.dev
+.env.prod
 node_modules
 settings.json
 *.sqlite
@@ -8,3 +10,4 @@ settings.json
 **/supabase/.branches
 **/supabase/.temp
 **/supabase/.env
+
