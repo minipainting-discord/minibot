@@ -8,6 +8,15 @@ export function pick(source, includedKeys) {
   )
 }
 
+export function partition(array, criteria) {
+  return array.reduce(
+    (partitions, item) => (
+      partitions[criteria(item) ? 0 : 1].push(item), partitions
+    ),
+    [[], []]
+  )
+}
+
 export async function importDirectory(directory, logger) {
   const files = await readdir(directory, { withFileTypes: true })
 

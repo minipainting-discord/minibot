@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js"
+import { updateDisplayName } from "../helpers/userbase.js"
 
 export default function santa(bot) {
   return {
@@ -7,7 +8,40 @@ export default function santa(bot) {
     availability: bot.AVAILABILITY.PUBLIC,
 
     async execute(interaction) {
-      await interaction.reply({
+      const guildMember = await bot.guild.members.fetch(interaction.user)
+      await updateDisplayName(bot, guildMember)
+      const { data: user } = await bot.db
+        .from("users")
+        .select()
+        .single()
+        .match({ userId: interaction.user.id })
+
+      if (!user) {
+        await bot.logger.error(`User not found ${user}`)
+        return await interaction.reply({
+          content: "Something went wrong, we've been warned",
+          ephemeral: true,
+        })
+      }
+
+      if (user.canParticipateInSecretSanta === false) {
+        return await interaction.reply({
+          content: "You are not allowed to participate in Secret Santa.",
+          ephemeral: true,
+        })
+      }
+
+      if (user.canParticipateInSecretSanta === null && user.rankId === null) {
+        return await interaction.reply({
+          content: [
+            "You are not allowed to participate in Secret Santa yet.",
+            "You need a rank or an explicit approval from the admin.",
+          ].join("\n"),
+          ephemeral: true,
+        })
+      }
+
+      return await interaction.reply({
         components: [
           new ActionRowBuilder().addComponents(
             new ButtonBuilder()

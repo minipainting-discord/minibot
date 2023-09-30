@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType } from "discord.js"
-import { shuffle } from "../utils.js"
+import { partition, shuffle } from "../utils.js"
+import { updateDisplayName } from "../helpers/userbase.js"
 
 const DEADLINE = "Dec 14th"
 
@@ -33,6 +34,57 @@ export default function roleAdmin(bot) {
         description: "🔒 Send letters!",
         type: ApplicationCommandOptionType.Subcommand,
       },
+      {
+        name: "allowlist",
+        description: "🔒 Manage allowed users",
+        type: ApplicationCommandOptionType.SubcommandGroup,
+        options: [
+          {
+            name: "list",
+            description: "🔒 List allowed users",
+            type: ApplicationCommandOptionType.Subcommand,
+          },
+          {
+            name: "allow",
+            description: "🔒 Allow an user",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "user",
+                description: "The user to allow",
+                type: ApplicationCommandOptionType.User,
+                required: true,
+              },
+            ],
+          },
+          {
+            name: "disallow",
+            description: "🔒 Disallow an user",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "user",
+                description: "The user to disallow",
+                type: ApplicationCommandOptionType.User,
+                required: true,
+              },
+            ],
+          },
+          {
+            name: "forget",
+            description: "🔒 Forget an user",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "user",
+                description: "The user to forget",
+                type: ApplicationCommandOptionType.User,
+                required: true,
+              },
+            ],
+          },
+        ],
+      },
     ],
 
     async execute(interaction) {
@@ -43,15 +95,32 @@ export default function roleAdmin(bot) {
         })
       }
 
-      const command = interaction.options.getSubcommand()
+      const subcommandGroup = interaction.options.getSubcommandGroup()
+      const subcommand = interaction.options.getSubcommand()
 
-      switch (command) {
-        case "list":
-          return await listParticipants(interaction, bot)
-        case "match":
-          return await matchParticipants(interaction, bot)
-        case "send":
-          return await sendMatcheesToParticipants(interaction, bot)
+      switch (subcommandGroup) {
+        case "allowlist":
+          switch (subcommand) {
+            case "list":
+              return await listAllowedUsers(interaction, bot)
+            case "allow":
+              return await allowUser(interaction, bot)
+            case "disallow":
+              return await disallowUser(interaction, bot)
+            case "forget":
+              return await forgetUser(interaction, bot)
+          }
+          break
+        case null: {
+          switch (subcommand) {
+            case "list":
+              return await listParticipants(interaction, bot)
+            case "match":
+              return await matchParticipants(interaction, bot)
+            case "send":
+              return await sendMatcheesToParticipants(interaction, bot)
+          }
+        }
       }
     },
   }
@@ -122,6 +191,7 @@ async function sendMatcheesToParticipants(interaction, bot) {
   if (letters.some((letter) => !letter.matcheeId)) {
     return interaction.reply({
       content: "Not everyone is matched! Please match people first.",
+      ephemeral: true,
     })
   }
 
@@ -170,4 +240,108 @@ function groupLetters(letters) {
   }
 
   return regions
+}
+
+async function listAllowedUsers(interaction, bot) {
+  const { data: users } = await bot.db
+    .from("users")
+    .select()
+    .not("canParticipateInSecretSanta", "is", null)
+
+  if (!users?.length) {
+    return interaction.reply({
+      content: "No users manually allowed or disallowed yet",
+      ephemeral: true,
+    })
+  }
+
+  const [allow, disallow] = partition(
+    users,
+    (user) => user.canParticipateInSecretSanta
+  )
+
+  return interaction.reply({
+    content: [
+      allow.length
+        ? `Manually allowed users: ${users
+            .map((user) => user.displayName)
+            .join(", ")}`
+        : null,
+      disallow.length
+        ? `Manually disallowed users: ${users
+            .map((user) => user.displayName)
+            .join(", ")}`
+        : null,
+    ]
+      .filter((line) => line !== null)
+      .join("\n"),
+    ephemeral: true,
+  })
+}
+
+export async function allowUser(interaction, bot) {
+  const user = interaction.options.getUser("user")
+  const guildMember = await bot.guild.members.fetch(user)
+  await updateDisplayName(bot, guildMember)
+
+  const { error } = await bot.db
+    .from("users")
+    .update({
+      canParticipateInSecretSanta: true,
+    })
+    .eq("userId", user.id)
+
+  if (error) {
+    throw new Error("Unable to update user", { cause: error })
+  }
+
+  await interaction.reply({
+    content: `Allowed user ${user}`,
+    ephemeral: true,
+  })
+}
+
+export async function disallowUser(interaction, bot) {
+  const user = interaction.options.getUser("user")
+  const guildMember = await bot.guild.members.fetch(user)
+  await updateDisplayName(bot, guildMember)
+  console.log(guildMember)
+
+  const { error } = await bot.db
+    .from("users")
+    .update({
+      canParticipateInSecretSanta: false,
+    })
+    .eq("userId", user.id)
+
+  if (error) {
+    throw new Error("Unable to update user", { cause: error })
+  }
+
+  await interaction.reply({
+    content: `Disallowed user ${user}`,
+    ephemeral: true,
+  })
+}
+
+export async function forgetUser(interaction, bot) {
+  const user = interaction.options.getUser("user")
+  const guildMember = await bot.guild.members.fetch(user)
+  await updateDisplayName(bot, guildMember)
+
+  const { error } = await bot.db
+    .from("users")
+    .update({
+      canParticipateInSecretSanta: null,
+    })
+    .eq("userId", user.id)
+
+  if (error) {
+    throw new Error("Unable to update user", { cause: error })
+  }
+
+  await interaction.reply({
+    content: `Forgot user ${user}`,
+    ephemeral: true,
+  })
 }

@@ -14,7 +14,7 @@
     "bufferutil": "^4.0.7",
     "chalk": "^5.2.0",
     "dicebag": "^0.1.2",
-    "discord.js": "^14.8.0",
+    "discord.js": "^14.13.0",
     "dotenv-cli": "^7.1.0",
     "friendly-node-cron": "^1.4.1",
     "node-cron": "^3.0.2",
@@ -27,6 +27,7 @@
     "lint-staged": "^13.2.0",
     "nodemon": "^2.0.22",
     "prettier": "^2.8.7",
+    "supabase": "^1.99.5",
     "uvu": "^0.5.6"
   },
   "repository": {
