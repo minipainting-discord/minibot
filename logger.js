@@ -6,6 +6,7 @@ const COLORS = {
   warn: "yellow",
   error: "red",
   fatal: "magenta",
+  moderation: "bgYellow",
 }
 
 const DISCORD_COLORS = {
@@ -13,6 +14,7 @@ const DISCORD_COLORS = {
   warn: "#f6c42f",
   error: "#f52565",
   fatal: "#a05bb4",
+  moderation: "#f59207",
 }
 
 export default function createLogger() {
@@ -31,7 +33,7 @@ export default function createLogger() {
       )
     bot.channels.bot.send({ embeds: [embed] })
 
-    if (["error", "fatal"].includes(level)) {
+    if (["error", "fatal", "moderation"].includes(level)) {
       bot.channels.bot.send(`<@${bot.settings.botMasterId}> :arrow_up:`)
     }
   }
@@ -59,6 +61,11 @@ export default function createLogger() {
     error(scope, message, error) {
       console.error(format("error", scope, message), error)
       botLog("error", scope, message, error)
+    },
+
+    moderation(scope, message, error) {
+      console.error(format("moderation", scope, message), error)
+      botLog("moderation", scope, message, error)
     },
 
     fatal(scope, message, error) {
