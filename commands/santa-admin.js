@@ -88,13 +88,6 @@ export default function roleAdmin(bot) {
     ],
 
     async execute(interaction) {
-      if (interaction.member.id !== bot.settings.botMasterId) {
-        return interaction.reply({
-          content: "Only 🎅 can use this command!",
-          ephemeral: true,
-        })
-      }
-
       const subcommandGroup = interaction.options.getSubcommandGroup()
       const subcommand = interaction.options.getSubcommand()
 
