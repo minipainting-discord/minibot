@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from "discord.js"
 import { partition, shuffle } from "../utils.js"
 import { updateDisplayName } from "../helpers/userbase.js"
 
-const DEADLINE = "Dec 14th"
+const DEADLINE = "Nov 30th"
 
 const REGIONS = ["na", "eu", "any"]
 
