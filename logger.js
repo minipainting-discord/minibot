@@ -33,8 +33,11 @@ export default function createLogger() {
       )
     bot.channels.bot.send({ embeds: [embed] })
 
-    if (["error", "fatal", "moderation"].includes(level)) {
+    if (["error", "fatal"].includes(level)) {
       bot.channels.bot.send(`<@${bot.settings.botMasterId}> :arrow_up:`)
+    }
+    if (level === "moderation") {
+      bot.channels.bot.send(`<@${bot.roles.mod}> :arrow_up:`)
     }
   }
 
