@@ -37,7 +37,7 @@ export default function createLogger() {
       bot.channels.bot.send(`<@${bot.settings.botMasterId}> :arrow_up:`)
     }
     if (level === "moderation") {
-      bot.channels.bot.send(`<@${bot.roles.mod}> :arrow_up:`)
+      bot.channels.bot.send(`${bot.roles.mod} :arrow_up:`)
     }
   }
 
