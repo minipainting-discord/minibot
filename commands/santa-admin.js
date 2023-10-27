@@ -203,7 +203,19 @@ async function sendMatcheesToParticipants(interaction, bot) {
         "Here is their Santa letter:",
       ].join("\n")
     )
-    await dmChannel.send(`>>> ${letter.content}`)
+    if (letter.content.length > 1900) {
+      await dmChannel.send(
+        `>>> ${letter.content.slice(0, Math.floor(letter.length / 2))}`
+      )
+      await dmChannel.send(
+        `>>> ${letter.content.slice(
+          Math.floor(letter.length / 2),
+          letter.length
+        )}`
+      )
+    } else {
+      await dmChannel.send(`>>> ${letter.content}`)
+    }
     await dmChannel.send(
       [
         "Pick at least one item in this list, buy it and send it to this address:",
