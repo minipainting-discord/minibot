@@ -203,18 +203,8 @@ async function sendMatcheesToParticipants(interaction, bot) {
         "Here is their Santa letter:",
       ].join("\n")
     )
-    if (letter.content.length > 1900) {
-      await dmChannel.send(
-        `>>> ${letter.content.slice(0, Math.floor(letter.length / 2))}`
-      )
-      await dmChannel.send(
-        `>>> ${letter.content.slice(
-          Math.floor(letter.length / 2),
-          letter.length
-        )}`
-      )
-    } else {
-      await dmChannel.send(`>>> ${letter.content}`)
+    for (const message of breakLetterIntoMessages(letter)) {
+      await dmChannel.send(`>>> ${message}`)
     }
     await dmChannel.send(
       [
@@ -235,6 +225,21 @@ async function sendMatcheesToParticipants(interaction, bot) {
   }
 
   await interaction.followUp({ content: "Letters sent! :snowflake: :rocket:" })
+}
+
+function breakLetterIntoMessages(letter) {
+  return letter.content.split("\n").reduce(
+    (messages, line) => {
+      const lastMessage = messages.at(-1)
+      const withNewLine = lastMessage + line + "\n"
+      if (withNewLine.length > 1996) {
+        return [...messages, line]
+      } else {
+        return [...messages.slice(0, messages.length - 1), withNewLine]
+      }
+    },
+    [""]
+  )
 }
 
 function groupLetters(letters) {
