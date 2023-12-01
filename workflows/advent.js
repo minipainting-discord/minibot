@@ -6,7 +6,7 @@ export default async function advent(bot) {
     parseSchedule("every day at 00:00 from 1 through 24 of december"),
     () => sayDailyWord(bot),
     {
-      timezone: "America/Los_Angeles",
+      timezone: "America/New_York",
     }
   )
 }
