@@ -25,20 +25,18 @@ export default function leaderboard(bot) {
       const currentDigits = digits(
         currentLeaderboard.reduce(
           (max, line) => (line.points > max ? line.points : max),
-          0
-        )
+          0,
+        ),
       )
 
       const lifetimeDigits = digits(
         lifetimeLeaderboard.reduce(
           (max, line) => (line.points > max ? line.points : max),
-          0
-        )
+          0,
+        ),
       )
 
       const maxDigits = Math.max(currentDigits, lifetimeDigits)
-
-      console.log(lifetimeLeaderboard, currentLeaderboard)
 
       // TODO: Add the web leaderboard
       const embed = createEmbed({
@@ -51,9 +49,9 @@ export default function leaderboard(bot) {
                   (line) =>
                     `\`${String(line.points).padStart(maxDigits)}\` <@${
                       line.userId
-                    }>`
+                    }>`,
                 )
-                .join("\n")
+                .join("\n"),
             ),
           },
           {
@@ -64,9 +62,9 @@ export default function leaderboard(bot) {
                   (line) =>
                     `\`${String(line.points).padStart(maxDigits)}\` <@${
                       line.userId
-                    }>`
+                    }>`,
                 )
-                .join("\n")
+                .join("\n"),
             ),
           },
         ],

@@ -141,7 +141,7 @@ async function listParticipants(interaction, bot) {
           (letter) =>
             `${FLAGS[letter.region]} <@${letter.userId}> ${
               letter.matcheeId ? `(🎅 <@${letter.matcheeId}>)` : ""
-            }`
+            }`,
         )
         .join("\n"),
     ].join("\n"),
@@ -201,7 +201,7 @@ async function sendMatcheesToParticipants(interaction, bot) {
         "",
         `I picked a giftee for you and it is **<@${user.id}>**!`,
         "Here is their Santa letter:",
-      ].join("\n")
+      ].join("\n"),
     )
     for (const message of breakLetterIntoMessages(letter)) {
       await dmChannel.send(`>>> ${message}`)
@@ -216,11 +216,11 @@ async function sendMatcheesToParticipants(interaction, bot) {
         "",
         `Last thing, please don't forget to send your package before **${DEADLINE}**.`,
         `For any additional question, please ask <@${bot.settings.botMasterId}>!`,
-      ].join("\n")
+      ].join("\n"),
     )
     bot.logger.info(
       "commands/santa-admin",
-      `Sent letter to ${santa.displayName}`
+      `Sent letter to ${santa.displayName}`,
     )
   }
 
@@ -238,7 +238,7 @@ function breakLetterIntoMessages(letter) {
         return [...messages.slice(0, messages.length - 1), withNewLine]
       }
     },
-    [""]
+    [""],
   )
 }
 
@@ -267,7 +267,7 @@ async function listAllowedUsers(interaction, bot) {
 
   const [allow, disallow] = partition(
     users,
-    (user) => user.canParticipateInSecretSanta
+    (user) => user.canParticipateInSecretSanta,
   )
 
   return interaction.reply({
@@ -315,7 +315,6 @@ export async function disallowUser(interaction, bot) {
   const user = interaction.options.getUser("user")
   const guildMember = await bot.guild.members.fetch(user)
   await updateDisplayName(bot, guildMember)
-  console.log(guildMember)
 
   const { error } = await bot.db
     .from("users")
