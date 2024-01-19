@@ -10,25 +10,25 @@
     "console": "dotenv -- node console.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.12.1",
-    "bufferutil": "^4.0.7",
-    "chalk": "^5.2.0",
-    "date-fns": "^2.30.0",
+    "@supabase/supabase-js": "^2.39.3",
+    "bufferutil": "^4.0.8",
+    "chalk": "^5.3.0",
+    "date-fns": "^3.2.0",
     "dicebag": "^0.1.2",
-    "discord.js": "^14.13.0",
-    "dotenv-cli": "^7.1.0",
+    "discord.js": "^14.14.1",
+    "dotenv-cli": "^7.3.0",
     "friendly-node-cron": "^1.4.1",
-    "node-cron": "^3.0.2",
+    "node-cron": "^3.0.3",
     "utf-8-validate": "^6.0.3",
-    "zlib-sync": "^0.1.8"
+    "zlib-sync": "^0.1.9"
   },
   "devDependencies": {
-    "eslint": "^8.36.0",
+    "eslint": "^8.56.0",
     "husky": "^4.3.8",
     "lint-staged": "^13.2.0",
-    "nodemon": "^2.0.22",
-    "prettier": "^2.8.7",
-    "supabase": "^1.99.5",
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.4",
+    "supabase": "^1.131.5",
     "uvu": "^0.5.6"
   },
   "repository": {
