@@ -13,12 +13,18 @@ export default function points(bot) {
         description: "An optional user to show points for",
         type: ApplicationCommandOptionType.User,
       },
+      {
+        name: "year",
+        description: "An optional year to show points for",
+        type: ApplicationCommandOptionType.Number,
+      },
     ],
 
     async execute(interaction) {
       const userArg = interaction.options.getUser("user")
-      const user = userArg || interaction.user
-      const year = getCurrentYear()
+      const yearArg = interaction.options.getNumber("year")
+      const user = userArg ?? interaction.user
+      const year = yearArg ?? getCurrentYear()
 
       const currentScore = await getYearScore(bot, user, year)
       const lifetimeScore = await getLifetimeScore(bot, user)
