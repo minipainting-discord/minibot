@@ -46,7 +46,11 @@ export async function getYearScore(bot, user, year) {
     .match({ userId: user.id, year })
 
   if (error) {
-    bot.logger.error("helper/getYearScore", "Error while updating user", error)
+    bot.logger.error(
+      "helper/getYearScore",
+      `Unable to get score for ${user}`,
+      error,
+    )
   }
 
   return yearScore
