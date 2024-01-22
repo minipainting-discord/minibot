@@ -6,7 +6,6 @@ import {
 } from "../helpers/raffle.js"
 import { getYearScore } from "../helpers/points.js"
 import { getPreviousYear, pluralize } from "../utils.js"
-import { getManagedRoleFromOptions } from "../helpers/roles.js"
 
 const POINTS_PER_ENTRY = 20
 
@@ -56,7 +55,7 @@ async function raffleStatus(interaction, bot) {
   await interaction.deferReply({ ephemeral: true })
   const isInRaffle = await isUserInRaffle(bot, user)
   const yearScore = await getYearScore(bot, user, getPreviousYear())
-  const entries = Math.floor(yearScore.points / 20)
+  const entries = Math.floor(yearScore.points / POINTS_PER_ENTRY)
 
   const entriesMessage =
     entries === 1
@@ -81,7 +80,7 @@ async function joinRaffle(interaction, bot) {
   const { user } = interaction
   await interaction.deferReply({ ephemeral: true })
   const yearScore = await getYearScore(bot, user, getPreviousYear())
-  const entries = Math.floor(yearScore.points / 20)
+  const entries = Math.floor(yearScore.points / POINTS_PER_ENTRY)
   const hasUserBeenAdded = await addUserToRaffle(bot, user)
 
   if (entries === 0) {

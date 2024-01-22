@@ -39,11 +39,15 @@ export async function addPoints(bot, guildMember, points, year) {
 }
 
 export async function getYearScore(bot, user, year) {
-  const { data: yearScore } = await bot.db
+  const { error, data: yearScore } = await bot.db
     .from("leaderboard")
     .select()
     .single()
     .match({ userId: user.id, year })
+
+  if (error) {
+    bot.logger.error("helper/getYearScore", "Error while updating user", error)
+  }
 
   return yearScore
 }
