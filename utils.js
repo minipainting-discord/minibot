@@ -4,7 +4,7 @@ import { EmbedBuilder } from "discord.js"
 
 export function pick(source, includedKeys) {
   return Object.fromEntries(
-    Object.entries(source).filter(([key]) => includedKeys.includes(key))
+    Object.entries(source).filter(([key]) => includedKeys.includes(key)),
   )
 }
 
@@ -13,7 +13,7 @@ export function partition(array, criteria) {
     (partitions, item) => (
       partitions[criteria(item) ? 0 : 1].push(item), partitions
     ),
-    [[], []]
+    [[], []],
   )
 }
 
@@ -32,13 +32,13 @@ export async function importDirectory(directory, logger) {
         if (!module.default) {
           logger.warn(
             "utils",
-            `Ignoring module without default export at ${moduleToLoad}`
+            `Ignoring module without default export at ${moduleToLoad}`,
           )
           return null
         }
 
         return module.default
-      })
+      }),
     )
 
     return modules.filter((m) => m !== null)
@@ -76,6 +76,10 @@ export function shuffle(collection) {
 
 export function getCurrentYear() {
   return new Date().getFullYear()
+}
+
+export function getPreviousYear() {
+  return getCurrentYear() - 1
 }
 
 export function pluralize(word, count, plural = word + "s") {
