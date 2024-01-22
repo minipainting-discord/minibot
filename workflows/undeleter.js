@@ -4,7 +4,7 @@ export default async function undeleter(bot) {
   async function onMessageDelete(message) {
     bot.logger.info(
       "undeleter",
-      `Message by ${message.author} deleted: ${message}`
+      `Message by ${message.author} deleted: ${message}`,
     )
   }
 }

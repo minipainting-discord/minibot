@@ -7,7 +7,7 @@ export default async function advent(bot) {
     () => sayDailyWord(bot),
     {
       timezone: "America/New_York",
-    }
+    },
   )
 }
 
@@ -22,7 +22,7 @@ async function sayDailyWord(bot) {
   const { word } = daily
 
   const message = await bot.channels.advent.send(
-    `:calendar_spiral: Howdy ${bot.roles.advent}! Today's word is: **${word}**`
+    `:calendar_spiral: Howdy ${bot.roles.advent}! Today's word is: **${word}**`,
   )
   await message.pin()
 

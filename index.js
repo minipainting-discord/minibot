@@ -13,7 +13,7 @@ if (missing.length) {
   const s = missing.length > 1 ? "s" : ""
   logger.fatal(
     "env-check",
-    `Missing environment variable${s}: ${missing.join(", ")}`
+    `Missing environment variable${s}: ${missing.join(", ")}`,
   )
 }
 

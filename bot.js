@@ -131,7 +131,7 @@ async function syncRanks(bot) {
 async function syncEmojis(bot) {
   bot.emojis = bot.guild.emojis.cache.reduce(
     (emojis, emoji) => ({ ...emojis, [emoji.name]: emoji }),
-    {}
+    {},
   )
 }
 
@@ -177,7 +177,7 @@ async function registerCommands(bot) {
 
   bot.logger.info(
     "core",
-    `Enabled commands: ${commandList.map((c) => c.name).join(", ")}`
+    `Enabled commands: ${commandList.map((c) => c.name).join(", ")}`,
   )
 }
 
@@ -195,6 +195,6 @@ async function registerWorkflows(bot) {
     "core",
     `Registered workflows: ${workflowList
       .map((workflow) => workflow.name)
-      .join(", ")}`
+      .join(", ")}`,
   )
 }

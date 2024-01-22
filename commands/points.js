@@ -31,7 +31,7 @@ export default function points(bot) {
       await interaction.reply(
         userArg
           ? `${user} has ${score.lifetime} lifetime points and ${score.year} points for ${year}`
-          : `${user}, you have ${score.lifetime} lifetime points and ${score.year} points for ${year}`
+          : `${user}, you have ${score.lifetime} lifetime points and ${score.year} points for ${year}`,
       )
     },
   }

@@ -70,7 +70,7 @@ async function listRoles(interaction, bot) {
 
   const managedRolesIds = managedRoles.map((managedRole) => managedRole.roleId)
   const guildRoles = await bot.guild.roles.cache.filter((role) =>
-    managedRolesIds.includes(role.id)
+    managedRolesIds.includes(role.id),
   )
 
   // Partition guildRoles in roles joined by the invoking user and available roles
@@ -79,7 +79,7 @@ async function listRoles(interaction, bot) {
       interaction.member.roles.cache.has(role.roleId)
         ? [[...joinedRoles, role], availableRoles]
         : [joinedRoles, [...availableRoles, role]],
-    [[], []]
+    [[], []],
   )
 
   const listRoles = (roles) =>
@@ -94,7 +94,7 @@ async function listRoles(interaction, bot) {
       createEmbed({
         title: "Joined roles",
         description: listRoles(joinedRoles).slice(0, 4096),
-      })
+      }),
     )
   }
 
@@ -103,7 +103,7 @@ async function listRoles(interaction, bot) {
       createEmbed({
         title: "Available roles",
         description: listRoles(availableRoles).slice(0, 4096),
-      })
+      }),
     )
   }
 

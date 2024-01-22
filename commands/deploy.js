@@ -16,7 +16,7 @@ export default function deploy(bot) {
         commandList.map((command) => ({
           ...pick(command, ["name", "description", "options"]),
           defaultPermission: command.availability === bot.AVAILABILITY.PUBLIC,
-        }))
+        })),
       )
 
       // TODO: Discord has discontinued setting command permissions for bots

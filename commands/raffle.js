@@ -61,7 +61,11 @@ async function raffleStatus(interaction, bot) {
   const entriesMessage =
     entries === 1
       ? "You will have 1 entry into the raffle."
-      : `You will have ${entries} ${pluralize("entry", entries, "entries")} into the raffle.`
+      : `You will have ${entries} ${pluralize(
+          "entry",
+          entries,
+          "entries",
+        )} into the raffle.`
 
   await interaction.editReply({
     content: isInRaffle
@@ -89,7 +93,11 @@ async function joinRaffle(interaction, bot) {
 
   if (hasUserBeenAdded) {
     await interaction.editReply({
-      content: `You've been added to the raffle. You will get ${entries} ${pluralize("entry", entries, "entries")}.`,
+      content: `You've been added to the raffle. You will get ${entries} ${pluralize(
+        "entry",
+        entries,
+        "entries",
+      )}.`,
     })
   } else {
     await interaction.editReply({

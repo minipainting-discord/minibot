@@ -20,19 +20,19 @@ export default function roll(bot) {
       try {
         const roll = pool(
           parse(
-            expression.replace("F", "3-2") // Handle Fudge dice
-          )
+            expression.replace("F", "3-2"), // Handle Fudge dice
+          ),
         )
         const sum = roll.reduce((r, v) => r + v, 0)
         const list = roll.map((d) => `**\` ${d} \`**`).join(" ")
         const prefix = `🎲 **Rolling ${expression}:**`
 
         await interaction.reply(
-          `${prefix} ${list}${roll.length > 1 ? ` = **\` ${sum} \`**` : ""}`
+          `${prefix} ${list}${roll.length > 1 ? ` = **\` ${sum} \`**` : ""}`,
         )
       } catch (error) {
         await interaction.reply(
-          `Sorry, I don't know how to roll \`${expression}\` :person_shrugging:`
+          `Sorry, I don't know how to roll \`${expression}\` :person_shrugging:`,
         )
       }
     },

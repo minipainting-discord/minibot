@@ -121,7 +121,7 @@ async function processButtonClick(interaction, previousLetter) {
   modal.addComponents(
     new ActionRowBuilder().addComponents(regionComponent),
     new ActionRowBuilder().addComponents(addressComponent),
-    new ActionRowBuilder().addComponents(contentComponent)
+    new ActionRowBuilder().addComponents(contentComponent),
   )
 
   await interaction.showModal(modal)

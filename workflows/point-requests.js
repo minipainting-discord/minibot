@@ -33,7 +33,7 @@ export default async function pointRequests(bot) {
   requestCollector.on("collect", (message) => openPointRequest(bot, message))
 
   bot.discord.on("threadUpdate", (oldThread, newThread) =>
-    handleThreadUpdate(bot, oldThread, newThread)
+    handleThreadUpdate(bot, oldThread, newThread),
   )
 
   await resumePendingRequests(bot)
@@ -66,7 +66,7 @@ async function openPointRequest(bot, message) {
 
   bot.logger.info(
     "workflow/point-requests",
-    `Opened point request ${pointRequest.id} by ${guildMember.displayName}`
+    `Opened point request ${pointRequest.id} by ${guildMember.displayName}`,
   )
 
   try {
@@ -75,7 +75,7 @@ async function openPointRequest(bot, message) {
     bot.logger.error(
       "workflow/point-requests",
       `Unable to start watching point request ${pointRequest.id}`,
-      error
+      error,
     )
   }
 }
@@ -94,7 +94,7 @@ async function handleThreadUpdate(bot, oldThread, newThread) {
   if (oldThread.archived && !newThread.archived) {
     bot.logger.info(
       "workflow/point-requests",
-      `Reopening point request ${pointRequest.id}`
+      `Reopening point request ${pointRequest.id}`,
     )
     await newThread.send("Point request reopened!")
     await updatePointRequest(bot, pointRequest, { cleared: false })
@@ -104,7 +104,7 @@ async function handleThreadUpdate(bot, oldThread, newThread) {
       bot.logger.error(
         "workflow/point-requests",
         `Unable to start watching point request ${pointRequest.id}`,
-        error
+        error,
       )
     }
   }
@@ -119,8 +119,8 @@ async function resumePendingRequests(bot) {
       "workflow/point-requests",
       `Resuming tracking for ${pendingCount} point ${pluralize(
         "request",
-        pendingCount
-      )}`
+        pendingCount,
+      )}`,
     )
     for (const pointRequest of pendingPointRequests) {
       try {
@@ -129,7 +129,7 @@ async function resumePendingRequests(bot) {
         bot.logger.error(
           "workflow/point-requests",
           `Unable to resume tracking for ${pointRequest.requestMessageId}`,
-          error
+          error,
         )
       }
     }
@@ -139,12 +139,12 @@ async function resumePendingRequests(bot) {
 async function startPointRequestWatcher(
   bot,
   pointRequest,
-  knownActionMessage = null
+  knownActionMessage = null,
 ) {
   const user = await bot.discord.users.fetch(pointRequest.userId)
   const guildMember = await bot.guild.members.fetch(user)
   const requestMessage = await bot.channels.points.messages.fetch(
-    pointRequest.requestMessageId
+    pointRequest.requestMessageId,
   )
   const actionMessage =
     knownActionMessage ??
@@ -167,11 +167,11 @@ async function startPointRequestWatcher(
       const newScore = await addPoints(bot, guildMember, points, year)
 
       await requestMessage.thread.send(
-        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.year} points for ${year}`
+        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.year} points for ${year}`,
       )
     }
     await requestMessage.thread.send(
-      "This request is now cleared. If you feel like you're not being given the right amount of points please ping a moderator below and they will settle it."
+      "This request is now cleared. If you feel like you're not being given the right amount of points please ping a moderator below and they will settle it.",
     )
 
     await removeReaction(requestMessage, "👀")
@@ -183,16 +183,16 @@ async function startPointRequestWatcher(
     buttonCollector.stop()
     bot.logger.info(
       "workflow/point-requests",
-      `Point request ${pointRequest.id} closed by ${resolver.displayName} ${resolver} with ${points} points`
+      `Point request ${pointRequest.id} closed by ${resolver.displayName} ${resolver} with ${points} points`,
     )
   }
 
   messageCollector.on("collect", async (message) =>
-    handleModeratorInput(bot, message, resolveRequest)
+    handleModeratorInput(bot, message, resolveRequest),
   )
 
   buttonCollector.on("collect", async (interaction) =>
-    handleButtonInteraction(bot, interaction, resolveRequest)
+    handleButtonInteraction(bot, interaction, resolveRequest),
   )
 }
 
@@ -205,7 +205,7 @@ async function handleModeratorInput(_bot, message, resolveRequest) {
 async function handleButtonInteraction(bot, interaction, resolveRequest) {
   if (!bot.isModerator(interaction.member)) {
     return interaction.reply(
-      `${bot.emojis.LUL} well tried ${interaction.member}!`
+      `${bot.emojis.LUL} well tried ${interaction.member}!`,
     )
   }
 

@@ -136,6 +136,6 @@ async function editRole(interaction, bot) {
     .eq("roleId", role.id)
 
   await interaction.reply(
-    `Description for \`${role.name}\` changed to: ${description}`
+    `Description for \`${role.name}\` changed to: ${description}`,
   )
 }

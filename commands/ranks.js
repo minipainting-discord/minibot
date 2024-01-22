@@ -10,7 +10,7 @@ export default function ranks(bot) {
       const { ranks } = bot
 
       const maxPointsDigits = Math.floor(
-        1 + Math.log10(ranks[ranks.length - 1].minPoints)
+        1 + Math.log10(ranks[ranks.length - 1].minPoints),
       )
 
       const embed = createEmbed({
@@ -20,7 +20,7 @@ export default function ranks(bot) {
             [
               ` \`${String(rank.minPoints).padStart(maxPointsDigits)}\` `,
               rank.role,
-            ].join(" ")
+            ].join(" "),
           )
           .join("\n"),
       })

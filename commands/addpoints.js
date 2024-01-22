@@ -41,12 +41,12 @@ export default function addpoints(bot) {
 
       if (!newScore) {
         return await interaction.reply(
-          `💥 Error while adding points (I'm warning <@${bot.settings.botMasterId}>)`
+          `💥 Error while adding points (I'm warning <@${bot.settings.botMasterId}>)`,
         )
       }
 
       await interaction.reply(
-        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.year} points for ${year}`
+        `${user} now has ${newScore.lifetime} lifetime points and ${newScore.year} points for ${year}`,
       )
     },
   }

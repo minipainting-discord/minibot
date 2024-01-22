@@ -26,7 +26,7 @@ export async function addPoints(bot, guildMember, points, year) {
     bot.logger.error(
       "helper/addPoints",
       "Error while updating user",
-      userUpdateError
+      userUpdateError,
     )
   }
 

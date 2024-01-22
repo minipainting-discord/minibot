@@ -47,7 +47,7 @@ export default function santa(bot) {
             new ButtonBuilder()
               .setCustomId("join-secret-santa")
               .setLabel("Join the Secret Santa!")
-              .setStyle(ButtonStyle.Primary)
+              .setStyle(ButtonStyle.Primary),
           ),
         ],
         ephemeral: true,

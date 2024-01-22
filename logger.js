@@ -29,7 +29,7 @@ export default function createLogger() {
     const embed = new EmbedBuilder()
       .setColor(DISCORD_COLORS[level])
       .setDescription(
-        error ? `${description}\n\`\`\`\n${error.stack}\`\`\`` : description
+        error ? `${description}\n\`\`\`\n${error.stack}\`\`\`` : description,
       )
     bot.channels.bot.send({ embeds: [embed] })
 

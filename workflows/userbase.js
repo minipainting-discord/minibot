@@ -14,7 +14,7 @@ export default async function userbase(bot) {
     if (isSuspiciousUser(guildMember)) {
       bot.logger.moderation(
         "userbase",
-        `Suspicious new member: ${guildMember.displayName}`
+        `Suspicious new member: ${guildMember.displayName}`,
       )
     }
   }
@@ -28,7 +28,7 @@ export default async function userbase(bot) {
 
     bot.logger.info(
       "userbase",
-      `Rename ${oldGuildMember.displayName} to ${newGuildMember.displayName}`
+      `Rename ${oldGuildMember.displayName} to ${newGuildMember.displayName}`,
     )
 
     await updateDisplayName(bot, newGuildMember)

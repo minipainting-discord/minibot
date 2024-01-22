@@ -4,6 +4,6 @@ export async function complete(...partialStructures) {
       if (partialStructure.partial) {
         await partialStructure.fetch()
       }
-    })
+    }),
   )
 }

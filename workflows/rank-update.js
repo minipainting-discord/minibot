@@ -15,7 +15,7 @@ export default async function rankUpdate(bot) {
     setImmediate(async () => {
       try {
         const currentRank = bot.ranks.find((rank) =>
-          guildMember.roles.cache.has(rank.roleId)
+          guildMember.roles.cache.has(rank.roleId),
         )
         const nextRank = [...bot.ranks]
           .reverse()
@@ -41,14 +41,14 @@ export default async function rankUpdate(bot) {
 
         const { message, gifUrl } = await getRankingMessage(
           currentRank,
-          nextRank
+          nextRank,
         )
 
         bot.logger.info(
           "workflows/rank-update",
           `${guildMember.displayName} ${guildMember} ${
             currentRank?.name || "No rank"
-          } -> ${nextRank?.name || "No rank"}`
+          } -> ${nextRank?.name || "No rank"}`,
         )
 
         await bot.channels.general.send({
@@ -59,7 +59,7 @@ export default async function rankUpdate(bot) {
         bot.logger.error(
           "workflows/rank-update",
           "Error while updating rank",
-          error
+          error,
         )
       }
     })
