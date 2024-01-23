@@ -54,22 +54,24 @@ async function raffleStatus(interaction, bot) {
   const { user } = interaction
   await interaction.deferReply({ ephemeral: true })
   const isInRaffle = await isUserInRaffle(bot, user)
-  const yearScore = await getYearScore(bot, user, getPreviousYear())
-  const entries = Math.floor(yearScore.points / POINTS_PER_ENTRY)
 
-  const entriesMessage =
-    entries === 1
-      ? "You will have 1 entry into the raffle."
-      : `You will have ${entries} ${pluralize(
-          "entry",
-          entries,
-          "entries",
-        )} into the raffle.`
+  if (!isInRaffle) {
+    await interaction.editReply({
+      content: "You are not participating in the raffle",
+    })
+    return
+  }
+  const yearScore = await getYearScore(bot, user, getPreviousYear())
+  const entries = Math.floor((yearScore?.points ?? 0) / POINTS_PER_ENTRY)
+
+  const entriesMessage = `You will have ${entries} ${pluralize(
+    "entry",
+    entries,
+    "entries",
+  )} into the raffle.`
 
   await interaction.editReply({
-    content: isInRaffle
-      ? `You will be part of the raffle. ${entriesMessage}`
-      : "You are not participating in the raffle",
+    content: `You will be part of the raffle. ${entriesMessage}`,
   })
 }
 
@@ -80,7 +82,7 @@ async function joinRaffle(interaction, bot) {
   const { user } = interaction
   await interaction.deferReply({ ephemeral: true })
   const yearScore = await getYearScore(bot, user, getPreviousYear())
-  const entries = Math.floor(yearScore.points / POINTS_PER_ENTRY)
+  const entries = Math.floor((yearScore?.points ?? 0) / POINTS_PER_ENTRY)
   const hasUserBeenAdded = await addUserToRaffle(bot, user)
 
   if (entries === 0) {

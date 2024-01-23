@@ -39,21 +39,13 @@ export async function addPoints(bot, guildMember, points, year) {
 }
 
 export async function getYearScore(bot, user, year) {
-  const { error, data: yearScore } = await bot.db
+  const { data: yearScore } = await bot.db
     .from("leaderboard")
     .select()
     .single()
     .match({ userId: user.id, year })
 
-  if (error) {
-    bot.logger.error(
-      "helper/getYearScore",
-      `Unable to get score for ${user}`,
-      error,
-    )
-  }
-
-  return yearScore
+  return yearScore ?? 0
 }
 
 export async function getLifetimeScore(bot, user) {
