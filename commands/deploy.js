@@ -17,13 +17,27 @@ export default function deploy(bot) {
         commandList.map((command) => ({
           ...pick(command, ["name", "description", "options"]),
           defaultMemberPermissions:
-            command.availability === bot.AVAILABILITY.PUBLIC
-              ? PermissionFlagsBits.UseApplicationCommands
-              : 0,
+            convertAvailabilityToDefaultMemberPermissions(
+              bot,
+              command.availability,
+            ),
         })),
       )
 
       await interaction.reply("🤖 Commands deployed!")
     },
+  }
+}
+
+function convertAvailabilityToDefaultMemberPermissions(bot, availability) {
+  switch (availability) {
+    case bot.AVAILABILITY.PUBLIC:
+      return PermissionFlagsBits.UseApplicationCommands
+    case bot.AVAILABILITY.MOD:
+      return PermissionFlagsBits.KickMembers
+    case bot.AVAILABILITY.ADMIN:
+      return PermissionFlagsBits.Administrator
+    case bot.AVAILABILITY.BOT_MASTER:
+      return PermissionFlagsBits.ManageGuild
   }
 }
