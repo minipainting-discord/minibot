@@ -183,7 +183,7 @@ async function startPointRequestWatcher(
     buttonCollector.stop()
     bot.logger.info(
       "workflow/point-requests",
-      `Point request ${pointRequest.id} closed by ${resolver.displayName} ${resolver} with ${points} points`,
+      `Point request ${pointRequest.id} from ${user} closed by ${resolver.displayName} ${resolver} with ${points} points`,
     )
   }
 
