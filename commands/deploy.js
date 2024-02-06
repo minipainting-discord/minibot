@@ -1,3 +1,4 @@
+import { PermissionFlagsBits } from "discord.js"
 import { pick } from "../utils.js"
 
 export default function deploy(bot) {
@@ -15,8 +16,10 @@ export default function deploy(bot) {
       await guild.commands.set(
         commandList.map((command) => ({
           ...pick(command, ["name", "description", "options"]),
-          defaultMemberPermission:
-            command.availability === bot.AVAILABILITY.PUBLIC,
+          defaultMemberPermissions:
+            command.availability === bot.AVAILABILITY.PUBLIC
+              ? PermissionFlagsBits.UseApplicationCommands
+              : 0,
         })),
       )
 
