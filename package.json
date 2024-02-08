@@ -23,12 +23,16 @@
     "zlib-sync": "^0.1.9"
   },
   "devDependencies": {
+    "@types/node-cron": "^3.0.11",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.56.0",
     "husky": "^4.3.8",
     "lint-staged": "^13.2.0",
     "nodemon": "^3.0.3",
     "prettier": "^3.2.4",
     "supabase": "^1.131.5",
+    "type-fest": "^4.10.2",
     "uvu": "^0.5.6"
   },
   "repository": {
@@ -53,17 +57,5 @@
   },
   "prettier": {
     "semi": false
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-    "env": {
-      "browser": true,
-      "node": true,
-      "es2021": true
-    },
-    "parserOptions": {
-      "ecmaVersion": 13,
-      "sourceType": "module"
-    }
   }
 }
