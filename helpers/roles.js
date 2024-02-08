@@ -1,6 +1,4 @@
-export async function getManagedRoleFromOptions(bot, interaction) {
-  const role = interaction.options.getRole("role")
-
+export async function getManagedRoleFromOptions(bot, role) {
   const { data: managedRole } = await bot.db
     .from("managedRoles")
     .select()
@@ -8,10 +6,7 @@ export async function getManagedRoleFromOptions(bot, interaction) {
     .single()
 
   if (!managedRole) {
-    interaction.reply({
-      content: `Role ${role} is not managed by the bot.`,
-      ephemeral: true,
-    })
+    return null
   }
 
   return role

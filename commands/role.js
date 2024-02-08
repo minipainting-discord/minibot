@@ -115,10 +115,14 @@ async function listRoles(interaction, bot) {
  */
 async function joinRole(interaction, bot) {
   await interaction.deferReply()
-  const role = await getManagedRoleFromOptions(bot, interaction)
+  const role = interaction.options.getRole("role")
+  const managedRole = await getManagedRoleFromOptions(bot, role)
 
-  if (!role) {
-    return
+  if (!managedRole) {
+    return interaction.editReply({
+      content: `Role ${role} is not managed by the bot.`,
+      ephemeral: true,
+    })
   }
 
   if (interaction.member.roles.cache.has(role.id)) {
