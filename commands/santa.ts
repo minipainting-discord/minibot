@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js"
-import { updateDisplayName } from "../helpers/userbase.js"
+import { updateDisplayName } from "../helpers/updateDisplayName"
 
 export default function santa(bot) {
   return {

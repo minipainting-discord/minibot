@@ -1,6 +1,5 @@
 .env
-.env.dev
-.env.prod
+.env.local*
 node_modules
 settings.json
 *.sqlite

@@ -1,18 +1,31 @@
-import { ApplicationCommandOptionType } from "discord.js"
-import { partition, shuffle } from "../utils.js"
-import { updateDisplayName } from "../helpers/userbase.js"
+import {
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+} from "discord.js"
+import { partition, shuffle } from "../utils"
+import { updateDisplayName } from "../helpers/updateDisplayName"
+import { BotCommandBuilder } from "."
+import { Bot } from "../bot"
+import {
+  REGIONS,
+  Region,
+  SantaLetter,
+  allLettersMatched,
+  listSantaLetters,
+  setMatcheeId,
+} from "../models/SantaLetter"
+
+const LOG_SCOPE = "commands/santa-admin"
 
 const DEADLINE = "Nov 30th"
-
-const REGIONS = ["na", "eu", "any"]
 
 const FLAGS = {
   na: "🇺🇸",
   eu: "🇪🇺",
   any: "🌏",
-}
+} as const
 
-export default function roleAdmin(bot) {
+const command: BotCommandBuilder = function roleAdmin(bot) {
   return {
     name: "santa-admin",
     description: "Manage Secret Santa",
@@ -95,23 +108,23 @@ export default function roleAdmin(bot) {
         case "allowlist":
           switch (subcommand) {
             case "list":
-              return await listAllowedUsers(interaction, bot)
+              return await listAllowedUsers(bot, interaction)
             case "allow":
-              return await allowUser(interaction, bot)
+              return await allowUser(bot, interaction)
             case "disallow":
-              return await disallowUser(interaction, bot)
+              return await disallowUser(bot, interaction)
             case "forget":
-              return await forgetUser(interaction, bot)
+              return await forgetUser(bot, interaction)
           }
           break
         case null: {
           switch (subcommand) {
             case "list":
-              return await listParticipants(interaction, bot)
+              return await listParticipants(bot, interaction)
             case "match":
-              return await matchParticipants(interaction, bot)
+              return await matchParticipants(bot, interaction)
             case "send":
-              return await sendMatcheesToParticipants(interaction, bot)
+              return await sendMatcheesToParticipants(bot, interaction)
           }
         }
       }
@@ -119,10 +132,13 @@ export default function roleAdmin(bot) {
   }
 }
 
-async function listParticipants(interaction, bot) {
-  const { data: letters } = await bot.db.from("santaLetters").select()
+async function listParticipants(
+  bot: Bot,
+  interaction: ChatInputCommandInteraction,
+) {
+  const letters = await listSantaLetters(bot.db)
 
-  if (!letters?.length) {
+  if (!letters.length) {
     return interaction.reply({ content: ":shrug:", ephemeral: true })
   }
 
@@ -149,39 +165,57 @@ async function listParticipants(interaction, bot) {
   })
 }
 
-async function matchParticipants(interaction, bot) {
+async function matchParticipants(
+  bot: Bot,
+  interaction: ChatInputCommandInteraction,
+) {
   await interaction.deferReply({ ephemeral: true })
-  const { data: letters } = await bot.db.from("santaLetters").select()
+  const letters = await listSantaLetters(bot.db)
+
+  if (!letters.length) {
+    return interaction.reply({ content: ":shrug:", ephemeral: true })
+  }
+
   const lettersByRegion = groupLetters(letters)
 
   // Matching dance!
-  for (const region of REGIONS) {
-    const group = lettersByRegion[region]
-    const shuffledGroup = shuffle(group)
+  try {
+    for (const region of REGIONS) {
+      const group = lettersByRegion[region]
+      const shuffledGroup = shuffle(group)
 
-    for (const [i, letter] of shuffledGroup.entries()) {
-      const matchee = shuffledGroup[(i + 1) % shuffledGroup.length]
-      await bot.db
-        .from("santaLetters")
-        .update({ matcheeId: matchee.userId })
-        .eq("userId", letter.userId)
+      for (const [i, letter] of shuffledGroup.entries()) {
+        const matchee = shuffledGroup[(i + 1) % shuffledGroup.length]
+        await setMatcheeId(bot.db, letter.userId, matchee.userId)
+      }
     }
+  } catch (error) {
+    await interaction.editReply({
+      content: "There was an error while assigning matchees",
+    })
+    return bot.logger.error(
+      LOG_SCOPE,
+      "Error during matchee assignation",
+      error,
+    )
   }
 
   return interaction.editReply({
     content: "Matching dance is done!",
-    ephemeral: true,
   })
 }
 
-async function sendMatcheesToParticipants(interaction, bot) {
-  const { data: letters } = await bot.db.from("santaLetters").select()
+async function sendMatcheesToParticipants(
+  bot: Bot,
+  interaction: ChatInputCommandInteraction,
+) {
+  const letters = await listSantaLetters(bot.db)
 
-  if (!letters?.length) {
+  if (!letters.length) {
     return interaction.reply({ content: ":shrug:", ephemeral: true })
   }
 
-  if (letters.some((letter) => !letter.matcheeId)) {
+  if (allLettersMatched(letters)) {
     return interaction.reply({
       content: "Not everyone is matched! Please match people first.",
       ephemeral: true,
@@ -215,7 +249,7 @@ async function sendMatcheesToParticipants(interaction, bot) {
         "You also have been picked as a giftee for someone else!",
         "",
         `Last thing, please don't forget to send your package before **${DEADLINE}**.`,
-        `For any additional question, please ask <@${bot.settings.botMasterId}>!`,
+        `For any additional question, please ask <@${bot.env.BOT_MASTER_ID}>!`,
       ].join("\n"),
     )
     bot.logger.info(
@@ -242,17 +276,20 @@ function breakLetterIntoMessages(letter) {
   )
 }
 
-function groupLetters(letters) {
-  const regions = { na: [], eu: [], any: [] }
+function groupLetters(letters: SantaLetter[]) {
+  const byRegion: Record<Region, SantaLetter[]> = { na: [], eu: [], any: [] }
 
   for (const letter of letters) {
-    regions[letter.region].push(letter)
+    byRegion[letter.region].push(letter)
   }
 
-  return regions
+  return byRegion
 }
 
-async function listAllowedUsers(interaction, bot) {
+async function listAllowedUsers(
+  bot: Bot,
+  interaction: ChatInputCommandInteraction,
+) {
   const { data: users } = await bot.db
     .from("users")
     .select()
@@ -289,7 +326,10 @@ async function listAllowedUsers(interaction, bot) {
   })
 }
 
-export async function allowUser(interaction, bot) {
+export async function allowUser(
+  bot: Bot,
+  interaction: ChatInputCommandInteraction,
+) {
   const user = interaction.options.getUser("user")
   const guildMember = await bot.guild.members.fetch(user)
   await updateDisplayName(bot, guildMember)
@@ -311,7 +351,10 @@ export async function allowUser(interaction, bot) {
   })
 }
 
-export async function disallowUser(interaction, bot) {
+export async function disallowUser(
+  bot: Bot,
+  interaction: ChatInputCommandInteraction,
+) {
   const user = interaction.options.getUser("user")
   const guildMember = await bot.guild.members.fetch(user)
   await updateDisplayName(bot, guildMember)
@@ -333,7 +376,10 @@ export async function disallowUser(interaction, bot) {
   })
 }
 
-export async function forgetUser(interaction, bot) {
+export async function forgetUser(
+  bot: Bot,
+  interaction: ChatInputCommandInteraction,
+) {
   const user = interaction.options.getUser("user")
   const guildMember = await bot.guild.members.fetch(user)
   await updateDisplayName(bot, guildMember)
@@ -354,3 +400,4 @@ export async function forgetUser(interaction, bot) {
     ephemeral: true,
   })
 }
+export default command

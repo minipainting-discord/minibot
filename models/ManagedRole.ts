@@ -31,6 +31,16 @@ async function getManagedRoleFromDiscordRole(
   return data ? ManagedRole(data) : null
 }
 
+async function listManagedRoles(db: SupabaseClient<Database>) {
+  const { data, error } = await db.from("managedRoles").select()
+
+  if (error) {
+    throw error
+  }
+
+  return data ? data.map(ManagedRole) : []
+}
+
 async function createManagedRole(
   db: SupabaseClient<Database>,
   managedRole: Omit<ManagedRole, "id">,
@@ -75,6 +85,7 @@ async function updateManagedRole(
 export {
   ManagedRole,
   getManagedRoleFromDiscordRole,
+  listManagedRoles,
   createManagedRole,
   removeManagedRole,
   updateManagedRole,

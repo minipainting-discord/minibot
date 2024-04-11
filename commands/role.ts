@@ -1,8 +1,17 @@
-import { ApplicationCommandOptionType } from "discord.js"
-import { getManagedRoleFromOptions } from "../helpers/roles.js"
-import { createEmbed } from "../utils.js"
+import {
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+} from "discord.js"
+import { createEmbed } from "../utils"
+import { BotCommandBuilder } from "."
+import { Bot } from "../bot"
+import {
+  ManagedRole,
+  getManagedRoleFromDiscordRole,
+  listManagedRoles,
+} from "../models/ManagedRole"
 
-export default function role(bot) {
+const command: BotCommandBuilder = function role(bot) {
   return {
     name: "role",
     description: "Manage your assignable roles",
@@ -46,11 +55,11 @@ export default function role(bot) {
 
       switch (command) {
         case "list":
-          return await listRoles(interaction, bot)
+          return await listRoles(bot, interaction)
         case "join":
-          return await joinRole(interaction, bot)
+          return await joinRole(bot, interaction)
         case "leave":
-          return await leaveRole(interaction, bot)
+          return await leaveRole(bot, interaction)
       }
     },
   }
@@ -59,17 +68,20 @@ export default function role(bot) {
 /**
  * listRoles
  */
-async function listRoles(interaction, bot) {
-  const { data: managedRoles } = await bot.db.from("managedRoles").select()
-
+async function listRoles(bot: Bot, interaction: ChatInputCommandInteraction) {
+  if (!interaction.inCachedGuild()) {
+    return
+  }
   await interaction.deferReply({ ephemeral: true })
+
+  const managedRoles = await listManagedRoles(bot.db)
 
   if (!managedRoles.length) {
     return await interaction.editReply("There currently are no roles to join")
   }
 
   const managedRolesIds = managedRoles.map((managedRole) => managedRole.roleId)
-  const guildRoles = await bot.guild.roles.cache.filter((role) =>
+  const guildRoles = bot.guild.roles.cache.filter((role) =>
     managedRolesIds.includes(role.id),
   )
 
@@ -79,10 +91,10 @@ async function listRoles(interaction, bot) {
       interaction.member.roles.cache.has(role.roleId)
         ? [[...joinedRoles, role], availableRoles]
         : [joinedRoles, [...availableRoles, role]],
-    [[], []],
+    [[], []] as [ManagedRole[], ManagedRole[]],
   )
 
-  const listRoles = (roles) =>
+  const listRoles = (roles: ManagedRole[]) =>
     roles
       .map((role) => `${guildRoles.get(role.roleId)} ${role.description}`)
       .join("\n")
@@ -113,47 +125,61 @@ async function listRoles(interaction, bot) {
 /**
  * joinRole
  */
-async function joinRole(interaction, bot) {
-  await interaction.deferReply()
-  const role = await getManagedRoleFromOptions(bot, interaction)
-
-  if (!role) {
+async function joinRole(bot: Bot, interaction: ChatInputCommandInteraction) {
+  if (!interaction.inCachedGuild()) {
     return
   }
+  await interaction.deferReply({ ephemeral: true })
+  const discordRole = interaction.options.getRole("role", true)
 
-  if (interaction.member.roles.cache.has(role.id)) {
+  const role = await getManagedRoleFromDiscordRole(bot.db, discordRole.id)
+
+  if (!role) {
     return interaction.editReply({
-      content: `You already have the ${role} role`,
-      ephemeral: true,
+      content: `Role ${discordRole} is not managed by the bot.`,
     })
   }
 
-  await interaction.member.roles.add(role)
+  if (interaction.member?.roles.cache.has(role.roleId)) {
+    return interaction.editReply({
+      content: `You already have the ${discordRole} role`,
+    })
+  }
+
+  await interaction.member.roles.add(discordRole)
   await interaction.editReply({
-    content: `${interaction.member} added to ${role}`,
+    content: `${interaction.member} added to ${discordRole}`,
   })
 }
 
 /**
  * leaveRole
  */
-async function leaveRole(interaction, bot) {
-  await interaction.deferReply()
-  const role = await getManagedRoleFromOptions(bot, interaction)
-
-  if (!role) {
+async function leaveRole(bot: Bot, interaction: ChatInputCommandInteraction) {
+  if (!interaction.inCachedGuild()) {
     return
   }
+  await interaction.deferReply({ ephemeral: true })
+  const discordRole = interaction.options.getRole("role", true)
 
-  if (!interaction.member.roles.cache.has(role.id)) {
+  const role = await getManagedRoleFromDiscordRole(bot.db, discordRole.id)
+
+  if (!role) {
     return interaction.editReply({
-      content: `You don't have the ${role} role`,
-      ephemeral: true,
+      content: `Role ${discordRole} is not managed by the bot.`,
     })
   }
 
-  await interaction.member.roles.remove(role)
+  if (!interaction.member.roles.cache.has(role.roleId)) {
+    return interaction.editReply({
+      content: `You don't have the ${role} role`,
+    })
+  }
+
+  await interaction.member.roles.remove(discordRole)
   await interaction.editReply({
-    content: `${role} removed from ${interaction.member}`,
+    content: `${discordRole} removed from ${interaction.member}`,
   })
 }
+
+export default command
