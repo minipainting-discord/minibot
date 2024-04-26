@@ -18,8 +18,8 @@ import { updateDisplayName } from "../helpers/userbase.js"
 const URL_PATTERN = /https?:\/\//
 
 const BUTTONS = [
-  { customId: "plus-one", label: "Add 1", style: ButtonStyle.Primary },
-  { customId: "plus-two", label: "Add 2", style: ButtonStyle.Primary },
+  { customId: "plus-four", label: "Add 4", style: ButtonStyle.Primary },
+  { customId: "plus-eight", label: "Add 8", style: ButtonStyle.Primary },
   { customId: "close", label: "Close", style: ButtonStyle.Danger },
 ]
 
@@ -210,13 +210,13 @@ async function handleButtonInteraction(bot, interaction, resolveRequest) {
   }
 
   switch (interaction.customId) {
-    case "plus-one":
-      await interaction.reply(`Added 1 point by ${interaction.member}`)
-      await resolveRequest(1, interaction.member)
+    case "plus-four":
+      await interaction.reply(`Added 4 points by ${interaction.member}`)
+      await resolveRequest(4, interaction.member)
       break
-    case "plus-two":
-      await interaction.reply(`Added 2 points by ${interaction.member}`)
-      await resolveRequest(2, interaction.member)
+    case "plus-eight":
+      await interaction.reply(`Added 8 points by ${interaction.member}`)
+      await resolveRequest(8, interaction.member)
       break
     case "close":
       await interaction.reply(`Request closed by ${interaction.member}`)
