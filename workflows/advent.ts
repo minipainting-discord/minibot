@@ -1,6 +1,7 @@
 import cron from "node-cron"
 import parseSchedule from "friendly-node-cron"
 import { Bot } from "../bot"
+import { getTodaysAdventWord } from "../models/AdventWord"
 
 const LOG_SCOPE = "workflow/advent"
 const TIMEZONE = "America/New_York"
@@ -16,24 +17,16 @@ export default async function advent(bot: Bot) {
 }
 
 async function sayDailyWord(bot: Bot) {
-  const dayOfMonth = new Date().getDate()
+  const adventWord = await getTodaysAdventWord(bot.db)
 
-  const { data: daily } = await bot.db
-    .from("adventWords")
-    .select()
-    .eq("day", dayOfMonth)
-    .single()
-
-  if (!daily) {
+  if (!adventWord) {
     return bot.logger.error(LOG_SCOPE, "Unable to find today's word.")
   }
 
-  const { word } = daily
-
   const message = await bot.channels.advent.send(
-    `:calendar_spiral: Howdy ${bot.roles.advent}! Today's word is: **${word}**`,
+    `:calendar_spiral: Howdy ${bot.roles.advent}! Today's word is: **${adventWord.word}**`,
   )
   await message.pin()
 
-  bot.logger.info(LOG_SCOPE, `Sent daily word ${word}`)
+  bot.logger.info(LOG_SCOPE, `Sent daily word ${adventWord.word}`)
 }

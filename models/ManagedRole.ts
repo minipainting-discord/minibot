@@ -1,6 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { Database } from "../database.types"
-import { Role } from "discord.js"
+import { Database, DatabaseClient } from "../database.types"
 
 type DBManagedRole = Database["public"]["Tables"]["managedRoles"]["Row"]
 
@@ -19,7 +17,7 @@ function ManagedRole(dbManagedRole: DBManagedRole): ManagedRole {
 }
 
 async function getManagedRoleFromDiscordRole(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   discordRoleId: string,
 ) {
   const { data } = await db
@@ -31,7 +29,7 @@ async function getManagedRoleFromDiscordRole(
   return data ? ManagedRole(data) : null
 }
 
-async function listManagedRoles(db: SupabaseClient<Database>) {
+async function listManagedRoles(db: DatabaseClient) {
   const { data, error } = await db.from("managedRoles").select()
 
   if (error) {
@@ -42,10 +40,9 @@ async function listManagedRoles(db: SupabaseClient<Database>) {
 }
 
 async function createManagedRole(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   managedRole: Omit<ManagedRole, "id">,
 ) {
-  // { roleId: newRole.id, name, description, createdBy })
   const { error } = await db.from("managedRoles").insert(managedRole)
 
   if (error) {
@@ -53,10 +50,7 @@ async function createManagedRole(
   }
 }
 
-async function removeManagedRole(
-  db: SupabaseClient<Database>,
-  managedRole: ManagedRole,
-) {
+async function removeManagedRole(db: DatabaseClient, managedRole: ManagedRole) {
   const { error } = await db
     .from("managedRoles")
     .delete()
@@ -68,7 +62,7 @@ async function removeManagedRole(
 }
 
 async function updateManagedRole(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   managedRole: ManagedRole,
   description: string,
 ) {
@@ -90,5 +84,3 @@ export {
   removeManagedRole,
   updateManagedRole,
 }
-
-// async function createManagedRole()

@@ -1,5 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { Database } from "../database.types"
+import { Database, DatabaseClient } from "../database.types"
 
 type User = {
   userId: string
@@ -17,8 +16,17 @@ function User(dbUser: DBUser): User {
   }
 }
 
+async function getUserById(
+  db: DatabaseClient,
+  userId: string,
+): Promise<User | null> {
+  const { data } = await db.from("users").select().match({ userId }).single()
+
+  return data ? User(data) : null
+}
+
 async function updateUser(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   userId: string,
   update: Partial<User> & Pick<User, "displayName">,
 ): Promise<void> {
@@ -32,5 +40,5 @@ async function updateUser(
   }
 }
 
-export { updateUser }
+export { getUserById, updateUser }
 export type { User }

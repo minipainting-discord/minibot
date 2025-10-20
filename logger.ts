@@ -25,7 +25,6 @@ const COLORS = {
   warn: "yellow",
   error: "red",
   fatal: "magenta",
-  // moderation: "bgYellow", // TODO: Remove
 } as const
 
 const DISCORD_COLORS = {
@@ -33,7 +32,6 @@ const DISCORD_COLORS = {
   warn: "#f6c42f",
   error: "#f52565",
   fatal: "#a05bb4",
-  // moderation: "#f59207", // TODO: Remove
 } as const
 
 function createLogger(): Logger {

@@ -1,5 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { Database } from "../database.types"
+import { Database, DatabaseClient } from "../database.types"
 
 type DBYearScore = Database["public"]["Tables"]["leaderboard"]["Row"]
 
@@ -29,7 +28,7 @@ function LifetimeScore(dbLifetimeScore: DBLifetimeScore): LifetimeScore {
 type Score = YearScore | LifetimeScore
 
 async function getYearScore(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   userId: string,
   year: number,
 ): Promise<YearScore> {
@@ -44,7 +43,7 @@ async function getYearScore(
 }
 
 async function getLifetimeScore(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   userId: string,
 ): Promise<LifetimeScore> {
   const { data: lifetimeScore } = await db
@@ -58,7 +57,7 @@ async function getLifetimeScore(
 }
 
 async function getYearLeaderboard(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   year: number,
 ): Promise<Array<YearScore>> {
   const { data } = await db
@@ -72,7 +71,7 @@ async function getYearLeaderboard(
 }
 
 async function getLifetimeLeaderboard(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
 ): Promise<Array<LifetimeScore>> {
   const { data } = await db
     .from("lifetime")
@@ -84,7 +83,7 @@ async function getLifetimeLeaderboard(
 }
 
 async function updateScore(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   userId: string,
   points: number,
   year: number,

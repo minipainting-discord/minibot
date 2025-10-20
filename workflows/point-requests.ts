@@ -1,10 +1,12 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   ComponentType,
   Message,
   MessageActionRowComponentBuilder,
+  ThreadChannel,
 } from "discord.js"
 
 const LOG_SCOPE = "workflow/point-requests"
@@ -23,8 +25,8 @@ import { Bot } from "../bot"
 const URL_PATTERN = /https?:\/\//
 
 const BUTTONS = [
-  { customId: "plus-one", label: "Add 1", style: ButtonStyle.Primary },
-  { customId: "plus-two", label: "Add 2", style: ButtonStyle.Primary },
+  { customId: "plus-four", label: "Add 4", style: ButtonStyle.Primary },
+  { customId: "plus-eight", label: "Add 8", style: ButtonStyle.Primary },
   { customId: "close", label: "Close", style: ButtonStyle.Danger },
 ]
 
@@ -85,7 +87,11 @@ async function openPointRequest(bot: Bot, message: Message) {
   }
 }
 
-async function handleThreadUpdate(bot, oldThread, newThread) {
+async function handleThreadUpdate(
+  bot: Bot,
+  oldThread: ThreadChannel,
+  newThread: ThreadChannel,
+) {
   if (oldThread.parentId !== bot.channels.points.id) {
     return
   }
@@ -189,11 +195,11 @@ async function startPointRequestWatcher(
     )
   }
 
-  messageCollector.on("collect", async (message) =>
+  messageCollector.on("collect", async (message: Message) =>
     handleModeratorInput(bot, message, resolveRequest),
   )
 
-  buttonCollector.on("collect", async (interaction) =>
+  buttonCollector.on("collect", async (interaction: ButtonInteraction) =>
     handleButtonInteraction(bot, interaction, resolveRequest),
   )
 }
@@ -212,13 +218,13 @@ async function handleButtonInteraction(bot, interaction, resolveRequest) {
   }
 
   switch (interaction.customId) {
-    case "plus-one":
-      await interaction.reply(`Added 1 point by ${interaction.member}`)
-      await resolveRequest(1, interaction.member)
+    case "plus-four":
+      await interaction.reply(`Added 4 point by ${interaction.member}`)
+      await resolveRequest(4, interaction.member)
       break
-    case "plus-two":
-      await interaction.reply(`Added 2 points by ${interaction.member}`)
-      await resolveRequest(2, interaction.member)
+    case "plus-eight":
+      await interaction.reply(`Added 8 points by ${interaction.member}`)
+      await resolveRequest(8, interaction.member)
       break
     case "close":
       await interaction.reply(`Request closed by ${interaction.member}`)

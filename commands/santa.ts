@@ -1,7 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js"
 import { updateDisplayName } from "../helpers/updateDisplayName"
+import { BotCommandBuilder } from "."
+import { getUserById } from "../models/User"
 
-export default function santa(bot) {
+const LOG_SCOPE = "commands/santa"
+
+const command: BotCommandBuilder = function santa(bot) {
   return {
     name: "santa",
     description: "Take part in our annual Secret Santa!",
@@ -10,14 +14,10 @@ export default function santa(bot) {
     async execute(interaction) {
       const guildMember = await bot.guild.members.fetch(interaction.user)
       await updateDisplayName(bot, guildMember)
-      const { data: user } = await bot.db
-        .from("users")
-        .select()
-        .single()
-        .match({ userId: interaction.user.id })
+      const user = await getUserById(bot.db, interaction.user.id)
 
       if (!user) {
-        await bot.logger.error(`User not found ${user}`)
+        bot.logger.error(LOG_SCOPE, `User not found ${user}`)
         return await interaction.reply({
           content: "Something went wrong, we've been warned",
           ephemeral: true,
@@ -43,7 +43,7 @@ export default function santa(bot) {
 
       return await interaction.reply({
         components: [
-          new ActionRowBuilder().addComponents(
+          new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
               .setCustomId("join-secret-santa")
               .setLabel("Join the Secret Santa!")
@@ -55,3 +55,5 @@ export default function santa(bot) {
     },
   }
 }
+
+export default command

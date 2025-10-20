@@ -1,5 +1,5 @@
 import { isBefore, subWeeks } from "date-fns"
-import { departialize } from "../helpers/partials"
+import { departialize } from "../helpers/departialize"
 import { updateDisplayName } from "../helpers/updateDisplayName"
 import { Bot } from "../bot"
 import { GuildMember, PartialGuildMember } from "discord.js"

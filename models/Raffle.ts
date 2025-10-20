@@ -1,7 +1,6 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { Database } from "../database.types"
+import { DatabaseClient } from "../database.types"
 
-async function addUserToRaffle(db: SupabaseClient<Database>, userId: string) {
+async function addUserToRaffle(db: DatabaseClient, userId: string) {
   const { error } = await db.from("raffle").upsert({ userId })
 
   if (error) {
@@ -9,10 +8,7 @@ async function addUserToRaffle(db: SupabaseClient<Database>, userId: string) {
   }
 }
 
-async function removeUserFromRaffle(
-  db: SupabaseClient<Database>,
-  userId: string,
-) {
+async function removeUserFromRaffle(db: DatabaseClient, userId: string) {
   const { error } = await db.from("raffle").delete().eq("userId", userId)
 
   if (error) {
@@ -20,7 +16,7 @@ async function removeUserFromRaffle(
   }
 }
 
-async function isUserInRaffle(db: SupabaseClient<Database>, userId: string) {
+async function isUserInRaffle(db: DatabaseClient, userId: string) {
   const { data } = await db.from("raffle").select().match({ userId }).single()
 
   return data !== null

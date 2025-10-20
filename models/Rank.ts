@@ -1,6 +1,5 @@
 import { Role } from "discord.js"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { Database } from "../database-generated.types"
+import { Database, DatabaseClient } from "../database.types"
 
 type DBRank = Database["public"]["Tables"]["ranks"]["Row"]
 
@@ -26,9 +25,7 @@ function RankWithRole(rank: Rank, role: Role): RankWithRole {
   return { ...rank, role }
 }
 
-async function getSortedRanks(
-  db: SupabaseClient<Database>,
-): Promise<Array<Rank>> {
+async function getSortedRanks(db: DatabaseClient): Promise<Array<Rank>> {
   const { data, error } = await db
     .from("ranks")
     .select()
@@ -36,10 +33,9 @@ async function getSortedRanks(
 
   if (error) {
     throw error
-    // bot.logger.fatal("core", error.message, error)
   }
 
-  return (data ?? []).map((rank) => Rank(rank))
+  return (data ?? []).map((rank: DBRank) => Rank(rank))
 }
 
 export { RankWithRole, getSortedRanks }

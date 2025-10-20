@@ -1,4 +1,7 @@
-export async function listPendingPointRequests(bot) {
+import { Message, ThreadChannel } from "discord.js"
+import { Bot } from "../bot"
+
+export async function listPendingPointRequests(bot: Bot) {
   const { error, data } = await bot.db
     .from("pointRequests")
     .select()
@@ -11,17 +14,20 @@ export async function listPendingPointRequests(bot) {
   return data
 }
 
-export async function getPointRequestFromThread(bot, message) {
+export async function getPointRequestFromThread(
+  bot: Bot,
+  threadChannel: ThreadChannel,
+) {
   const { data } = await bot.db
     .from("pointRequests")
     .select()
-    .eq("requestMessageId", message.id)
+    .eq("requestMessageId", threadChannel.id)
     .single()
 
   return data
 }
 
-export async function createPointRequest(bot, message) {
+export async function createPointRequest(bot: Bot, message: Message) {
   const { data, error } = await bot.db
     .from("pointRequests")
     .insert({
@@ -38,6 +44,6 @@ export async function createPointRequest(bot, message) {
   return data
 }
 
-export async function updatePointRequest(bot, pointRequest, data) {
+export async function updatePointRequest(bot: Bot, pointRequest, data) {
   await bot.db.from("pointRequests").update(data).eq("id", pointRequest.id)
 }

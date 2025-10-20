@@ -10,3 +10,5 @@ settings.json
 **/supabase/.temp
 **/supabase/.env
 
+# Local scripts
+local/

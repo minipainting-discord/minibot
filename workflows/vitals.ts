@@ -13,17 +13,4 @@ export default async function vitals(bot: Bot) {
     ...pick(deployCommand, ["name", "description"]),
     defaultMemberPermissions: "0",
   })
-
-  // TODO: Implement OAuth2 flow to be able to do this
-  // await bot.guild.commands.permissions.add({
-  //   command: guildDeployCommand,
-  //   token: bot.env.DISCORD_API_TOKEN,
-  //   permissions: [
-  //     {
-  //       id: bot.env.BOT_MASTER_ID,
-  //       type: ApplicationCommandPermissionType.User,
-  //       permission: true,
-  //     },
-  //   ],
-  // })
 }

@@ -5,12 +5,12 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "node",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "target": "es2022",
+    "target": "es2022"
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules"]
 }

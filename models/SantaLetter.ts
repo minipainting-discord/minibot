@@ -1,5 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { Database } from "../database.types"
+import { Database, DatabaseClient } from "../database.types"
 
 const REGIONS = ["na", "eu", "any"] as const
 
@@ -25,7 +24,7 @@ function SantaLetter(dbSantaLetter: DBSantaLetter): SantaLetter {
   }
 }
 
-async function listSantaLetters(db: SupabaseClient<Database>) {
+async function listSantaLetters(db: DatabaseClient) {
   const { data, error } = await db.from("santaLetters").select()
 
   if (error) {
@@ -36,7 +35,7 @@ async function listSantaLetters(db: SupabaseClient<Database>) {
 }
 
 async function setMatcheeId(
-  db: SupabaseClient<Database>,
+  db: DatabaseClient,
   userId: string,
   matcheeId: string,
 ) {

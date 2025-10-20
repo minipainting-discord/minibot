@@ -215,7 +215,7 @@ async function sendMatcheesToParticipants(
     return interaction.reply({ content: ":shrug:", ephemeral: true })
   }
 
-  if (allLettersMatched(letters)) {
+  if (!allLettersMatched(letters)) {
     return interaction.reply({
       content: "Not everyone is matched! Please match people first.",
       ephemeral: true,
@@ -261,7 +261,7 @@ async function sendMatcheesToParticipants(
   await interaction.followUp({ content: "Letters sent! :snowflake: :rocket:" })
 }
 
-function breakLetterIntoMessages(letter) {
+function breakLetterIntoMessages(letter: SantaLetter) {
   return letter.content.split("\n").reduce(
     (messages, line) => {
       const lastMessage = messages.at(-1)
@@ -304,7 +304,7 @@ async function listAllowedUsers(
 
   const [allow, disallow] = partition(
     users,
-    (user) => user.canParticipateInSecretSanta,
+    (user) => user.canParticipateInSecretSanta ?? false,
   )
 
   return interaction.reply({
@@ -331,6 +331,12 @@ export async function allowUser(
   interaction: ChatInputCommandInteraction,
 ) {
   const user = interaction.options.getUser("user")
+
+  if (!user) {
+    bot.logger.error(LOG_SCOPE, `Unable to find user`)
+    return
+  }
+
   const guildMember = await bot.guild.members.fetch(user)
   await updateDisplayName(bot, guildMember)
 
@@ -356,6 +362,12 @@ export async function disallowUser(
   interaction: ChatInputCommandInteraction,
 ) {
   const user = interaction.options.getUser("user")
+
+  if (!user) {
+    bot.logger.error(LOG_SCOPE, `Unable to find user`)
+    return
+  }
+
   const guildMember = await bot.guild.members.fetch(user)
   await updateDisplayName(bot, guildMember)
 
@@ -381,6 +393,12 @@ export async function forgetUser(
   interaction: ChatInputCommandInteraction,
 ) {
   const user = interaction.options.getUser("user")
+
+  if (!user) {
+    bot.logger.error(LOG_SCOPE, `Unable to find user`)
+    return
+  }
+
   const guildMember = await bot.guild.members.fetch(user)
   await updateDisplayName(bot, guildMember)
 
